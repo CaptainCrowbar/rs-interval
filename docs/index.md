@@ -368,19 +368,19 @@ std::ostream& operator<<(std::ostream& out, const Interval& in);
 Format an interval as a string. The table below shows how intervals are
 formatted (`A` and `B` represent formatted values of `T`).
 
-Format   Description
-------   -----------
-`{}`     Empty interval
-`*`      Universal interval (contains every value)
-`A`      Single value
-`(A,B)`  Open interval
-`(A,B]`  Half-open interval, closed on the right
-`[A,B)`  Half-open interval, closed on the left
-`[A,B]`  Closed interval
-`<A`     Open interval, bounded above
-`<=A`    Closed interval, bounded above
-`>A`     Open interval, bounded below
-`>=A`    Closed interval, bounded below
+Format   | Description
+------   | -----------
+`{}`     | Empty interval
+`*`      | Universal interval (contains every value)
+`A`      | Single value
+`(A,B)`  | Open interval
+`(A,B]`  | Half-open interval, closed on the right
+`[A,B)`  | Half-open interval, closed on the left
+`[A,B]`  | Closed interval
+`<A`     | Open interval, bounded above
+`<=A`    | Closed interval, bounded above
+`>A`     | Open interval, bounded below
+`>=A`    | Closed interval, bounded below
 
 The `mode` and `prec` arguments will only be used if the value type is a
 floating point arithmetic type; `mode` must be one of `[EeFfGg]`, and `prec`
@@ -553,37 +553,37 @@ contain every value of `T` that is not in this set.
 
 ```c++
 // Set intersection
-    IntervalSet IntervalSet::set_intersection(const IntervalSet& b) const;
-    IntervalSet& IntervalSet::operator&=(const IntervalSet& b);
-    IntervalSet operator&(const IntervalSet& a, const IntervalSet& b);
-    IntervalSet operator&(const IntervalSet& a, const Interval& b);
-    IntervalSet operator&(const Interval& a, const IntervalSet& b);
-    IntervalSet operator&(const IntervalSet& a, const T& b);
-    IntervalSet operator&(const T& a, const IntervalSet& b);
+IntervalSet IntervalSet::set_intersection(const IntervalSet& b) const;
+IntervalSet& IntervalSet::operator&=(const IntervalSet& b);
+IntervalSet operator&(const IntervalSet& a, const IntervalSet& b);
+IntervalSet operator&(const IntervalSet& a, const Interval& b);
+IntervalSet operator&(const Interval& a, const IntervalSet& b);
+IntervalSet operator&(const IntervalSet& a, const T& b);
+IntervalSet operator&(const T& a, const IntervalSet& b);
 // Set union
-    IntervalSet IntervalSet::set_union(const IntervalSet& b) const;
-    IntervalSet& IntervalSet::operator|=(const IntervalSet& b);
-    IntervalSet operator|(const IntervalSet& a, const IntervalSet& b);
-    IntervalSet operator|(const IntervalSet& a, const Interval& b);
-    IntervalSet operator|(const Interval& a, const IntervalSet& b);
-    IntervalSet operator|(const IntervalSet& a, const T& b);
-    IntervalSet operator|(const T& a, const IntervalSet& b);
+IntervalSet IntervalSet::set_union(const IntervalSet& b) const;
+IntervalSet& IntervalSet::operator|=(const IntervalSet& b);
+IntervalSet operator|(const IntervalSet& a, const IntervalSet& b);
+IntervalSet operator|(const IntervalSet& a, const Interval& b);
+IntervalSet operator|(const Interval& a, const IntervalSet& b);
+IntervalSet operator|(const IntervalSet& a, const T& b);
+IntervalSet operator|(const T& a, const IntervalSet& b);
 // Set difference
-    IntervalSet IntervalSet::set_difference(const IntervalSet& b) const;
-    IntervalSet& IntervalSet::operator-=(const IntervalSet& b);
-    IntervalSet operator-(const IntervalSet& a, const IntervalSet& b);
-    IntervalSet operator-(const IntervalSet& a, const Interval& b);
-    IntervalSet operator-(const Interval& a, const IntervalSet& b);
-    IntervalSet operator-(const IntervalSet& a, const T& b);
-    IntervalSet operator-(const T& a, const IntervalSet& b);
+IntervalSet IntervalSet::set_difference(const IntervalSet& b) const;
+IntervalSet& IntervalSet::operator-=(const IntervalSet& b);
+IntervalSet operator-(const IntervalSet& a, const IntervalSet& b);
+IntervalSet operator-(const IntervalSet& a, const Interval& b);
+IntervalSet operator-(const Interval& a, const IntervalSet& b);
+IntervalSet operator-(const IntervalSet& a, const T& b);
+IntervalSet operator-(const T& a, const IntervalSet& b);
 // Set symmetric difference
-    IntervalSet IntervalSet::set_symmetric_difference(const IntervalSet& b) const;
-    IntervalSet& IntervalSet::operator^=(const IntervalSet& b);
-    IntervalSet operator^(const IntervalSet& a, const IntervalSet& b);
-    IntervalSet operator^(const IntervalSet& a, const Interval& b);
-    IntervalSet operator^(const Interval& a, const IntervalSet& b);
-    IntervalSet operator^(const IntervalSet& a, const T& b);
-    IntervalSet operator^(const T& a, const IntervalSet& b);
+IntervalSet IntervalSet::set_symmetric_difference(const IntervalSet& b) const;
+IntervalSet& IntervalSet::operator^=(const IntervalSet& b);
+IntervalSet operator^(const IntervalSet& a, const IntervalSet& b);
+IntervalSet operator^(const IntervalSet& a, const Interval& b);
+IntervalSet operator^(const Interval& a, const IntervalSet& b);
+IntervalSet operator^(const IntervalSet& a, const T& b);
+IntervalSet operator^(const T& a, const IntervalSet& b);
 ```
 
 Set operations.
