@@ -30,7 +30,7 @@ namespace RS::Intervals {
         template <typename T> constexpr bool has_adl_to_string_function = HasAdlToStringFunction<T>::value;
 
         template <typename T, typename = void> struct HasStdToStringFunction: std::false_type {};
-        template <typename T> struct HasStdToStringFunction<T, std::void_t<decltype(to_string(std::declval<T>()))>>: std::true_type {};
+        template <typename T> struct HasStdToStringFunction<T, std::void_t<decltype(std::to_string(std::declval<T>()))>>: std::true_type {};
         template <typename T> constexpr bool has_std_to_string_function = HasStdToStringFunction<T>::value;
 
         inline void fix_exp_format(std::string& str) noexcept {
