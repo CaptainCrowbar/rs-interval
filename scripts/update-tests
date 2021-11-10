@@ -6,27 +6,31 @@ dir="${PWD##*/}"
 dir="${dir%%-*}"
 if [ "$dir" == build ]; then cd ..; fi
 
-header=$(find source -name unit-test.hpp)
-if [ "$header" ]; then
-    header=${header#source/}
-else
-    header=rs-maker/unit-test.hpp
+head=$(find source -name unit-test.hpp)
+if ! [ "$head" ]; then
+    echo "*** unit-test.hpp not found"
+    exit 1
 fi
 
-project="${PWD##*/}"
-project="${project%-lib}"
-project="$(tr A-Z a-z <<< "$project")"
+main=$(find source -name unit-test.cpp)
+if ! [ "$main" ]; then
+    echo "*** unit-test.cpp not found"
+    exit 1
+fi
+temp="${main%.cpp}.temp.cpp"
 
-make=source/CMakeLists.txt
-main=source/test/unit-test.cpp
-temp=source/test/unit-test.temp.cpp
+cmake=$(find source -name CMakeLists.txt)
+if ! [ "$cmake" ]; then
+    echo "*** CMakeLists.txt not found"
+    exit 1
+fi
 
-testfiles=$(grep -E '^ +test/.*\btest\b.*\.cpp$' "$make" \
+testfiles=$(grep -E '[-]test\.cpp$' "$cmake" \
     | sed -E 's!^ +!source/!' \
     | grep -Fv "$main")
 
 cat > $temp << EOF
-#include "$header"
+#include "${head#source/}"
 
 int main(int argc, char** argv) {
 
