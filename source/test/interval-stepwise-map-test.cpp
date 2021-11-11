@@ -7,13 +7,13 @@ using namespace RS::Intervals;
 
 // TODO
 template <> struct IntervalTraits<int> {
-    static constexpr IntervalCategory category = IntervalCategory::integral;
+    static constexpr IntervalCategory category = IntervalCategory::stepwise;
 };
 
 using IntervalType = Interval<int>;
 using MapType = IntervalMap<int, std::string>;
 
-void test_rs_interval_integral_map() {
+void test_rs_interval_stepwise_map() {
 
     MapType map;
     MapType::iterator it;

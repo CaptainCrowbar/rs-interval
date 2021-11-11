@@ -152,7 +152,8 @@ namespace RS::Intervals {
     enum class IntervalCategory: int {
         none,        // Not usable in an interval
         ordered,     // Ordered but not an arithmetic type (e.g. string)
-        integral,    // Incrementable and not continuous (e.g. integer)
+        stepwise,    // Incrementable and decrementable (e.g. pointer)
+        integral,    // Integer arithmetic operations (e.g. integer)
         continuous,  // Models a continuous arithmetic type (e.g. floating point)
     };
 
@@ -160,6 +161,7 @@ namespace RS::Intervals {
         switch (ic) {
             case IntervalCategory::none:        out << "none"; break;
             case IntervalCategory::ordered:     out << "ordered"; break;
+            case IntervalCategory::stepwise:    out << "stepwise"; break;
             case IntervalCategory::integral:    out << "integral"; break;
             case IntervalCategory::continuous:  out << "continuous"; break;
             default:                            out << int(ic); break;
@@ -228,93 +230,64 @@ namespace RS::Intervals {
 
     namespace Detail {
 
-        template <typename T, typename = void> struct HasPreIncrementOperator: std::false_type {};
-        template <typename T>
-            struct HasPreIncrementOperator<T, std::void_t<decltype(++std::declval<T&>())>>:
-            std::true_type {};
-        template <typename T, typename = void> struct HasPreDecrementOperator: std::false_type {};
-        template <typename T>
-            struct HasPreDecrementOperator<T, std::void_t<decltype(--std::declval<T&>())>>:
-            std::true_type {};
-        template <typename T, typename = void> struct HasPostIncrementOperator: std::false_type {};
-        template <typename T>
-            struct HasPostIncrementOperator<T, std::void_t<decltype(std::declval<T&>()++)>>:
-            std::true_type {};
-        template <typename T, typename = void> struct HasPostDecrementOperator: std::false_type {};
-        template <typename T>
-            struct HasPostDecrementOperator<T, std::void_t<decltype(std::declval<T&>()--)>>:
-            std::true_type {};
-        template <typename T> constexpr bool has_increment_decrement_operators =
-            (HasPreIncrementOperator<T>::value && HasPreDecrementOperator<T>::value
-            && HasPostIncrementOperator<T>::value && HasPostDecrementOperator<T>::value);
+        #define RS_INTERVAL_DETECT_PREFIX_OPERATOR(name, op) \
+            template <typename T, typename = void> \
+                struct HasPrefixOperator_ ## name: \
+                std::false_type {}; \
+            template <typename T> \
+                struct HasPrefixOperator_ ## name<T, std::void_t<decltype(op std::declval<T&>())>>: \
+                std::true_type {}; \
+            template <typename T> \
+                constexpr bool has_prefix_ ## name ## _operator = HasPrefixOperator_ ## name<T>::value;
 
-        template <typename T, typename U, typename = void> struct HasBinaryPlusOperator: std::false_type {};
-        template <typename T, typename U>
-            struct HasBinaryPlusOperator<T, U, std::void_t<decltype(std::declval<T>() + std::declval<U>())>>:
-            std::true_type {};
-        template <typename T, typename U = T> constexpr bool has_binary_plus_operator = HasBinaryPlusOperator<T, U>::value;
+        #define RS_INTERVAL_DETECT_POSTFIX_OPERATOR(name, op) \
+            template <typename T, typename = void> \
+                struct HasPostfixOperator_ ## name: \
+                std::false_type {}; \
+            template <typename T> \
+                struct HasPostfixOperator_ ## name<T, std::void_t<decltype(std::declval<T&>() op)>>: \
+                std::true_type {}; \
+            template <typename T> \
+                constexpr bool has_postfix_ ## name ## _operator = HasPostfixOperator_ ## name<T>::value;
 
-        template <typename T, typename U, typename = void> struct HasBinaryMinusOperator: std::false_type {};
-        template <typename T, typename U>
-            struct HasBinaryMinusOperator<T, U, std::void_t<decltype(std::declval<T>() + std::declval<U>())>>:
-            std::true_type {};
-        template <typename T, typename U = T> constexpr bool has_binary_minus_operator = HasBinaryMinusOperator<T, U>::value;
+        #define RS_INTERVAL_DETECT_BINARY_OPERATOR(name, op) \
+            template <typename T, typename U = T, typename = void> \
+                struct HasBinaryOperator ## name: \
+                std::false_type {}; \
+            template <typename T, typename U> \
+                struct HasBinaryOperator ## name<T, U, std::void_t<decltype(std::declval<T>() op std::declval<U>())>>: \
+                std::true_type {}; \
+            template <typename T, typename U = T> \
+                constexpr bool has_ ## name ## _operator = HasBinaryOperator ## name<T, U>::value;
 
-        template <typename T, typename U, typename = void> struct HasBinaryMultiplyOperator: std::false_type {};
-        template <typename T, typename U>
-            struct HasBinaryMultiplyOperator<T, U, std::void_t<decltype(std::declval<T>() + std::declval<U>())>>:
-            std::true_type {};
-        template <typename T, typename U = T> constexpr bool has_binary_multiply_operator = HasBinaryMultiplyOperator<T, U>::value;
+        RS_INTERVAL_DETECT_PREFIX_OPERATOR(increment, ++)
+        RS_INTERVAL_DETECT_PREFIX_OPERATOR(decrement, --)
+        RS_INTERVAL_DETECT_POSTFIX_OPERATOR(increment, ++)
+        RS_INTERVAL_DETECT_POSTFIX_OPERATOR(decrement, --)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(plus, +)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(minus, -)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(multiply, *)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(divide, /)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(remainder, %)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(equality, ==)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(inequality, !=)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(less_than, <)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(greater_than, >)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(less_or_equal, <=)
+        RS_INTERVAL_DETECT_BINARY_OPERATOR(greater_or_equal, >=)
 
-        template <typename T, typename U, typename = void> struct HasBinaryDivideOperator: std::false_type {};
-        template <typename T, typename U>
-            struct HasBinaryDivideOperator<T, U, std::void_t<decltype(std::declval<T>() + std::declval<U>())>>:
-            std::true_type {};
-        template <typename T, typename U = T> constexpr bool has_binary_divide_operator = HasBinaryDivideOperator<T, U>::value;
+        template <typename T> constexpr bool has_stepwise_operators =
+            (has_prefix_increment_operator<T> && has_prefix_decrement_operator<T>
+            && has_postfix_increment_operator<T> && has_postfix_decrement_operator<T>);
 
-        template <typename T, typename U, typename = void> struct HasBinaryRemainderOperator: std::false_type {};
-        template <typename T, typename U>
-            struct HasBinaryRemainderOperator<T, U, std::void_t<decltype(std::declval<T>() + std::declval<U>())>>:
-            std::true_type {};
-        template <typename T, typename U = T> constexpr bool has_binary_remainder_operator = HasBinaryRemainderOperator<T, U>::value;
+        template <typename T> constexpr bool has_basic_arithmetic_operators =
+            (has_plus_operator<T> && has_minus_operator<T>
+            && has_multiply_operator<T> && has_divide_operator<T>);
 
-        template <typename T, typename U, typename = void> struct HasPlusAssignOperator: std::false_type {};
-        template <typename T, typename U>
-            struct HasPlusAssignOperator<T, U, std::void_t<decltype(std::declval<T&>() += std::declval<U>())>>:
-            std::true_type {};
-        template <typename T, typename U = T> constexpr bool has_plus_assign_operator = HasPlusAssignOperator<T, U>::value;
-
-        template <typename T, typename = void> struct HasEqualityOperator: std::false_type {};
-        template <typename T>
-            struct HasEqualityOperator<T, std::void_t<decltype(std::declval<T>() == std::declval<T>())>>:
-            std::true_type {};
-        template <typename T, typename = void> struct HasInequalityOperator: std::false_type {};
-        template <typename T>
-            struct HasInequalityOperator<T, std::void_t<decltype(std::declval<T>() != std::declval<T>())>>:
-            std::true_type {};
-        template <typename T, typename = void> struct HasLessThanOperator: std::false_type {};
-        template <typename T>
-            struct HasLessThanOperator<T, std::void_t<decltype(std::declval<T>() < std::declval<T>())>>:
-            std::true_type {};
-        template <typename T, typename = void> struct HasLessOrEqualOperator: std::false_type {};
-        template <typename T>
-            struct HasLessOrEqualOperator<T, std::void_t<decltype(std::declval<T>() > std::declval<T>())>>:
-            std::true_type {};
-        template <typename T, typename = void> struct HasGreaterThanOperator: std::false_type {};
-        template <typename T>
-            struct HasGreaterThanOperator<T, std::void_t<decltype(std::declval<T>() <= std::declval<T>())>>:
-            std::true_type {};
-        template <typename T, typename = void> struct HasGreaterOrEqualOperator: std::false_type {};
-        template <typename T>
-            struct HasGreaterOrEqualOperator<T, std::void_t<decltype(std::declval<T>() >= std::declval<T>())>>:
-            std::true_type {};
         template <typename T> constexpr bool has_comparison_operators =
-            (HasEqualityOperator<T>::value && HasInequalityOperator<T>::value
-            && HasLessThanOperator<T>::value && HasLessOrEqualOperator<T>::value
-            && HasGreaterThanOperator<T>::value && HasGreaterOrEqualOperator<T>::value);
-
-        using Views = std::vector<std::string_view>;
-        using ViewPairs = std::vector<std::pair<std::string_view, std::string_view>>;
+            (has_equality_operator<T> && has_inequality_operator<T>
+            && has_less_than_operator<T> && has_greater_than_operator<T>
+            && has_less_or_equal_operator<T> && has_greater_or_equal_operator<T>);
 
         template <typename T>
         struct LessThanComparable {
@@ -359,19 +332,22 @@ namespace RS::Intervals {
 
     template <typename T>
     struct IntervalTraits {
-        using base_type = std::remove_cv_t<T>;
+        using type = std::remove_cv_t<T>;
         static constexpr IntervalCategory category =
-            std::is_same_v<base_type, bool>
-                || ! std::is_default_constructible_v<base_type>
-                || ! std::is_copy_constructible_v<base_type>
-                || ! std::is_copy_assignable_v<base_type>
-                || ! Detail::has_comparison_operators<base_type> ? IntervalCategory::none :
-            std::numeric_limits<base_type>::is_specialized ?
-                (std::numeric_limits<base_type>::is_integer ? IntervalCategory::integral : IntervalCategory::continuous) :
-            Detail::has_binary_plus_operator<base_type> && Detail::has_binary_minus_operator<base_type>
-                && Detail::has_binary_multiply_operator<base_type> && Detail::has_binary_divide_operator<base_type>
-                && ! Detail::has_binary_remainder_operator<base_type> ? IntervalCategory::continuous :
-            Detail::has_increment_decrement_operators<base_type> ? IntervalCategory::integral : IntervalCategory::ordered;
+            ! std::is_default_constructible_v<type> || ! std::is_copy_constructible_v<type> || ! std::is_copy_assignable_v<type>
+                    || ! Detail::has_comparison_operators<type> || std::is_same_v<type, bool> ?
+                IntervalCategory::none :
+            std::is_integral_v<T> || (std::numeric_limits<type>::is_specialized && std::numeric_limits<type>::is_integer) ?
+                IntervalCategory::integral :
+            std::is_floating_point_v<T> || (std::numeric_limits<type>::is_specialized && ! std::numeric_limits<type>::is_integer) ?
+                IntervalCategory::continuous :
+            Detail::has_basic_arithmetic_operators<type> && Detail::has_stepwise_operators<type> ?
+                IntervalCategory::integral :
+            Detail::has_basic_arithmetic_operators<type> ?
+                IntervalCategory::continuous :
+            Detail::has_stepwise_operators<type> ?
+                IntervalCategory::stepwise :
+                IntervalCategory::ordered;
     };
 
     template <typename T> constexpr auto interval_category = IntervalTraits<T>::category;
@@ -479,7 +455,7 @@ namespace RS::Intervals {
                 return false;
             if (int(right.flag) - int(left.flag) == 1 && left.value == right.value)
                 return true;
-            if constexpr (interval_category<T> == IntervalCategory::integral) {
+            if constexpr (interval_category<T> == IntervalCategory::stepwise || interval_category<T> == IntervalCategory::integral) {
                 if (left.flag == Detail::BoundaryType::exact_value && right.flag == Detail::BoundaryType::exact_value && left.value < right.value) {
                     T t = left.value;
                     return ++t == right.value;
@@ -497,14 +473,15 @@ namespace RS::Intervals {
     class IntervalCategoryBase<T, IntervalCategory::ordered>:
     public IntervalTypeBase<T> {};
 
+    // TODO
     template <typename T>
-    class IntervalCategoryBase<T, IntervalCategory::integral>:
+    class IntervalCategoryBase<T, IntervalCategory::stepwise>:
     public IntervalTypeBase<T> {
     private:
-        static constexpr bool has_t_arithmetic = Detail::has_plus_assign_operator<T, T> && Detail::has_binary_minus_operator<T>;
-        static constexpr bool has_int_arithmetic = Detail::has_plus_assign_operator<T, int> && Detail::has_binary_minus_operator<T, int>;
+        static constexpr bool has_t_arithmetic = Detail::has_plus_operator<T> && Detail::has_minus_operator<T>;
+        static constexpr bool has_int_arithmetic = Detail::has_plus_operator<T, int> && Detail::has_minus_operator<T, int>;
         static constexpr bool has_random_access = has_t_arithmetic || has_int_arithmetic;
-        static constexpr bool prefer_ptrdiff_arithmetic = has_int_arithmetic && sizeof(T) >= sizeof(ptrdiff_t);
+        static constexpr bool prefer_ptrdiff_arithmetic = has_int_arithmetic && sizeof(T) > sizeof(int);
         using delta_type = std::conditional_t<has_t_arithmetic, T, std::conditional_t<prefer_ptrdiff_arithmetic, ptrdiff_t, int>>;
     public:
         class iterator:
@@ -523,8 +500,81 @@ namespace RS::Intervals {
             iterator operator++(int) { auto old = *this; ++value_; return old; }
             iterator& operator--() { --value_; return *this; }
             iterator operator--(int) { auto old = *this; --value_; return old; }
-            iterator& operator+=(delta_type rhs) { value_ += delta_type(rhs); return *this; }
-            iterator& operator-=(delta_type rhs) { value_ -= delta_type(rhs); return *this; }
+            iterator& operator+=(delta_type rhs) { value_ = value_ + delta_type(rhs); return *this; }
+            iterator& operator-=(delta_type rhs) { value_ = value_ - delta_type(rhs); return *this; }
+            iterator operator+(delta_type rhs) const { auto it = *this; it += rhs; return it; }
+            friend iterator operator+(delta_type lhs, const iterator& rhs) { return rhs + lhs; }
+            iterator operator-(delta_type rhs) const { auto it = *this; it -= rhs; return it; }
+            delta_type operator-(const iterator& rhs) { return delta_type(value_ - rhs.value_); }
+            bool operator==(const iterator& rhs) const noexcept { return value_ == rhs.value_; }
+            bool operator<(const iterator& rhs) const noexcept { return value_ < rhs.value_; }
+        private:
+            T value_;
+        };
+        iterator begin() const { return this->empty() ? iterator() : iterator(this->min_); }
+        iterator end() const { return this->empty() ? iterator() : std::next(iterator(this->max_)); }
+        size_t size() const;
+    protected:
+        void adjust_bounds();
+    };
+
+        template <typename T>
+        size_t IntervalCategoryBase<T, IntervalCategory::stepwise>::size() const {
+            if (this->empty())
+                return 0;
+            if (this->is_infinite())
+                return std::string::npos;
+            if constexpr (Detail::has_minus_operator<T> && std::is_constructible_v<size_t, T>) {
+                return static_cast<size_t>(this->max_ - this->min_) + 1;
+            } else {
+                size_t n = 1;
+                for (T t = this->min_; t != this->max_; ++t, ++n) {}
+                return n;
+            }
+        }
+
+        template <typename T>
+        void IntervalCategoryBase<T, IntervalCategory::stepwise>::adjust_bounds() {
+            if (this->left_ == IntervalBound::open) {
+                ++this->min_;
+                this->left_ = IntervalBound::closed;
+            }
+            if (this->right_ == IntervalBound::open) {
+                --this->max_;
+                this->right_ = IntervalBound::closed;
+            }
+            IntervalTypeBase<T>::adjust_bounds();
+        }
+
+    // TODO
+    template <typename T>
+    class IntervalCategoryBase<T, IntervalCategory::integral>:
+    public IntervalTypeBase<T> {
+    private:
+        static constexpr bool has_t_arithmetic = Detail::has_plus_operator<T> && Detail::has_minus_operator<T>;
+        static constexpr bool has_int_arithmetic = Detail::has_plus_operator<T, int> && Detail::has_minus_operator<T, int>;
+        static constexpr bool has_random_access = has_t_arithmetic || has_int_arithmetic;
+        static constexpr bool prefer_ptrdiff_arithmetic = has_int_arithmetic && sizeof(T) > sizeof(int);
+        using delta_type = std::conditional_t<has_t_arithmetic, T, std::conditional_t<prefer_ptrdiff_arithmetic, ptrdiff_t, int>>;
+    public:
+        class iterator:
+        public Detail::LessThanComparable<iterator> {
+        public:
+            using difference_type = delta_type;
+            using iterator_category = std::conditional_t<has_random_access, std::random_access_iterator_tag, std::bidirectional_iterator_tag>;
+            using pointer = const T*;
+            using reference = const T&;
+            using value_type = T;
+            iterator() = default;
+            explicit iterator(T t): value_(t) {}
+            const T& operator*() const noexcept { return value_; }
+            const T* operator->() const noexcept { return &value_; }
+            iterator& operator++() { ++value_; return *this; }
+            iterator operator++(int) { auto old = *this; ++value_; return old; }
+            iterator& operator--() { --value_; return *this; }
+            iterator operator--(int) { auto old = *this; --value_; return old; }
+            iterator& operator+=(delta_type rhs) { value_ = value_ + delta_type(rhs); return *this; }
+            iterator& operator-=(delta_type rhs) { value_ = value_ - delta_type(rhs); return *this; }
             iterator operator+(delta_type rhs) const { auto it = *this; it += rhs; return it; }
             friend iterator operator+(delta_type lhs, const iterator& rhs) { return rhs + lhs; }
             iterator operator-(delta_type rhs) const { auto it = *this; it -= rhs; return it; }
@@ -547,7 +597,7 @@ namespace RS::Intervals {
                 return 0;
             if (this->is_infinite())
                 return std::string::npos;
-            if constexpr (Detail::has_binary_minus_operator<T> && std::is_constructible_v<size_t, T>) {
+            if constexpr (Detail::has_minus_operator<T> && std::is_constructible_v<size_t, T>) {
                 return static_cast<size_t>(this->max_ - this->min_) + 1;
             } else {
                 size_t n = 1;
@@ -666,6 +716,9 @@ namespace RS::Intervals {
 
     template <typename IntervalType, typename T>
     class IntervalArithmeticBase<IntervalType, T, IntervalCategory::ordered> {};
+
+    template <typename IntervalType, typename T>
+    class IntervalArithmeticBase<IntervalType, T, IntervalCategory::stepwise> {};
 
     // Interval class
 

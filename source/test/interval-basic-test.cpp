@@ -24,19 +24,20 @@ void test_rs_interval_basic_type_traits() {
     TEST_EQUAL(interval_category<void*>, IntervalCategory::ordered);
     TEST_EQUAL(interval_category<const void*>, IntervalCategory::ordered);
 
+    TEST_EQUAL(interval_category<char*>, IntervalCategory::stepwise);
+    TEST_EQUAL(interval_category<const char*>, IntervalCategory::stepwise);
+    TEST_EQUAL(interval_category<std::string::const_iterator>, IntervalCategory::stepwise);
+    TEST_EQUAL(interval_category<std::string::iterator>, IntervalCategory::stepwise);
+    TEST_EQUAL(interval_category<std::vector<int>::const_iterator>, IntervalCategory::stepwise);
+    TEST_EQUAL(interval_category<std::vector<int>::iterator>, IntervalCategory::stepwise);
+    TEST_EQUAL(interval_category<std::chrono::microseconds>, IntervalCategory::stepwise);
+
     TEST_EQUAL(interval_category<int>, IntervalCategory::integral);
     TEST_EQUAL(interval_category<const int>, IntervalCategory::integral);
     TEST_EQUAL(interval_category<volatile int>, IntervalCategory::integral);
     TEST_EQUAL(interval_category<const volatile int>, IntervalCategory::integral);
     TEST_EQUAL(interval_category<uint8_t>, IntervalCategory::integral);
     TEST_EQUAL(interval_category<int64_t>, IntervalCategory::integral);
-    TEST_EQUAL(interval_category<char*>, IntervalCategory::integral);
-    TEST_EQUAL(interval_category<const char*>, IntervalCategory::integral);
-    TEST_EQUAL(interval_category<std::string::const_iterator>, IntervalCategory::integral);
-    TEST_EQUAL(interval_category<std::string::iterator>, IntervalCategory::integral);
-    TEST_EQUAL(interval_category<std::vector<int>::const_iterator>, IntervalCategory::integral);
-    TEST_EQUAL(interval_category<std::vector<int>::iterator>, IntervalCategory::integral);
-    TEST_EQUAL(interval_category<std::chrono::microseconds>, IntervalCategory::integral);
 
     TEST_EQUAL(interval_category<float>, IntervalCategory::continuous);
     TEST_EQUAL(interval_category<const float>, IntervalCategory::continuous);

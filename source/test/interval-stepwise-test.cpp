@@ -8,20 +8,20 @@
 using namespace RS;
 using namespace RS::Intervals;
 
+// TODO
+template <> struct IntervalTraits<int> {
+    static constexpr IntervalCategory category = IntervalCategory::stepwise;
+};
+
 using IntervalType = Interval<int>;
 using SetType = IntervalSet<int>;
 
-// TODO
-template <> struct IntervalTraits<int> {
-    static constexpr IntervalCategory category = IntervalCategory::integral;
-};
-
-void test_rs_interval_integral_basic_properties() {
+void test_rs_interval_stepwise_basic_properties() {
 
     IntervalType in;
 
     TEST_TYPE(IntervalType::value_type, int);
-    TEST_EQUAL(IntervalType::category, IntervalCategory::integral);
+    TEST_EQUAL(IntervalType::category, IntervalCategory::stepwise);
     TEST(in.empty());
     TEST_EQUAL(in.size(), 0u);
     TEST(! in);
@@ -33,7 +33,7 @@ void test_rs_interval_integral_basic_properties() {
 
 }
 
-void test_rs_interval_integral_construction() {
+void test_rs_interval_stepwise_construction() {
 
     IntervalType in;
     std::string str;
@@ -96,7 +96,7 @@ void test_rs_interval_integral_construction() {
 
 }
 
-void test_rs_interval_integral_iterators() {
+void test_rs_interval_stepwise_iterators() {
 
     IntervalType in;
     IntervalType::iterator it1 = {}, it2 = {};
@@ -115,7 +115,7 @@ void test_rs_interval_integral_iterators() {
 
 }
 
-void test_rs_interval_integral_inverse() {
+void test_rs_interval_stepwise_inverse() {
 
     IntervalType in;
     SetType set;
@@ -135,7 +135,7 @@ void test_rs_interval_integral_inverse() {
 
 }
 
-void test_rs_interval_integral_binary_operations() {
+void test_rs_interval_stepwise_binary_operations() {
 
     struct test_info {
         int line;

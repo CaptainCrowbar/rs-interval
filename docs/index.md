@@ -15,12 +15,12 @@ namespace RS::Intervals;
 ## Supporting types
 
 ```c++
-enum class IntervalBound
-    IntervalBound::empty = 0    // interval is empty
-    IntervalBound::closed = 1   // interval includes the bound
-    IntervalBound::open = 2     // interval does not include the bound
-    IntervalBound::unbound = 3  // interval is unbounded in this direction
-std::ostream& operator<<(std::ostream& out, IntervalBound ib)
+enum class IntervalBound;
+    IntervalBound::empty = 0;    // interval is empty
+    IntervalBound::closed = 1;   // interval includes the bound
+    IntervalBound::open = 2;     // interval does not include the bound
+    IntervalBound::unbound = 3;  // interval is unbounded in this direction
+std::ostream& operator<<(std::ostream& out, IntervalBound ib);
 ```
 
 Indicates what kind of bound the interval has. An `Interval` object contains
@@ -31,7 +31,7 @@ one bound is `empty`, the other must also be `empty`.
 enum class IntervalCategory;
     // see below for the list of values
 std::ostream& operator<<(std::ostream& out, IntervalCategory ic);
-template <typename T> struct IntervalTraits
+template <typename T> struct IntervalTraits;
     static constexpr IntervalCategory IntervalTraits::category;
 template <typename T> constexpr IntervalCategory interval_category
     = IntervalTraits<T>::category;
@@ -47,29 +47,32 @@ IntervalCategory  | Value  | Description                          | Example
 ----------------  | -----  | -----------                          | -------
 `none`            | 0      | Not usable in an interval            | `bool`
 `ordered`         | 1      | Ordered but not an arithmetic type   | `std::string`
-`integral`        | 2      | Incrementable and not continuous     | `int`
-`continuous`      | 3      | Models a continuous arithmetic type  | `float`
+`stepwise`        | 2      | Incrementable and decrementable      | `int*`
+`integral`        | 3      | Integer arithmetic operations        | `int`
+`continuous`      | 4      | Models a continuous arithmetic type  | `float`
 
 The `IntervalTraits` or `interval_category` templates determine the category
 of a given type, according to the following algorithm:
 
-* _if `T` is `bool`_
+[TODO]
+
+* _if `T` is `bool` or `T` is not default constructible, copyable, and totally ordered_
     * _category is `none`_
-* _else if `T` is not default constructible, copyable, and totally ordered_
-    * _category is `none`_
-* _else if `numeric_limits<T>` is defined and `is_integer` is true_
+* _else if `is_integral_v<T>` is true, or `numeric_limits<T>` is defined and `is_integer` is true_
     * _category is `integral`_
-* _else if `numeric_limits<T>` is defined and `is_integer` is false_
+* _else if `is_floating_point_v<T>` is true, or `numeric_limits<T>` is defined and `is_integer` is false_
     * _category is `continuous`_
-* _else if `T` has binary `+ - * /` operators but not `%`_
-    * _category is `continuous`_
-* _else if `T` has unary `++` and `--` operators_
+* _else if `T` has unary `++ --` and binary `+ - * /`_
     * _category is `integral`_
+* _else if `T` has `+ - * /` operators but not `++ --`_
+    * _category is `continuous`_
+* _else if `T` has `++ --` operators but not `+ - * /`_
+    * _category is `stepwise`_
 * _else_
     * _category is `ordered`_
 
 The interval category for a user defined type can be controlled by
-specializing `IntervalCategory` for that type, if the default algorithm does
+specializing `IntervalTraits` for that type, if the default algorithm does
 not give the appropriate category.
 
 ```c++
