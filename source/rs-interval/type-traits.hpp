@@ -6,40 +6,65 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
+
+#define RS_INTERVAL_DETECT_PREFIX_OPERATOR(name, op) \
+    template <typename T, typename = void> \
+        struct HasPrefixOperator_ ## name: \
+        std::false_type {}; \
+    template <typename T> \
+        struct HasPrefixOperator_ ## name<T, std::void_t<decltype(op std::declval<T&>())>>: \
+        std::true_type {}; \
+    template <typename T> \
+        constexpr bool has_prefix_ ## name ## _operator = HasPrefixOperator_ ## name<T>::value;
+
+#define RS_INTERVAL_DETECT_POSTFIX_OPERATOR(name, op) \
+    template <typename T, typename = void> \
+        struct HasPostfixOperator_ ## name: \
+        std::false_type {}; \
+    template <typename T> \
+        struct HasPostfixOperator_ ## name<T, std::void_t<decltype(std::declval<T&>() op)>>: \
+        std::true_type {}; \
+    template <typename T> \
+        constexpr bool has_postfix_ ## name ## _operator = HasPostfixOperator_ ## name<T>::value;
+
+#define RS_INTERVAL_DETECT_BINARY_OPERATOR(name, op) \
+    template <typename T, typename U = T, typename = void> \
+        struct HasBinaryOperator ## name: \
+        std::false_type {}; \
+    template <typename T, typename U> \
+        struct HasBinaryOperator ## name<T, U, std::void_t<decltype(std::declval<T>() op std::declval<U>())>>: \
+        std::true_type {}; \
+    template <typename T, typename U = T> \
+        constexpr bool has_ ## name ## _operator = HasBinaryOperator ## name<T, U>::value;
+
+#define RS_INTERVAL_ENUM_IMPL_(EnumType, enum_class, IntType, first_value, first_name, ...) \
+    enum enum_class EnumType: IntType { \
+        first_name = first_value, \
+        __VA_ARGS__ \
+    }; \
+    inline std::string to_string(EnumType t) { \
+        static const auto names = ::RS::Intervals::Detail::split_string(# first_name "," # __VA_ARGS__, " ,"); \
+        IntType index = IntType(t) - IntType(first_value); \
+        if (index >= 0 && index < IntType(names.size())) \
+            return names[size_t(index)]; \
+        else \
+            return std::to_string(IntType(t)); \
+    } \
+    inline std::ostream& operator<<(std::ostream& out, EnumType t) { \
+        return out << to_string(t); \
+    }
+#define RS_INTERVAL_ENUM(EnumType, IntType, first_value, first_name, ...) \
+    RS_INTERVAL_ENUM_IMPL_(EnumType,, IntType, first_value, first_name, __VA_ARGS__)
+#define RS_INTERVAL_ENUM_CLASS(EnumType, IntType, first_value, first_name, ...) \
+    RS_INTERVAL_ENUM_IMPL_(EnumType, class, IntType, first_value, first_name, __VA_ARGS__)
 
 namespace RS::Intervals {
 
+    constexpr const char* ascii_whitespace = "\t\n\f\r ";
+    constexpr size_t npos = std::string::npos;
+
     namespace Detail {
-
-        #define RS_INTERVAL_DETECT_PREFIX_OPERATOR(name, op) \
-            template <typename T, typename = void> \
-                struct HasPrefixOperator_ ## name: \
-                std::false_type {}; \
-            template <typename T> \
-                struct HasPrefixOperator_ ## name<T, std::void_t<decltype(op std::declval<T&>())>>: \
-                std::true_type {}; \
-            template <typename T> \
-                constexpr bool has_prefix_ ## name ## _operator = HasPrefixOperator_ ## name<T>::value;
-
-        #define RS_INTERVAL_DETECT_POSTFIX_OPERATOR(name, op) \
-            template <typename T, typename = void> \
-                struct HasPostfixOperator_ ## name: \
-                std::false_type {}; \
-            template <typename T> \
-                struct HasPostfixOperator_ ## name<T, std::void_t<decltype(std::declval<T&>() op)>>: \
-                std::true_type {}; \
-            template <typename T> \
-                constexpr bool has_postfix_ ## name ## _operator = HasPostfixOperator_ ## name<T>::value;
-
-        #define RS_INTERVAL_DETECT_BINARY_OPERATOR(name, op) \
-            template <typename T, typename U = T, typename = void> \
-                struct HasBinaryOperator ## name: \
-                std::false_type {}; \
-            template <typename T, typename U> \
-                struct HasBinaryOperator ## name<T, U, std::void_t<decltype(std::declval<T>() op std::declval<U>())>>: \
-                std::true_type {}; \
-            template <typename T, typename U = T> \
-                constexpr bool has_ ## name ## _operator = HasBinaryOperator ## name<T, U>::value;
 
         RS_INTERVAL_DETECT_PREFIX_OPERATOR(increment, ++)
         RS_INTERVAL_DETECT_PREFIX_OPERATOR(decrement, --)
@@ -105,13 +130,26 @@ namespace RS::Intervals {
         template <typename T> constexpr bool is_range = (HasAdlBeginFunction<T>::value && HasAdlEndFunction<T>::value)
             || (HasStdBeginFunction<T>::value && HasStdEndFunction<T>::value);
 
-        enum class BoundaryType {
+        inline std::vector<std::string> split_string(const std::string& str, const std::string& chars = ascii_whitespace) {
+            std::vector<std::string> vec;
+            size_t i = 0, j = 0;
+            while (j < str.size()) {
+                i = str.find_first_not_of(chars, j);
+                if (i == npos)
+                    break;
+                j = str.find_first_of(chars, i);
+                vec.push_back(str.substr(i, j - i));
+            }
+            return vec;
+        }
+
+        RS_INTERVAL_ENUM_CLASS(BoundaryType, int, 0,
             minus_infinity,
             value_minus_epsilon,
             exact_value,
             value_plus_epsilon,
             plus_infinity
-        };
+        )
 
         constexpr bool no_boundary(BoundaryType b) noexcept {
             return b == BoundaryType::minus_infinity || b == BoundaryType::plus_infinity;
@@ -121,67 +159,33 @@ namespace RS::Intervals {
 
     // Supporting types
 
-    enum class IntervalBound: int {
-        empty,    // The interval is empty
-        closed,   // The interval includes the boundary value
-        open,     // The interval does not include the boundary value
-        unbound,  // The interval is unbounded in this direction
-    };
+    RS_INTERVAL_ENUM_CLASS(IntervalBound, int, 0,
+        empty,   // The interval is empty
+        closed,  // The interval includes the boundary value
+        open,    // The interval does not include the boundary value
+        unbound  // The interval is unbounded in this direction
+    )
 
     constexpr IntervalBound operator~(IntervalBound b) noexcept { return IntervalBound(3 - int(b)); }
 
-    inline std::ostream& operator<<(std::ostream& out, IntervalBound ib) {
-        switch (ib) {
-            case IntervalBound::empty:    out << "empty"; break;
-            case IntervalBound::closed:   out << "closed"; break;
-            case IntervalBound::open:     out << "open"; break;
-            case IntervalBound::unbound:  out << "unbound"; break;
-            default:                      out << int(ib); break;
-        }
-        return out;
-    }
+    RS_INTERVAL_ENUM_CLASS(IntervalCategory, int, 0,
+        none,       // Not usable in an interval
+        ordered,    // Ordered but not an arithmetic type (e.g. string)
+        stepwise,   // Incrementable and decrementable (e.g. pointer)
+        integral,   // Integer arithmetic operations (e.g. integer)
+        continuous  // Models a continuous arithmetic type (e.g. floating point)
+    )
 
-    enum class IntervalCategory: int {
-        none,        // Not usable in an interval
-        ordered,     // Ordered but not an arithmetic type (e.g. string)
-        stepwise,    // Incrementable and decrementable (e.g. pointer)
-        integral,    // Integer arithmetic operations (e.g. integer)
-        continuous,  // Models a continuous arithmetic type (e.g. floating point)
-    };
+    RS_INTERVAL_ENUM_CLASS(IntervalMatch, int, -1,
+        low,    // The value is less than the interval's lower bound
+        match,  // The value is an element of the interval
+        high,   // The value is greater than the interval's upper bound
+        empty   // The interval is empty
+    )
 
-    inline std::ostream& operator<<(std::ostream& out, IntervalCategory ic) {
-        switch (ic) {
-            case IntervalCategory::none:        out << "none"; break;
-            case IntervalCategory::ordered:     out << "ordered"; break;
-            case IntervalCategory::stepwise:    out << "stepwise"; break;
-            case IntervalCategory::integral:    out << "integral"; break;
-            case IntervalCategory::continuous:  out << "continuous"; break;
-            default:                            out << int(ic); break;
-        }
-        return out;
-    }
-
-    enum class IntervalMatch: int {
-        low = -1,  // The value is less than the interval's lower bound
-        match,     // The value is an element of the interval
-        high,      // The value is greater than the interval's upper bound
-        empty,     // The interval is empty
-    };
-
-    inline std::ostream& operator<<(std::ostream& out, IntervalMatch im) {
-        switch (im) {
-            case IntervalMatch::low:    out << "low"; break;
-            case IntervalMatch::match:  out << "match"; break;
-            case IntervalMatch::high:   out << "high"; break;
-            case IntervalMatch::empty:  out << "empty"; break;
-            default:                    out << int(im); break;
-        }
-        return out;
-    }
-
-    enum class IntervalOrder: int {
+    RS_INTERVAL_ENUM_CLASS(IntervalOrder, int, -7,
         // Name             Index  Picture    Description
-        b_only = -7,        // -7  BBB        A is empty, B is not
+        b_only,             // -7  BBB        A is empty, B is not
         a_below_b,          // -6  AAA...BBB  Upper bound of A is less than lower bound of B, with a gap
         a_touches_b,        // -5  AAABBB     Upper bound of A is less than lower bound of B, with no gap
         a_overlaps_b,       // -4  AAA***BBB  Upper bound of A overlaps lower bound of B
@@ -195,30 +199,8 @@ namespace RS::Intervals {
         b_overlaps_a,       // 4   BBB***AAA  Upper bound of B overlaps lower bound of A
         b_touches_a,        // 5   BBBAAA     Upper bound of B is less than lower bound of A, with no gap
         b_below_a,          // 6   BBB...AAA  Upper bound of B is less than lower bound of A, with a gap
-        a_only,             // 7   AAA        B is empty, A is not
-    };
-
-    inline std::ostream& operator<<(std::ostream& out, IntervalOrder io) {
-        switch (io) {
-            case IntervalOrder::b_only:             out << "b_only"; break;
-            case IntervalOrder::a_below_b:          out << "a_below_b"; break;
-            case IntervalOrder::a_touches_b:        out << "a_touches_b"; break;
-            case IntervalOrder::a_overlaps_b:       out << "a_overlaps_b"; break;
-            case IntervalOrder::a_extends_below_b:  out << "a_extends_below_b"; break;
-            case IntervalOrder::a_encloses_b:       out << "a_encloses_b"; break;
-            case IntervalOrder::b_extends_above_a:  out << "b_extends_above_a"; break;
-            case IntervalOrder::equal:              out << "equal"; break;
-            case IntervalOrder::a_extends_above_b:  out << "a_extends_above_b"; break;
-            case IntervalOrder::b_encloses_a:       out << "b_encloses_a"; break;
-            case IntervalOrder::b_extends_below_a:  out << "b_extends_below_a"; break;
-            case IntervalOrder::b_overlaps_a:       out << "b_overlaps_a"; break;
-            case IntervalOrder::b_touches_a:        out << "b_touches_a"; break;
-            case IntervalOrder::b_below_a:          out << "b_below_a"; break;
-            case IntervalOrder::a_only:             out << "a_only"; break;
-            default:                                out << int(io); break;
-        }
-        return out;
-    }
+        a_only              // 7   AAA        B is empty, A is not
+    )
 
     template <typename T>
     struct IntervalTraits {

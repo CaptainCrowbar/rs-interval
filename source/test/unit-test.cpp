@@ -9,6 +9,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_format_interval_floating_point)
 
     // type-traits-test.cpp
+    UNIT_TEST(rs_interval_enumeration)
     UNIT_TEST(rs_interval_type_traits)
 
     // ordered-test.cpp

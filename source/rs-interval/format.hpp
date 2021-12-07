@@ -31,8 +31,6 @@ namespace RS::Intervals {
     //          s = Always show a sign
     //          z = Strip trailing zeroes
 
-    constexpr size_t npos = std::string::npos;
-
     template <typename T> std::string format_object(const T& t, const std::string& spec = {});
     std::string format_integer(int64_t x, const std::string& spec = {});
     std::string format_float(double x, const std::string& spec = {});
