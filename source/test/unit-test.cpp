@@ -5,71 +5,71 @@ int main(int argc, char** argv) {
     RS::UnitTest::begin_tests(argc, argv);
 
     // format-test.cpp
-    UNIT_TEST(rs_interval_format_integer)
-    UNIT_TEST(rs_interval_format_floating_point)
+    UNIT_TEST(rs_format_interval_integer)
+    UNIT_TEST(rs_format_interval_floating_point)
 
-    // interval-basic-test.cpp
-    UNIT_TEST(rs_interval_basic_type_traits)
+    // type-traits-test.cpp
+    UNIT_TEST(rs_interval_type_traits)
 
-    // interval-ordered-test.cpp
-    UNIT_TEST(rs_interval_ordered_basic_properties)
-    UNIT_TEST(rs_interval_ordered_construction)
-    UNIT_TEST(rs_interval_ordered_inverse)
-    UNIT_TEST(rs_interval_ordered_binary_operations)
+    // ordered-test.cpp
+    UNIT_TEST(rs_ordered_interval_basic_properties)
+    UNIT_TEST(rs_ordered_interval_construction)
+    UNIT_TEST(rs_ordered_interval_inverse)
+    UNIT_TEST(rs_ordered_interval_binary_operations)
 
-    // interval-ordered-set-test.cpp
-    UNIT_TEST(rs_interval_ordered_set_construct_insert_erase)
-    UNIT_TEST(rs_interval_ordered_set_operations)
+    // ordered-set-test.cpp
+    UNIT_TEST(rs_ordered_interval_set_construct_insert_erase)
+    UNIT_TEST(rs_ordered_interval_set_operations)
 
-    // interval-ordered-map-test.cpp
-    UNIT_TEST(rs_interval_ordered_map)
+    // ordered-map-test.cpp
+    UNIT_TEST(rs_ordered_interval_map)
 
-    // interval-stepwise-test.cpp
-    UNIT_TEST(rs_interval_stepwise_basic_properties)
-    UNIT_TEST(rs_interval_stepwise_construction)
-    UNIT_TEST(rs_interval_stepwise_iterators)
-    UNIT_TEST(rs_interval_stepwise_inverse)
-    UNIT_TEST(rs_interval_stepwise_binary_operations)
+    // stepwise-test.cpp
+    UNIT_TEST(rs_stepwise_interval_basic_properties)
+    UNIT_TEST(rs_stepwise_interval_construction)
+    UNIT_TEST(rs_stepwise_interval_iterators)
+    UNIT_TEST(rs_stepwise_interval_inverse)
+    UNIT_TEST(rs_stepwise_interval_binary_operations)
 
-    // interval-stepwise-set-test.cpp
-    UNIT_TEST(rs_interval_stepwise_set_construct_insert_erase)
-    UNIT_TEST(rs_interval_stepwise_set_operations)
+    // stepwise-set-test.cpp
+    UNIT_TEST(rs_stepwise_interval_set_construct_insert_erase)
+    UNIT_TEST(rs_stepwise_interval_set_operations)
 
-    // interval-stepwise-map-test.cpp
-    UNIT_TEST(rs_interval_stepwise_map)
+    // stepwise-map-test.cpp
+    UNIT_TEST(rs_stepwise_interval_map)
 
-    // interval-integral-test.cpp
-    UNIT_TEST(rs_interval_integral_basic_properties)
-    UNIT_TEST(rs_interval_integral_construction)
-    UNIT_TEST(rs_interval_integral_iterators)
-    UNIT_TEST(rs_interval_integral_inverse)
-    UNIT_TEST(rs_interval_integral_binary_operations)
+    // integral-test.cpp
+    UNIT_TEST(rs_integral_interval_basic_properties)
+    UNIT_TEST(rs_integral_interval_construction)
+    UNIT_TEST(rs_integral_interval_iterators)
+    UNIT_TEST(rs_integral_interval_inverse)
+    UNIT_TEST(rs_integral_interval_binary_operations)
 
-    // interval-integral-set-test.cpp
-    UNIT_TEST(rs_interval_integral_set_construct_insert_erase)
-    UNIT_TEST(rs_interval_integral_set_operations)
+    // integral-set-test.cpp
+    UNIT_TEST(rs_integral_interval_set_construct_insert_erase)
+    UNIT_TEST(rs_integral_interval_set_operations)
 
-    // interval-integral-map-test.cpp
-    UNIT_TEST(rs_interval_integral_map)
+    // integral-map-test.cpp
+    UNIT_TEST(rs_integral_interval_map)
 
-    // interval-integral-arithmetic-test.cpp
-    UNIT_TEST(rs_interval_integral_arithmetic)
+    // integral-arithmetic-test.cpp
+    UNIT_TEST(rs_integral_interval_arithmetic)
 
-    // interval-continuous-test.cpp
-    UNIT_TEST(rs_interval_continuous_basic_properties)
-    UNIT_TEST(rs_interval_continuous_construction)
-    UNIT_TEST(rs_interval_continuous_inverse)
-    UNIT_TEST(rs_interval_continuous_binary_operations)
+    // continuous-test.cpp
+    UNIT_TEST(rs_continuous_interval_basic_properties)
+    UNIT_TEST(rs_continuous_interval_construction)
+    UNIT_TEST(rs_continuous_interval_inverse)
+    UNIT_TEST(rs_continuous_interval_binary_operations)
 
-    // interval-continuous-set-test.cpp
-    UNIT_TEST(rs_interval_continuous_set_construct_insert_erase)
-    UNIT_TEST(rs_interval_continuous_set_operations)
+    // continuous-set-test.cpp
+    UNIT_TEST(rs_continuous_interval_set_construct_insert_erase)
+    UNIT_TEST(rs_continuous_interval_set_operations)
 
-    // interval-continuous-map-test.cpp
-    UNIT_TEST(rs_interval_continuous_map)
+    // continuous-map-test.cpp
+    UNIT_TEST(rs_continuous_interval_map)
 
-    // interval-continuous-arithmetic-test.cpp
-    UNIT_TEST(rs_interval_continuous_arithmetic)
+    // continuous-arithmetic-test.cpp
+    UNIT_TEST(rs_continuous_interval_arithmetic)
 
     return RS::UnitTest::end_tests();
 

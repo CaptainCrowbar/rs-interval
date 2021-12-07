@@ -13,7 +13,7 @@ template <> struct IntervalTraits<int> {
 using IntervalType = Interval<int>;
 using SetType = IntervalSet<int>;
 
-void test_rs_interval_integral_arithmetic() {
+void test_rs_integral_interval_arithmetic() {
 
     IntervalType in;
     std::string str;

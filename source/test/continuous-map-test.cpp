@@ -8,7 +8,7 @@ using namespace RS::Intervals;
 using IntervalType = Interval<double>;
 using MapType = IntervalMap<double, std::string>;
 
-void test_rs_interval_continuous_map() {
+void test_rs_continuous_interval_map() {
 
     MapType map;
     MapType::iterator it;

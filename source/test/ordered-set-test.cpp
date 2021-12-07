@@ -12,7 +12,7 @@ using namespace std::literals;
 using IntervalType = Interval<std::string>;
 using SetType = IntervalSet<std::string>;
 
-void test_rs_interval_ordered_set_construct_insert_erase() {
+void test_rs_ordered_interval_set_construct_insert_erase() {
 
     SetType set, inv;
     SetType::iterator it;
@@ -84,7 +84,7 @@ void test_rs_interval_ordered_set_construct_insert_erase() {
 
 }
 
-void test_rs_interval_ordered_set_operations() {
+void test_rs_ordered_interval_set_operations() {
 
     using random_int = std::uniform_int_distribution<int>;
 

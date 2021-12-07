@@ -10,7 +10,7 @@ using namespace RS::Intervals;
 using IntervalType = Interval<double>;
 using SetType = IntervalSet<double>;
 
-void test_rs_interval_continuous_basic_properties() {
+void test_rs_continuous_interval_basic_properties() {
 
     IntervalType in;
 
@@ -27,7 +27,7 @@ void test_rs_interval_continuous_basic_properties() {
 
 }
 
-void test_rs_interval_continuous_construction() {
+void test_rs_continuous_interval_construction() {
 
     IntervalType in;
     std::string str;
@@ -91,7 +91,7 @@ void test_rs_interval_continuous_construction() {
 
 }
 
-void test_rs_interval_continuous_inverse() {
+void test_rs_continuous_interval_inverse() {
 
     IntervalType in;
     SetType set;
@@ -111,7 +111,7 @@ void test_rs_interval_continuous_inverse() {
 
 }
 
-void test_rs_interval_continuous_binary_operations() {
+void test_rs_continuous_interval_binary_operations() {
 
     struct test_info {
         int line;

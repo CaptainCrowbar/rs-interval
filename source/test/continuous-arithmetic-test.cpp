@@ -10,7 +10,7 @@ using namespace RS::Intervals;
 using IntervalType = Interval<double>;
 using SetType = IntervalSet<double>;
 
-void test_rs_interval_continuous_arithmetic() {
+void test_rs_continuous_interval_arithmetic() {
 
     IntervalType in;
     std::string str;

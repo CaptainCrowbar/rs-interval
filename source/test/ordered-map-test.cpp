@@ -8,7 +8,7 @@ using namespace RS::Intervals;
 using IntervalType = Interval<std::string>;
 using MapType = IntervalMap<std::string, std::string>;
 
-void test_rs_interval_ordered_map() {
+void test_rs_ordered_interval_map() {
 
     MapType map;
     MapType::iterator it;

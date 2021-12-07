@@ -16,7 +16,7 @@ template <> struct IntervalTraits<int> {
 using IntervalType = Interval<int>;
 using SetType = IntervalSet<int>;
 
-void test_rs_interval_integral_set_construct_insert_erase() {
+void test_rs_integral_interval_set_construct_insert_erase() {
 
     SetType set, inv;
     SetType::iterator it;
@@ -93,7 +93,7 @@ void test_rs_interval_integral_set_construct_insert_erase() {
 
 }
 
-void test_rs_interval_integral_set_operations() {
+void test_rs_integral_interval_set_operations() {
 
     using random_int = std::uniform_int_distribution<int>;
 

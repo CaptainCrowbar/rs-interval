@@ -11,7 +11,7 @@ using namespace RS::Intervals;
 using IntervalType = Interval<double>;
 using SetType = IntervalSet<double>;
 
-void test_rs_interval_continuous_set_construct_insert_erase() {
+void test_rs_continuous_interval_set_construct_insert_erase() {
 
     SetType set, inv;
     SetType::iterator it;
@@ -83,7 +83,7 @@ void test_rs_interval_continuous_set_construct_insert_erase() {
 
 }
 
-void test_rs_interval_continuous_set_operations() {
+void test_rs_continuous_interval_set_operations() {
 
     using random_int = std::uniform_int_distribution<int>;
 

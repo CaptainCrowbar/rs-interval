@@ -1,14 +1,13 @@
 #pragma once
 
+#include "rs-interval/type-traits.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
-#include <iterator>
 #include <sstream>
 #include <string>
 #include <type_traits>
-#include <utility>
 
 namespace RS::Intervals {
 
@@ -39,33 +38,6 @@ namespace RS::Intervals {
     std::string format_float(double x, const std::string& spec = {});
 
     namespace Detail {
-
-        template <typename T, typename = void> struct HasStrMethod: std::false_type {};
-        template <typename T> struct HasStrMethod<T,
-            std::void_t<decltype(std::declval<std::string&>() = std::declval<const T&>().str())>>: std::true_type {};
-        template <typename T> constexpr bool has_str_method = HasStrMethod<T>::value;
-
-        template <typename T, typename = void> struct HasAdlToStringFunction: std::false_type {};
-        template <typename T> struct HasAdlToStringFunction<T,
-            std::void_t<decltype(std::declval<std::string&>() = to_string(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T> constexpr bool has_adl_to_string_function = HasAdlToStringFunction<T>::value;
-
-        template <typename T, typename = void> struct HasStdToStringFunction: std::false_type {};
-        template <typename T> struct HasStdToStringFunction<T,
-            std::void_t<decltype(std::declval<std::string&>() = std::to_string(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T> constexpr bool has_std_to_string_function = HasStdToStringFunction<T>::value;
-
-        template <typename T, typename = void> struct HasAdlBeginFunction: std::false_type {};
-        template <typename T> struct HasAdlBeginFunction<T, std::void_t<decltype(begin(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T, typename = void> struct HasAdlEndFunction: std::false_type {};
-        template <typename T> struct HasAdlEndFunction<T, std::void_t<decltype(end(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T, typename = void> struct HasStdBeginFunction: std::false_type {};
-        template <typename T> struct HasStdBeginFunction<T, std::void_t<decltype(std::begin(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T, typename = void> struct HasStdEndFunction: std::false_type {};
-        template <typename T> struct HasStdEndFunction<T, std::void_t<decltype(std::end(std::declval<const T&>()))>>: std::true_type {};
-
-        template <typename T> constexpr bool is_range = (HasAdlBeginFunction<T>::value && HasAdlEndFunction<T>::value)
-            || (HasStdBeginFunction<T>::value && HasStdEndFunction<T>::value);
 
         inline int str_to_int(const std::string& str) {
             return int(std::strtol(str.data(), nullptr, 10));

@@ -5,7 +5,7 @@
 using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
 
-void test_rs_interval_format_integer() {
+void test_rs_format_interval_integer() {
 
     int n;
     std::string s;
@@ -46,7 +46,7 @@ void test_rs_interval_format_integer() {
 
 }
 
-void test_rs_interval_format_floating_point() {
+void test_rs_format_interval_floating_point() {
 
     double x;
     std::string s;

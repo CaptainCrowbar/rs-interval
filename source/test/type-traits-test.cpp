@@ -1,4 +1,4 @@
-#include "rs-interval/interval.hpp"
+#include "rs-interval/type-traits.hpp"
 #include "test/unit-test.hpp"
 #include <chrono>
 #include <complex>
@@ -7,7 +7,7 @@
 
 using namespace RS::Intervals;
 
-void test_rs_interval_basic_type_traits() {
+void test_rs_interval_type_traits() {
 
     TEST_EQUAL(interval_category<bool>, IntervalCategory::none);
     TEST_EQUAL(interval_category<const bool>, IntervalCategory::none);

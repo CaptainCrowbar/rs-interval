@@ -11,7 +11,7 @@ using namespace std::literals;
 using IntervalType = Interval<std::string>;
 using SetType = IntervalSet<std::string>;
 
-void test_rs_interval_ordered_basic_properties() {
+void test_rs_ordered_interval_basic_properties() {
 
     IntervalType in;
 
@@ -27,7 +27,7 @@ void test_rs_interval_ordered_basic_properties() {
 
 }
 
-void test_rs_interval_ordered_construction() {
+void test_rs_ordered_interval_construction() {
 
     IntervalType in;
     std::string str;
@@ -90,7 +90,7 @@ void test_rs_interval_ordered_construction() {
 
 }
 
-void test_rs_interval_ordered_inverse() {
+void test_rs_ordered_interval_inverse() {
 
     IntervalType in;
     SetType set;
@@ -110,7 +110,7 @@ void test_rs_interval_ordered_inverse() {
 
 }
 
-void test_rs_interval_ordered_binary_operations() {
+void test_rs_ordered_interval_binary_operations() {
 
     struct test_info {
         int line;
