@@ -1,4 +1,5 @@
 #include "rs-interval/interval.hpp"
+#include "test/stepwise.hpp"
 #include "test/unit-test.hpp"
 #include <iostream>
 #include <iterator>
@@ -8,28 +9,23 @@
 using namespace RS;
 using namespace RS::Intervals;
 
-// TODO
-template <> struct IntervalTraits<int> {
-    static constexpr IntervalCategory category = IntervalCategory::stepwise;
-};
-
-using IntervalType = Interval<int>;
-using SetType = IntervalSet<int>;
+using IntervalType = Interval<Stepwise>;
+using SetType = IntervalSet<Stepwise>;
 
 void test_rs_stepwise_interval_basic_properties() {
 
     IntervalType in;
 
-    TEST_TYPE(IntervalType::value_type, int);
+    TEST_TYPE(IntervalType::value_type, Stepwise);
     TEST_EQUAL(IntervalType::category, IntervalCategory::stepwise);
     TEST(in.empty());
     TEST_EQUAL(in.size(), 0u);
     TEST(! in);
     TEST_EQUAL(in.str(), "{}");
-    TEST_EQUAL(in.match(0), IntervalMatch::empty);
-    TEST_EQUAL(in.match(42), IntervalMatch::empty);
-    TEST(! in(0));
-    TEST(! in(42));
+    TEST_EQUAL(in.match(0_sw), IntervalMatch::empty);
+    TEST_EQUAL(in.match(42_sw), IntervalMatch::empty);
+    TEST(! in(0_sw));
+    TEST(! in(42_sw));
 
 }
 
@@ -38,61 +34,61 @@ void test_rs_stepwise_interval_construction() {
     IntervalType in;
     std::string str;
 
-    TRY(in = IntervalType());                                                   TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1));                                                  TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = IntervalType(1, IntervalBound::closed, IntervalBound::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = IntervalType(1, IntervalBound::closed, IntervalBound::open));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1, IntervalBound::open, IntervalBound::closed));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1, IntervalBound::closed, IntervalBound::unbound));   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = IntervalType(1, IntervalBound::unbound, IntervalBound::closed));   TRY(str = in.str());  TEST_EQUAL(str, "<=1");
-    TRY(in = IntervalType(1, IntervalBound::open, IntervalBound::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = IntervalType(1, IntervalBound::unbound, IntervalBound::open));     TRY(str = in.str());  TEST_EQUAL(str, "<=0");
-    TRY(in = IntervalType(1, IntervalBound::unbound, IntervalBound::unbound));  TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType(1, 5));                                               TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, IntervalBound::closed));                        TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, IntervalBound::open));                          TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = IntervalType(1, 5, IntervalBound::closed, IntervalBound::open));   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = IntervalType(1, 5, IntervalBound::open, IntervalBound::closed));   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = IntervalType(1, 5, "[]"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, "()"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = IntervalType(1, 5, "[)"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = IntervalType(1, 5, "(]"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = IntervalType(1, 5, "<"));                                          TRY(str = in.str());  TEST_EQUAL(str, "<=4");
-    TRY(in = IntervalType(1, 5, "<="));                                         TRY(str = in.str());  TEST_EQUAL(str, "<=5");
-    TRY(in = IntervalType(1, 5, ">"));                                          TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = IntervalType(1, 5, ">="));                                         TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = IntervalType(1, 5, "*"));                                          TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType(5, 1));                                               TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = IntervalType());                                                        TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = IntervalType(1_sw));                                                    TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = IntervalType(1_sw, IntervalBound::closed, IntervalBound::closed));      TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = IntervalType(1_sw, IntervalBound::closed, IntervalBound::open));        TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = IntervalType(1_sw, IntervalBound::open, IntervalBound::closed));        TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = IntervalType(1_sw, IntervalBound::closed, IntervalBound::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = IntervalType(1_sw, IntervalBound::unbound, IntervalBound::closed));     TRY(str = in.str());  TEST_EQUAL(str, "<=1");
+    TRY(in = IntervalType(1_sw, IntervalBound::open, IntervalBound::unbound));       TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = IntervalType(1_sw, IntervalBound::unbound, IntervalBound::open));       TRY(str = in.str());  TEST_EQUAL(str, "<=0");
+    TRY(in = IntervalType(1_sw, IntervalBound::unbound, IntervalBound::unbound));    TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = IntervalType(1_sw, 5_sw));                                              TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = IntervalType(1_sw, 5_sw, IntervalBound::closed));                       TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = IntervalType(1_sw, 5_sw, IntervalBound::open));                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = IntervalType(1_sw, 5_sw, IntervalBound::closed, IntervalBound::open));  TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = IntervalType(1_sw, 5_sw, IntervalBound::open, IntervalBound::closed));  TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = IntervalType(1_sw, 5_sw, "[]"));                                        TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = IntervalType(1_sw, 5_sw, "()"));                                        TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = IntervalType(1_sw, 5_sw, "[)"));                                        TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = IntervalType(1_sw, 5_sw, "(]"));                                        TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = IntervalType(1_sw, 5_sw, "<"));                                         TRY(str = in.str());  TEST_EQUAL(str, "<=4");
+    TRY(in = IntervalType(1_sw, 5_sw, "<="));                                        TRY(str = in.str());  TEST_EQUAL(str, "<=5");
+    TRY(in = IntervalType(1_sw, 5_sw, ">"));                                         TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = IntervalType(1_sw, 5_sw, ">="));                                        TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = IntervalType(1_sw, 5_sw, "*"));                                         TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = IntervalType(5_sw, 1_sw));                                              TRY(str = in.str());  TEST_EQUAL(str, "{}");
 
-    TRY(in = make_interval(1));                                                  TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = make_interval(1, IntervalBound::closed, IntervalBound::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = make_interval(1, IntervalBound::closed, IntervalBound::open));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = make_interval(1, IntervalBound::open, IntervalBound::closed));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = make_interval(1, IntervalBound::closed, IntervalBound::unbound));   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = make_interval(1, IntervalBound::unbound, IntervalBound::closed));   TRY(str = in.str());  TEST_EQUAL(str, "<=1");
-    TRY(in = make_interval(1, IntervalBound::open, IntervalBound::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = make_interval(1, IntervalBound::unbound, IntervalBound::open));     TRY(str = in.str());  TEST_EQUAL(str, "<=0");
-    TRY(in = make_interval(1, IntervalBound::unbound, IntervalBound::unbound));  TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = make_interval(1, 5));                                               TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = make_interval(1, 5, IntervalBound::closed));                        TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = make_interval(1, 5, IntervalBound::open));                          TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = make_interval(1, 5, IntervalBound::closed, IntervalBound::open));   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = make_interval(1, 5, IntervalBound::open, IntervalBound::closed));   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = make_interval(1, 5, "[]"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = make_interval(1, 5, "()"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = make_interval(1, 5, "[)"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = make_interval(1, 5, "(]"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = make_interval(1, 5, "<"));                                          TRY(str = in.str());  TEST_EQUAL(str, "<=4");
-    TRY(in = make_interval(1, 5, "<="));                                         TRY(str = in.str());  TEST_EQUAL(str, "<=5");
-    TRY(in = make_interval(1, 5, ">"));                                          TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = make_interval(1, 5, ">="));                                         TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = make_interval(1, 5, "*"));                                          TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = make_interval(5, 1));                                               TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = make_interval(1_sw));                                                    TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = make_interval(1_sw, IntervalBound::closed, IntervalBound::closed));      TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = make_interval(1_sw, IntervalBound::closed, IntervalBound::open));        TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = make_interval(1_sw, IntervalBound::open, IntervalBound::closed));        TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = make_interval(1_sw, IntervalBound::closed, IntervalBound::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = make_interval(1_sw, IntervalBound::unbound, IntervalBound::closed));     TRY(str = in.str());  TEST_EQUAL(str, "<=1");
+    TRY(in = make_interval(1_sw, IntervalBound::open, IntervalBound::unbound));       TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = make_interval(1_sw, IntervalBound::unbound, IntervalBound::open));       TRY(str = in.str());  TEST_EQUAL(str, "<=0");
+    TRY(in = make_interval(1_sw, IntervalBound::unbound, IntervalBound::unbound));    TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = make_interval(1_sw, 5_sw));                                              TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = make_interval(1_sw, 5_sw, IntervalBound::closed));                       TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = make_interval(1_sw, 5_sw, IntervalBound::open));                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = make_interval(1_sw, 5_sw, IntervalBound::closed, IntervalBound::open));  TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = make_interval(1_sw, 5_sw, IntervalBound::open, IntervalBound::closed));  TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = make_interval(1_sw, 5_sw, "[]"));                                        TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = make_interval(1_sw, 5_sw, "()"));                                        TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = make_interval(1_sw, 5_sw, "[)"));                                        TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = make_interval(1_sw, 5_sw, "(]"));                                        TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = make_interval(1_sw, 5_sw, "<"));                                         TRY(str = in.str());  TEST_EQUAL(str, "<=4");
+    TRY(in = make_interval(1_sw, 5_sw, "<="));                                        TRY(str = in.str());  TEST_EQUAL(str, "<=5");
+    TRY(in = make_interval(1_sw, 5_sw, ">"));                                         TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = make_interval(1_sw, 5_sw, ">="));                                        TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = make_interval(1_sw, 5_sw, "*"));                                         TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = make_interval(5_sw, 1_sw));                                              TRY(str = in.str());  TEST_EQUAL(str, "{}");
 
-    TRY(in = ordered_interval(5, 1, IntervalBound::closed));                       TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = ordered_interval(5, 1, IntervalBound::open));                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = ordered_interval(5, 1, IntervalBound::closed, IntervalBound::open));  TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = ordered_interval(5, 1, IntervalBound::open, IntervalBound::closed));  TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = ordered_interval(5_sw, 1_sw, IntervalBound::closed));                       TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = ordered_interval(5_sw, 1_sw, IntervalBound::open));                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = ordered_interval(5_sw, 1_sw, IntervalBound::closed, IntervalBound::open));  TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = ordered_interval(5_sw, 1_sw, IntervalBound::open, IntervalBound::closed));  TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
 
 }
 
@@ -102,15 +98,15 @@ void test_rs_stepwise_interval_iterators() {
     IntervalType::iterator it1 = {}, it2 = {};
     ptrdiff_t diff = 0;
 
-    TRY(in = {});           TEST_EQUAL(in.size(), 0u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 0);
-    TRY(in = 1);            TEST_EQUAL(in.size(), 1u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 1);
-    TRY(in = IntervalType(1, 5));  TEST_EQUAL(in.size(), 5u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 5);
+    TRY(in = {});                        TEST_EQUAL(in.size(), 0u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 0);
+    TRY(in = 1_sw);                      TEST_EQUAL(in.size(), 1u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 1);
+    TRY(in = IntervalType(1_sw, 5_sw));  TEST_EQUAL(in.size(), 5u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 5);
 
-    TEST_EQUAL(*it1, 1);  TRY(++it1);
-    TEST_EQUAL(*it1, 2);  TRY(++it1);
-    TEST_EQUAL(*it1, 3);  TRY(++it1);
-    TEST_EQUAL(*it1, 4);  TRY(++it1);
-    TEST_EQUAL(*it1, 5);  TRY(++it1);
+    TEST_EQUAL(*it1, 1_sw);  TRY(++it1);
+    TEST_EQUAL(*it1, 2_sw);  TRY(++it1);
+    TEST_EQUAL(*it1, 3_sw);  TRY(++it1);
+    TEST_EQUAL(*it1, 4_sw);  TRY(++it1);
+    TEST_EQUAL(*it1, 5_sw);  TRY(++it1);
     TEST(it1 == it2);
 
 }
@@ -123,15 +119,15 @@ void test_rs_stepwise_interval_inverse() {
 
     TRY((in = {}));                   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{*}");
     TRY((in = IntervalType::all()));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
-    TRY((in = 42));                   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=41,>=43}");
-    TRY((in = {42,42,"<"}));          TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=42}");
-    TRY((in = {42,42,"<="}));         TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=43}");
-    TRY((in = {42,42,">"}));          TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=42}");
-    TRY((in = {42,42,">="}));         TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=41}");
-    TRY((in = {86,99,"()"}));         TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=86,>=99}");
-    TRY((in = {86,99,"(]"}));         TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=86,>=100}");
-    TRY((in = {86,99,"[)"}));         TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=85,>=99}");
-    TRY((in = {86,99,"[]"}));         TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=85,>=100}");
+    TRY((in = 42_sw));                TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=41,>=43}");
+    TRY((in = {42_sw,42_sw,"<"}));    TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=42}");
+    TRY((in = {42_sw,42_sw,"<="}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=43}");
+    TRY((in = {42_sw,42_sw,">"}));    TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=42}");
+    TRY((in = {42_sw,42_sw,">="}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=41}");
+    TRY((in = {86_sw,99_sw,"()"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=86,>=99}");
+    TRY((in = {86_sw,99_sw,"(]"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=86,>=100}");
+    TRY((in = {86_sw,99_sw,"[)"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=85,>=99}");
+    TRY((in = {86_sw,99_sw,"[]"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=85,>=100}");
 
 }
 
@@ -155,172 +151,172 @@ void test_rs_stepwise_interval_binary_operations() {
     static const std::vector<test_info> tests = {
 
         // line      lhs          rhs          cmp  incl    over    touch   envel     inter     union           diff            symm              --
-        { __LINE__,  {},          {},          0,   false,  false,  false,  "{}",     "{}",     "{}",           "{}",           "{}",             },
-        { __LINE__,  {0,0,"*"},   {},          1,   false,  false,  false,  "*",      "{}",     "{*}",          "{*}",          "{*}",            },
-        { __LINE__,  {0,0,"*"},   {0,0,"*"},   0,   true,   true,   true,   "*",      "*",      "{*}",          "{}",           "{}",             },
-        { __LINE__,  {3},         {},          1,   false,  false,  false,  "3",      "{}",     "{3}",          "{3}",          "{3}",            },
-        { __LINE__,  {3},         {0,0,"*"},   1,   false,  true,   true,   "*",      "3",      "{*}",          "{}",           "{<=2,>=4}",      },
-        { __LINE__,  {3},         {1},         1,   false,  false,  false,  "[1,3]",  "{}",     "{1,3}",        "{3}",          "{1,3}",          },
-        { __LINE__,  {3},         {2},         1,   false,  false,  true,   "[2,3]",  "{}",     "{[2,3]}",      "{3}",          "{[2,3]}",        },
-        { __LINE__,  {3},         {3},         0,   true,   true,   true,   "3",      "3",      "{3}",          "{}",           "{}",             },
-        { __LINE__,  {3},         {4},         -1,  false,  false,  true,   "[3,4]",  "{}",     "{[3,4]}",      "{3}",          "{[3,4]}",        },
-        { __LINE__,  {3},         {5},         -1,  false,  false,  false,  "[3,5]",  "{}",     "{3,5}",        "{3}",          "{3,5}",          },
-        { __LINE__,  {3,3,"<"},   {},          1,   false,  false,  false,  "<=2",    "{}",     "{<=2}",        "{<=2}",        "{<=2}",          },
-        { __LINE__,  {3,3,"<"},   {0,0,"*"},   -1,  false,  true,   true,   "*",      "<=2",    "{*}",          "{}",           "{>=3}",          },
-        { __LINE__,  {3,3,"<"},   {1},         -1,  true,   true,   true,   "<=2",    "1",      "{<=2}",        "{<=0,2}",      "{<=0,2}",        },
-        { __LINE__,  {3,3,"<"},   {2},         -1,  true,   true,   true,   "<=2",    "2",      "{<=2}",        "{<=1}",        "{<=1}",          },
-        { __LINE__,  {3,3,"<"},   {3},         -1,  false,  false,  true,   "<=3",    "{}",     "{<=3}",        "{<=2}",        "{<=3}",          },
-        { __LINE__,  {3,3,"<"},   {4},         -1,  false,  false,  false,  "<=4",    "{}",     "{<=2,4}",      "{<=2}",        "{<=2,4}",        },
-        { __LINE__,  {3,3,"<"},   {5},         -1,  false,  false,  false,  "<=5",    "{}",     "{<=2,5}",      "{<=2}",        "{<=2,5}",        },
-        { __LINE__,  {3,3,"<"},   {1,1,"<"},   1,   true,   true,   true,   "<=2",    "<=0",    "{<=2}",        "{[1,2]}",      "{[1,2]}",        },
-        { __LINE__,  {3,3,"<"},   {2,2,"<"},   1,   true,   true,   true,   "<=2",    "<=1",    "{<=2}",        "{2}",          "{2}",            },
-        { __LINE__,  {3,3,"<"},   {3,3,"<"},   0,   true,   true,   true,   "<=2",    "<=2",    "{<=2}",        "{}",           "{}",             },
-        { __LINE__,  {3,3,"<"},   {4,4,"<"},   -1,  false,  true,   true,   "<=3",    "<=2",    "{<=3}",        "{}",           "{3}",            },
-        { __LINE__,  {3,3,"<"},   {5,5,"<"},   -1,  false,  true,   true,   "<=4",    "<=2",    "{<=4}",        "{}",           "{[3,4]}",        },
-        { __LINE__,  {3,3,"<="},  {},          1,   false,  false,  false,  "<=3",    "{}",     "{<=3}",        "{<=3}",        "{<=3}",          },
-        { __LINE__,  {3,3,"<="},  {0,0,"*"},   -1,  false,  true,   true,   "*",      "<=3",    "{*}",          "{}",           "{>=4}",          },
-        { __LINE__,  {3,3,"<="},  {1},         -1,  true,   true,   true,   "<=3",    "1",      "{<=3}",        "{<=0,[2,3]}",  "{<=0,[2,3]}",    },
-        { __LINE__,  {3,3,"<="},  {2},         -1,  true,   true,   true,   "<=3",    "2",      "{<=3}",        "{<=1,3}",      "{<=1,3}",        },
-        { __LINE__,  {3,3,"<="},  {3},         -1,  true,   true,   true,   "<=3",    "3",      "{<=3}",        "{<=2}",        "{<=2}",          },
-        { __LINE__,  {3,3,"<="},  {4},         -1,  false,  false,  true,   "<=4",    "{}",     "{<=4}",        "{<=3}",        "{<=4}",          },
-        { __LINE__,  {3,3,"<="},  {5},         -1,  false,  false,  false,  "<=5",    "{}",     "{<=3,5}",      "{<=3}",        "{<=3,5}",        },
-        { __LINE__,  {3,3,"<="},  {1,1,"<"},   1,   true,   true,   true,   "<=3",    "<=0",    "{<=3}",        "{[1,3]}",      "{[1,3]}",        },
-        { __LINE__,  {3,3,"<="},  {2,2,"<"},   1,   true,   true,   true,   "<=3",    "<=1",    "{<=3}",        "{[2,3]}",      "{[2,3]}",        },
-        { __LINE__,  {3,3,"<="},  {3,3,"<"},   1,   true,   true,   true,   "<=3",    "<=2",    "{<=3}",        "{3}",          "{3}",            },
-        { __LINE__,  {3,3,"<="},  {4,4,"<"},   0,   true,   true,   true,   "<=3",    "<=3",    "{<=3}",        "{}",           "{}",             },
-        { __LINE__,  {3,3,"<="},  {5,5,"<"},   -1,  false,  true,   true,   "<=4",    "<=3",    "{<=4}",        "{}",           "{4}",            },
-        { __LINE__,  {3,3,"<="},  {1,1,"<="},  1,   true,   true,   true,   "<=3",    "<=1",    "{<=3}",        "{[2,3]}",      "{[2,3]}",        },
-        { __LINE__,  {3,3,"<="},  {2,2,"<="},  1,   true,   true,   true,   "<=3",    "<=2",    "{<=3}",        "{3}",          "{3}",            },
-        { __LINE__,  {3,3,"<="},  {3,3,"<="},  0,   true,   true,   true,   "<=3",    "<=3",    "{<=3}",        "{}",           "{}",             },
-        { __LINE__,  {3,3,"<="},  {4,4,"<="},  -1,  false,  true,   true,   "<=4",    "<=3",    "{<=4}",        "{}",           "{4}",            },
-        { __LINE__,  {3,3,"<="},  {5,5,"<="},  -1,  false,  true,   true,   "<=5",    "<=3",    "{<=5}",        "{}",           "{[4,5]}",        },
-        { __LINE__,  {3,3,">"},   {},          1,   false,  false,  false,  ">=4",    "{}",     "{>=4}",        "{>=4}",        "{>=4}",          },
-        { __LINE__,  {3,3,">"},   {0,0,"*"},   1,   false,  true,   true,   "*",      ">=4",    "{*}",          "{}",           "{<=3}",          },
-        { __LINE__,  {3,3,">"},   {1},         1,   false,  false,  false,  ">=1",    "{}",     "{1,>=4}",      "{>=4}",        "{1,>=4}",        },
-        { __LINE__,  {3,3,">"},   {2},         1,   false,  false,  false,  ">=2",    "{}",     "{2,>=4}",      "{>=4}",        "{2,>=4}",        },
-        { __LINE__,  {3,3,">"},   {3},         1,   false,  false,  true,   ">=3",    "{}",     "{>=3}",        "{>=4}",        "{>=3}",          },
-        { __LINE__,  {3,3,">"},   {4},         1,   true,   true,   true,   ">=4",    "4",      "{>=4}",        "{>=5}",        "{>=5}",          },
-        { __LINE__,  {3,3,">"},   {5},         -1,  true,   true,   true,   ">=4",    "5",      "{>=4}",        "{4,>=6}",      "{4,>=6}",        },
-        { __LINE__,  {3,3,">"},   {1,1,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=0,>=4}",    "{>=4}",        "{<=0,>=4}",      },
-        { __LINE__,  {3,3,">"},   {2,2,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=1,>=4}",    "{>=4}",        "{<=1,>=4}",      },
-        { __LINE__,  {3,3,">"},   {3,3,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=2,>=4}",    "{>=4}",        "{<=2,>=4}",      },
-        { __LINE__,  {3,3,">"},   {4,4,"<"},   1,   false,  false,  true,   "*",      "{}",     "{*}",          "{>=4}",        "{*}",            },
-        { __LINE__,  {3,3,">"},   {5,5,"<"},   1,   false,  true,   true,   "*",      "4",      "{*}",          "{>=5}",        "{<=3,>=5}",      },
-        { __LINE__,  {3,3,">"},   {1,1,"<="},  1,   false,  false,  false,  "*",      "{}",     "{<=1,>=4}",    "{>=4}",        "{<=1,>=4}",      },
-        { __LINE__,  {3,3,">"},   {2,2,"<="},  1,   false,  false,  false,  "*",      "{}",     "{<=2,>=4}",    "{>=4}",        "{<=2,>=4}",      },
-        { __LINE__,  {3,3,">"},   {3,3,"<="},  1,   false,  false,  true,   "*",      "{}",     "{*}",          "{>=4}",        "{*}",            },
-        { __LINE__,  {3,3,">"},   {4,4,"<="},  1,   false,  true,   true,   "*",      "4",      "{*}",          "{>=5}",        "{<=3,>=5}",      },
-        { __LINE__,  {3,3,">"},   {5,5,"<="},  1,   false,  true,   true,   "*",      "[4,5]",  "{*}",          "{>=6}",        "{<=3,>=6}",      },
-        { __LINE__,  {3,3,">"},   {1,1,">"},   1,   false,  true,   true,   ">=2",    ">=4",    "{>=2}",        "{}",           "{[2,3]}",        },
-        { __LINE__,  {3,3,">"},   {2,2,">"},   1,   false,  true,   true,   ">=3",    ">=4",    "{>=3}",        "{}",           "{3}",            },
-        { __LINE__,  {3,3,">"},   {3,3,">"},   0,   true,   true,   true,   ">=4",    ">=4",    "{>=4}",        "{}",           "{}",             },
-        { __LINE__,  {3,3,">"},   {4,4,">"},   -1,  true,   true,   true,   ">=4",    ">=5",    "{>=4}",        "{4}",          "{4}",            },
-        { __LINE__,  {3,3,">"},   {5,5,">"},   -1,  true,   true,   true,   ">=4",    ">=6",    "{>=4}",        "{[4,5]}",      "{[4,5]}",        },
-        { __LINE__,  {3,3,">="},  {},          1,   false,  false,  false,  ">=3",    "{}",     "{>=3}",        "{>=3}",        "{>=3}",          },
-        { __LINE__,  {3,3,">="},  {0,0,"*"},   1,   false,  true,   true,   "*",      ">=3",    "{*}",          "{}",           "{<=2}",          },
-        { __LINE__,  {3,3,">="},  {1},         1,   false,  false,  false,  ">=1",    "{}",     "{1,>=3}",      "{>=3}",        "{1,>=3}",        },
-        { __LINE__,  {3,3,">="},  {2},         1,   false,  false,  true,   ">=2",    "{}",     "{>=2}",        "{>=3}",        "{>=2}",          },
-        { __LINE__,  {3,3,">="},  {3},         1,   true,   true,   true,   ">=3",    "3",      "{>=3}",        "{>=4}",        "{>=4}",          },
-        { __LINE__,  {3,3,">="},  {4},         -1,  true,   true,   true,   ">=3",    "4",      "{>=3}",        "{3,>=5}",      "{3,>=5}",        },
-        { __LINE__,  {3,3,">="},  {5},         -1,  true,   true,   true,   ">=3",    "5",      "{>=3}",        "{[3,4],>=6}",  "{[3,4],>=6}",    },
-        { __LINE__,  {3,3,">="},  {1,1,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=0,>=3}",    "{>=3}",        "{<=0,>=3}",      },
-        { __LINE__,  {3,3,">="},  {2,2,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=1,>=3}",    "{>=3}",        "{<=1,>=3}",      },
-        { __LINE__,  {3,3,">="},  {3,3,"<"},   1,   false,  false,  true,   "*",      "{}",     "{*}",          "{>=3}",        "{*}",            },
-        { __LINE__,  {3,3,">="},  {4,4,"<"},   1,   false,  true,   true,   "*",      "3",      "{*}",          "{>=4}",        "{<=2,>=4}",      },
-        { __LINE__,  {3,3,">="},  {5,5,"<"},   1,   false,  true,   true,   "*",      "[3,4]",  "{*}",          "{>=5}",        "{<=2,>=5}",      },
-        { __LINE__,  {3,3,">="},  {1,1,"<="},  1,   false,  false,  false,  "*",      "{}",     "{<=1,>=3}",    "{>=3}",        "{<=1,>=3}",      },
-        { __LINE__,  {3,3,">="},  {2,2,"<="},  1,   false,  false,  true,   "*",      "{}",     "{*}",          "{>=3}",        "{*}",            },
-        { __LINE__,  {3,3,">="},  {3,3,"<="},  1,   false,  true,   true,   "*",      "3",      "{*}",          "{>=4}",        "{<=2,>=4}",      },
-        { __LINE__,  {3,3,">="},  {4,4,"<="},  1,   false,  true,   true,   "*",      "[3,4]",  "{*}",          "{>=5}",        "{<=2,>=5}",      },
-        { __LINE__,  {3,3,">="},  {5,5,"<="},  1,   false,  true,   true,   "*",      "[3,5]",  "{*}",          "{>=6}",        "{<=2,>=6}",      },
-        { __LINE__,  {3,3,">="},  {1,1,">"},   1,   false,  true,   true,   ">=2",    ">=3",    "{>=2}",        "{}",           "{2}",            },
-        { __LINE__,  {3,3,">="},  {2,2,">"},   0,   true,   true,   true,   ">=3",    ">=3",    "{>=3}",        "{}",           "{}",             },
-        { __LINE__,  {3,3,">="},  {3,3,">"},   -1,  true,   true,   true,   ">=3",    ">=4",    "{>=3}",        "{3}",          "{3}",            },
-        { __LINE__,  {3,3,">="},  {4,4,">"},   -1,  true,   true,   true,   ">=3",    ">=5",    "{>=3}",        "{[3,4]}",      "{[3,4]}",        },
-        { __LINE__,  {3,3,">="},  {5,5,">"},   -1,  true,   true,   true,   ">=3",    ">=6",    "{>=3}",        "{[3,5]}",      "{[3,5]}",        },
-        { __LINE__,  {3,3,">="},  {1,1,">="},  1,   false,  true,   true,   ">=1",    ">=3",    "{>=1}",        "{}",           "{[1,2]}",        },
-        { __LINE__,  {3,3,">="},  {2,2,">="},  1,   false,  true,   true,   ">=2",    ">=3",    "{>=2}",        "{}",           "{2}",            },
-        { __LINE__,  {3,3,">="},  {3,3,">="},  0,   true,   true,   true,   ">=3",    ">=3",    "{>=3}",        "{}",           "{}",             },
-        { __LINE__,  {3,3,">="},  {4,4,">="},  -1,  true,   true,   true,   ">=3",    ">=4",    "{>=3}",        "{3}",          "{3}",            },
-        { __LINE__,  {3,3,">="},  {5,5,">="},  -1,  true,   true,   true,   ">=3",    ">=5",    "{>=3}",        "{[3,4]}",      "{[3,4]}",        },
-        { __LINE__,  {3,6,"[]"},  {},          1,   false,  false,  false,  "[3,6]",  "{}",     "{[3,6]}",      "{[3,6]}",      "{[3,6]}",        },
-        { __LINE__,  {3,6,"[]"},  {0,0,"*"},   1,   false,  true,   true,   "*",      "[3,6]",  "{*}",          "{}",           "{<=2,>=7}",      },
-        { __LINE__,  {3,6,"[]"},  {1},         1,   false,  false,  false,  "[1,6]",  "{}",     "{1,[3,6]}",    "{[3,6]}",      "{1,[3,6]}",      },
-        { __LINE__,  {3,6,"[]"},  {2},         1,   false,  false,  true,   "[2,6]",  "{}",     "{[2,6]}",      "{[3,6]}",      "{[2,6]}",        },
-        { __LINE__,  {3,6,"[]"},  {3},         1,   true,   true,   true,   "[3,6]",  "3",      "{[3,6]}",      "{[4,6]}",      "{[4,6]}",        },
-        { __LINE__,  {3,6,"[]"},  {4},         -1,  true,   true,   true,   "[3,6]",  "4",      "{[3,6]}",      "{3,[5,6]}",    "{3,[5,6]}",      },
-        { __LINE__,  {3,6,"[]"},  {5},         -1,  true,   true,   true,   "[3,6]",  "5",      "{[3,6]}",      "{[3,4],6}",    "{[3,4],6}",      },
-        { __LINE__,  {3,6,"[]"},  {6},         -1,  true,   true,   true,   "[3,6]",  "6",      "{[3,6]}",      "{[3,5]}",      "{[3,5]}",        },
-        { __LINE__,  {3,6,"[]"},  {7},         -1,  false,  false,  true,   "[3,7]",  "{}",     "{[3,7]}",      "{[3,6]}",      "{[3,7]}",        },
-        { __LINE__,  {3,6,"[]"},  {8},         -1,  false,  false,  false,  "[3,8]",  "{}",     "{[3,6],8}",    "{[3,6]}",      "{[3,6],8}",      },
-        { __LINE__,  {3,6,"[]"},  {1,1,"<"},   1,   false,  false,  false,  "<=6",    "{}",     "{<=0,[3,6]}",  "{[3,6]}",      "{<=0,[3,6]}",    },
-        { __LINE__,  {3,6,"[]"},  {2,2,"<"},   1,   false,  false,  false,  "<=6",    "{}",     "{<=1,[3,6]}",  "{[3,6]}",      "{<=1,[3,6]}",    },
-        { __LINE__,  {3,6,"[]"},  {3,3,"<"},   1,   false,  false,  true,   "<=6",    "{}",     "{<=6}",        "{[3,6]}",      "{<=6}",          },
-        { __LINE__,  {3,6,"[]"},  {4,4,"<"},   1,   false,  true,   true,   "<=6",    "3",      "{<=6}",        "{[4,6]}",      "{<=2,[4,6]}",    },
-        { __LINE__,  {3,6,"[]"},  {5,5,"<"},   1,   false,  true,   true,   "<=6",    "[3,4]",  "{<=6}",        "{[5,6]}",      "{<=2,[5,6]}",    },
-        { __LINE__,  {3,6,"[]"},  {6,6,"<"},   1,   false,  true,   true,   "<=6",    "[3,5]",  "{<=6}",        "{6}",          "{<=2,6}",        },
-        { __LINE__,  {3,6,"[]"},  {7,7,"<"},   1,   false,  true,   true,   "<=6",    "[3,6]",  "{<=6}",        "{}",           "{<=2}",          },
-        { __LINE__,  {3,6,"[]"},  {8,8,"<"},   1,   false,  true,   true,   "<=7",    "[3,6]",  "{<=7}",        "{}",           "{<=2,7}",        },
-        { __LINE__,  {3,6,"[]"},  {1,1,"<="},  1,   false,  false,  false,  "<=6",    "{}",     "{<=1,[3,6]}",  "{[3,6]}",      "{<=1,[3,6]}",    },
-        { __LINE__,  {3,6,"[]"},  {2,2,"<="},  1,   false,  false,  true,   "<=6",    "{}",     "{<=6}",        "{[3,6]}",      "{<=6}",          },
-        { __LINE__,  {3,6,"[]"},  {3,3,"<="},  1,   false,  true,   true,   "<=6",    "3",      "{<=6}",        "{[4,6]}",      "{<=2,[4,6]}",    },
-        { __LINE__,  {3,6,"[]"},  {4,4,"<="},  1,   false,  true,   true,   "<=6",    "[3,4]",  "{<=6}",        "{[5,6]}",      "{<=2,[5,6]}",    },
-        { __LINE__,  {3,6,"[]"},  {5,5,"<="},  1,   false,  true,   true,   "<=6",    "[3,5]",  "{<=6}",        "{6}",          "{<=2,6}",        },
-        { __LINE__,  {3,6,"[]"},  {6,6,"<="},  1,   false,  true,   true,   "<=6",    "[3,6]",  "{<=6}",        "{}",           "{<=2}",          },
-        { __LINE__,  {3,6,"[]"},  {7,7,"<="},  1,   false,  true,   true,   "<=7",    "[3,6]",  "{<=7}",        "{}",           "{<=2,7}",        },
-        { __LINE__,  {3,6,"[]"},  {8,8,"<="},  1,   false,  true,   true,   "<=8",    "[3,6]",  "{<=8}",        "{}",           "{<=2,[7,8]}",    },
-        { __LINE__,  {3,6,"[]"},  {1,1,">"},   1,   false,  true,   true,   ">=2",    "[3,6]",  "{>=2}",        "{}",           "{2,>=7}",        },
-        { __LINE__,  {3,6,"[]"},  {2,2,">"},   -1,  false,  true,   true,   ">=3",    "[3,6]",  "{>=3}",        "{}",           "{>=7}",          },
-        { __LINE__,  {3,6,"[]"},  {3,3,">"},   -1,  false,  true,   true,   ">=3",    "[4,6]",  "{>=3}",        "{3}",          "{3,>=7}",        },
-        { __LINE__,  {3,6,"[]"},  {4,4,">"},   -1,  false,  true,   true,   ">=3",    "[5,6]",  "{>=3}",        "{[3,4]}",      "{[3,4],>=7}",    },
-        { __LINE__,  {3,6,"[]"},  {5,5,">"},   -1,  false,  true,   true,   ">=3",    "6",      "{>=3}",        "{[3,5]}",      "{[3,5],>=7}",    },
-        { __LINE__,  {3,6,"[]"},  {6,6,">"},   -1,  false,  false,  true,   ">=3",    "{}",     "{>=3}",        "{[3,6]}",      "{>=3}",          },
-        { __LINE__,  {3,6,"[]"},  {7,7,">"},   -1,  false,  false,  false,  ">=3",    "{}",     "{[3,6],>=8}",  "{[3,6]}",      "{[3,6],>=8}",    },
-        { __LINE__,  {3,6,"[]"},  {8,8,">"},   -1,  false,  false,  false,  ">=3",    "{}",     "{[3,6],>=9}",  "{[3,6]}",      "{[3,6],>=9}",    },
-        { __LINE__,  {3,6,"[]"},  {1,1,">="},  1,   false,  true,   true,   ">=1",    "[3,6]",  "{>=1}",        "{}",           "{[1,2],>=7}",    },
-        { __LINE__,  {3,6,"[]"},  {2,2,">="},  1,   false,  true,   true,   ">=2",    "[3,6]",  "{>=2}",        "{}",           "{2,>=7}",        },
-        { __LINE__,  {3,6,"[]"},  {3,3,">="},  -1,  false,  true,   true,   ">=3",    "[3,6]",  "{>=3}",        "{}",           "{>=7}",          },
-        { __LINE__,  {3,6,"[]"},  {4,4,">="},  -1,  false,  true,   true,   ">=3",    "[4,6]",  "{>=3}",        "{3}",          "{3,>=7}",        },
-        { __LINE__,  {3,6,"[]"},  {5,5,">="},  -1,  false,  true,   true,   ">=3",    "[5,6]",  "{>=3}",        "{[3,4]}",      "{[3,4],>=7}",    },
-        { __LINE__,  {3,6,"[]"},  {6,6,">="},  -1,  false,  true,   true,   ">=3",    "6",      "{>=3}",        "{[3,5]}",      "{[3,5],>=7}",    },
-        { __LINE__,  {3,6,"[]"},  {7,7,">="},  -1,  false,  false,  true,   ">=3",    "{}",     "{>=3}",        "{[3,6]}",      "{>=3}",          },
-        { __LINE__,  {3,6,"[]"},  {8,8,">="},  -1,  false,  false,  false,  ">=3",    "{}",     "{[3,6],>=8}",  "{[3,6]}",      "{[3,6],>=8}",    },
-        { __LINE__,  {3,6,"[]"},  {1,1,"[]"},  1,   false,  false,  false,  "[1,6]",  "{}",     "{1,[3,6]}",    "{[3,6]}",      "{1,[3,6]}",      },
-        { __LINE__,  {3,6,"[]"},  {1,2,"[]"},  1,   false,  false,  true,   "[1,6]",  "{}",     "{[1,6]}",      "{[3,6]}",      "{[1,6]}",        },
-        { __LINE__,  {3,6,"[]"},  {1,3,"[]"},  1,   false,  true,   true,   "[1,6]",  "3",      "{[1,6]}",      "{[4,6]}",      "{[1,2],[4,6]}",  },
-        { __LINE__,  {3,6,"[]"},  {1,4,"[]"},  1,   false,  true,   true,   "[1,6]",  "[3,4]",  "{[1,6]}",      "{[5,6]}",      "{[1,2],[5,6]}",  },
-        { __LINE__,  {3,6,"[]"},  {1,5,"[]"},  1,   false,  true,   true,   "[1,6]",  "[3,5]",  "{[1,6]}",      "{6}",          "{[1,2],6}",      },
-        { __LINE__,  {3,6,"[]"},  {1,6,"[]"},  1,   false,  true,   true,   "[1,6]",  "[3,6]",  "{[1,6]}",      "{}",           "{[1,2]}",        },
-        { __LINE__,  {3,6,"[]"},  {1,7,"[]"},  1,   false,  true,   true,   "[1,7]",  "[3,6]",  "{[1,7]}",      "{}",           "{[1,2],7}",      },
-        { __LINE__,  {3,6,"[]"},  {1,8,"[]"},  1,   false,  true,   true,   "[1,8]",  "[3,6]",  "{[1,8]}",      "{}",           "{[1,2],[7,8]}",  },
-        { __LINE__,  {3,6,"[]"},  {2,2,"[]"},  1,   false,  false,  true,   "[2,6]",  "{}",     "{[2,6]}",      "{[3,6]}",      "{[2,6]}",        },
-        { __LINE__,  {3,6,"[]"},  {2,3,"[]"},  1,   false,  true,   true,   "[2,6]",  "3",      "{[2,6]}",      "{[4,6]}",      "{2,[4,6]}",      },
-        { __LINE__,  {3,6,"[]"},  {2,4,"[]"},  1,   false,  true,   true,   "[2,6]",  "[3,4]",  "{[2,6]}",      "{[5,6]}",      "{2,[5,6]}",      },
-        { __LINE__,  {3,6,"[]"},  {2,5,"[]"},  1,   false,  true,   true,   "[2,6]",  "[3,5]",  "{[2,6]}",      "{6}",          "{2,6}",          },
-        { __LINE__,  {3,6,"[]"},  {2,6,"[]"},  1,   false,  true,   true,   "[2,6]",  "[3,6]",  "{[2,6]}",      "{}",           "{2}",            },
-        { __LINE__,  {3,6,"[]"},  {2,7,"[]"},  1,   false,  true,   true,   "[2,7]",  "[3,6]",  "{[2,7]}",      "{}",           "{2,7}",          },
-        { __LINE__,  {3,6,"[]"},  {2,8,"[]"},  1,   false,  true,   true,   "[2,8]",  "[3,6]",  "{[2,8]}",      "{}",           "{2,[7,8]}",      },
-        { __LINE__,  {3,6,"[]"},  {3,3,"[]"},  1,   true,   true,   true,   "[3,6]",  "3",      "{[3,6]}",      "{[4,6]}",      "{[4,6]}",        },
-        { __LINE__,  {3,6,"[]"},  {3,4,"[]"},  1,   true,   true,   true,   "[3,6]",  "[3,4]",  "{[3,6]}",      "{[5,6]}",      "{[5,6]}",        },
-        { __LINE__,  {3,6,"[]"},  {3,5,"[]"},  1,   true,   true,   true,   "[3,6]",  "[3,5]",  "{[3,6]}",      "{6}",          "{6}",            },
-        { __LINE__,  {3,6,"[]"},  {3,6,"[]"},  0,   true,   true,   true,   "[3,6]",  "[3,6]",  "{[3,6]}",      "{}",           "{}",             },
-        { __LINE__,  {3,6,"[]"},  {3,7,"[]"},  -1,  false,  true,   true,   "[3,7]",  "[3,6]",  "{[3,7]}",      "{}",           "{7}",            },
-        { __LINE__,  {3,6,"[]"},  {3,8,"[]"},  -1,  false,  true,   true,   "[3,8]",  "[3,6]",  "{[3,8]}",      "{}",           "{[7,8]}",        },
-        { __LINE__,  {3,6,"[]"},  {4,4,"[]"},  -1,  true,   true,   true,   "[3,6]",  "4",      "{[3,6]}",      "{3,[5,6]}",    "{3,[5,6]}",      },
-        { __LINE__,  {3,6,"[]"},  {4,5,"[]"},  -1,  true,   true,   true,   "[3,6]",  "[4,5]",  "{[3,6]}",      "{3,6}",        "{3,6}",          },
-        { __LINE__,  {3,6,"[]"},  {4,6,"[]"},  -1,  true,   true,   true,   "[3,6]",  "[4,6]",  "{[3,6]}",      "{3}",          "{3}",            },
-        { __LINE__,  {3,6,"[]"},  {4,7,"[]"},  -1,  false,  true,   true,   "[3,7]",  "[4,6]",  "{[3,7]}",      "{3}",          "{3,7}",          },
-        { __LINE__,  {3,6,"[]"},  {4,8,"[]"},  -1,  false,  true,   true,   "[3,8]",  "[4,6]",  "{[3,8]}",      "{3}",          "{3,[7,8]}",      },
-        { __LINE__,  {3,6,"[]"},  {5,5,"[]"},  -1,  true,   true,   true,   "[3,6]",  "5",      "{[3,6]}",      "{[3,4],6}",    "{[3,4],6}",      },
-        { __LINE__,  {3,6,"[]"},  {5,6,"[]"},  -1,  true,   true,   true,   "[3,6]",  "[5,6]",  "{[3,6]}",      "{[3,4]}",      "{[3,4]}",        },
-        { __LINE__,  {3,6,"[]"},  {5,7,"[]"},  -1,  false,  true,   true,   "[3,7]",  "[5,6]",  "{[3,7]}",      "{[3,4]}",      "{[3,4],7}",      },
-        { __LINE__,  {3,6,"[]"},  {5,8,"[]"},  -1,  false,  true,   true,   "[3,8]",  "[5,6]",  "{[3,8]}",      "{[3,4]}",      "{[3,4],[7,8]}",  },
-        { __LINE__,  {3,6,"[]"},  {6,6,"[]"},  -1,  true,   true,   true,   "[3,6]",  "6",      "{[3,6]}",      "{[3,5]}",      "{[3,5]}",        },
-        { __LINE__,  {3,6,"[]"},  {6,7,"[]"},  -1,  false,  true,   true,   "[3,7]",  "6",      "{[3,7]}",      "{[3,5]}",      "{[3,5],7}",      },
-        { __LINE__,  {3,6,"[]"},  {6,8,"[]"},  -1,  false,  true,   true,   "[3,8]",  "6",      "{[3,8]}",      "{[3,5]}",      "{[3,5],[7,8]}",  },
-        { __LINE__,  {3,6,"[]"},  {7,7,"[]"},  -1,  false,  false,  true,   "[3,7]",  "{}",     "{[3,7]}",      "{[3,6]}",      "{[3,7]}",        },
-        { __LINE__,  {3,6,"[]"},  {7,8,"[]"},  -1,  false,  false,  true,   "[3,8]",  "{}",     "{[3,8]}",      "{[3,6]}",      "{[3,8]}",        },
-        { __LINE__,  {3,6,"[]"},  {8,8,"[]"},  -1,  false,  false,  false,  "[3,8]",  "{}",     "{[3,6],8}",    "{[3,6]}",      "{[3,6],8}",      },
+        { __LINE__,  {},                {},                0,   false,  false,  false,  "{}",     "{}",     "{}",           "{}",           "{}",             },
+        { __LINE__,  {0_sw,0_sw,"*"},   {},                1,   false,  false,  false,  "*",      "{}",     "{*}",          "{*}",          "{*}",            },
+        { __LINE__,  {0_sw,0_sw,"*"},   {0_sw,0_sw,"*"},   0,   true,   true,   true,   "*",      "*",      "{*}",          "{}",           "{}",             },
+        { __LINE__,  {3_sw},            {},                1,   false,  false,  false,  "3",      "{}",     "{3}",          "{3}",          "{3}",            },
+        { __LINE__,  {3_sw},            {0_sw,0_sw,"*"},   1,   false,  true,   true,   "*",      "3",      "{*}",          "{}",           "{<=2,>=4}",      },
+        { __LINE__,  {3_sw},            {1_sw},            1,   false,  false,  false,  "[1,3]",  "{}",     "{1,3}",        "{3}",          "{1,3}",          },
+        { __LINE__,  {3_sw},            {2_sw},            1,   false,  false,  true,   "[2,3]",  "{}",     "{[2,3]}",      "{3}",          "{[2,3]}",        },
+        { __LINE__,  {3_sw},            {3_sw},            0,   true,   true,   true,   "3",      "3",      "{3}",          "{}",           "{}",             },
+        { __LINE__,  {3_sw},            {4_sw},            -1,  false,  false,  true,   "[3,4]",  "{}",     "{[3,4]}",      "{3}",          "{[3,4]}",        },
+        { __LINE__,  {3_sw},            {5_sw},            -1,  false,  false,  false,  "[3,5]",  "{}",     "{3,5}",        "{3}",          "{3,5}",          },
+        { __LINE__,  {3_sw,3_sw,"<"},   {},                1,   false,  false,  false,  "<=2",    "{}",     "{<=2}",        "{<=2}",        "{<=2}",          },
+        { __LINE__,  {3_sw,3_sw,"<"},   {0_sw,0_sw,"*"},   -1,  false,  true,   true,   "*",      "<=2",    "{*}",          "{}",           "{>=3}",          },
+        { __LINE__,  {3_sw,3_sw,"<"},   {1_sw},            -1,  true,   true,   true,   "<=2",    "1",      "{<=2}",        "{<=0,2}",      "{<=0,2}",        },
+        { __LINE__,  {3_sw,3_sw,"<"},   {2_sw},            -1,  true,   true,   true,   "<=2",    "2",      "{<=2}",        "{<=1}",        "{<=1}",          },
+        { __LINE__,  {3_sw,3_sw,"<"},   {3_sw},            -1,  false,  false,  true,   "<=3",    "{}",     "{<=3}",        "{<=2}",        "{<=3}",          },
+        { __LINE__,  {3_sw,3_sw,"<"},   {4_sw},            -1,  false,  false,  false,  "<=4",    "{}",     "{<=2,4}",      "{<=2}",        "{<=2,4}",        },
+        { __LINE__,  {3_sw,3_sw,"<"},   {5_sw},            -1,  false,  false,  false,  "<=5",    "{}",     "{<=2,5}",      "{<=2}",        "{<=2,5}",        },
+        { __LINE__,  {3_sw,3_sw,"<"},   {1_sw,1_sw,"<"},   1,   true,   true,   true,   "<=2",    "<=0",    "{<=2}",        "{[1,2]}",      "{[1,2]}",        },
+        { __LINE__,  {3_sw,3_sw,"<"},   {2_sw,2_sw,"<"},   1,   true,   true,   true,   "<=2",    "<=1",    "{<=2}",        "{2}",          "{2}",            },
+        { __LINE__,  {3_sw,3_sw,"<"},   {3_sw,3_sw,"<"},   0,   true,   true,   true,   "<=2",    "<=2",    "{<=2}",        "{}",           "{}",             },
+        { __LINE__,  {3_sw,3_sw,"<"},   {4_sw,4_sw,"<"},   -1,  false,  true,   true,   "<=3",    "<=2",    "{<=3}",        "{}",           "{3}",            },
+        { __LINE__,  {3_sw,3_sw,"<"},   {5_sw,5_sw,"<"},   -1,  false,  true,   true,   "<=4",    "<=2",    "{<=4}",        "{}",           "{[3,4]}",        },
+        { __LINE__,  {3_sw,3_sw,"<="},  {},                1,   false,  false,  false,  "<=3",    "{}",     "{<=3}",        "{<=3}",        "{<=3}",          },
+        { __LINE__,  {3_sw,3_sw,"<="},  {0_sw,0_sw,"*"},   -1,  false,  true,   true,   "*",      "<=3",    "{*}",          "{}",           "{>=4}",          },
+        { __LINE__,  {3_sw,3_sw,"<="},  {1_sw},            -1,  true,   true,   true,   "<=3",    "1",      "{<=3}",        "{<=0,[2,3]}",  "{<=0,[2,3]}",    },
+        { __LINE__,  {3_sw,3_sw,"<="},  {2_sw},            -1,  true,   true,   true,   "<=3",    "2",      "{<=3}",        "{<=1,3}",      "{<=1,3}",        },
+        { __LINE__,  {3_sw,3_sw,"<="},  {3_sw},            -1,  true,   true,   true,   "<=3",    "3",      "{<=3}",        "{<=2}",        "{<=2}",          },
+        { __LINE__,  {3_sw,3_sw,"<="},  {4_sw},            -1,  false,  false,  true,   "<=4",    "{}",     "{<=4}",        "{<=3}",        "{<=4}",          },
+        { __LINE__,  {3_sw,3_sw,"<="},  {5_sw},            -1,  false,  false,  false,  "<=5",    "{}",     "{<=3,5}",      "{<=3}",        "{<=3,5}",        },
+        { __LINE__,  {3_sw,3_sw,"<="},  {1_sw,1_sw,"<"},   1,   true,   true,   true,   "<=3",    "<=0",    "{<=3}",        "{[1,3]}",      "{[1,3]}",        },
+        { __LINE__,  {3_sw,3_sw,"<="},  {2_sw,2_sw,"<"},   1,   true,   true,   true,   "<=3",    "<=1",    "{<=3}",        "{[2,3]}",      "{[2,3]}",        },
+        { __LINE__,  {3_sw,3_sw,"<="},  {3_sw,3_sw,"<"},   1,   true,   true,   true,   "<=3",    "<=2",    "{<=3}",        "{3}",          "{3}",            },
+        { __LINE__,  {3_sw,3_sw,"<="},  {4_sw,4_sw,"<"},   0,   true,   true,   true,   "<=3",    "<=3",    "{<=3}",        "{}",           "{}",             },
+        { __LINE__,  {3_sw,3_sw,"<="},  {5_sw,5_sw,"<"},   -1,  false,  true,   true,   "<=4",    "<=3",    "{<=4}",        "{}",           "{4}",            },
+        { __LINE__,  {3_sw,3_sw,"<="},  {1_sw,1_sw,"<="},  1,   true,   true,   true,   "<=3",    "<=1",    "{<=3}",        "{[2,3]}",      "{[2,3]}",        },
+        { __LINE__,  {3_sw,3_sw,"<="},  {2_sw,2_sw,"<="},  1,   true,   true,   true,   "<=3",    "<=2",    "{<=3}",        "{3}",          "{3}",            },
+        { __LINE__,  {3_sw,3_sw,"<="},  {3_sw,3_sw,"<="},  0,   true,   true,   true,   "<=3",    "<=3",    "{<=3}",        "{}",           "{}",             },
+        { __LINE__,  {3_sw,3_sw,"<="},  {4_sw,4_sw,"<="},  -1,  false,  true,   true,   "<=4",    "<=3",    "{<=4}",        "{}",           "{4}",            },
+        { __LINE__,  {3_sw,3_sw,"<="},  {5_sw,5_sw,"<="},  -1,  false,  true,   true,   "<=5",    "<=3",    "{<=5}",        "{}",           "{[4,5]}",        },
+        { __LINE__,  {3_sw,3_sw,">"},   {},                1,   false,  false,  false,  ">=4",    "{}",     "{>=4}",        "{>=4}",        "{>=4}",          },
+        { __LINE__,  {3_sw,3_sw,">"},   {0_sw,0_sw,"*"},   1,   false,  true,   true,   "*",      ">=4",    "{*}",          "{}",           "{<=3}",          },
+        { __LINE__,  {3_sw,3_sw,">"},   {1_sw},            1,   false,  false,  false,  ">=1",    "{}",     "{1,>=4}",      "{>=4}",        "{1,>=4}",        },
+        { __LINE__,  {3_sw,3_sw,">"},   {2_sw},            1,   false,  false,  false,  ">=2",    "{}",     "{2,>=4}",      "{>=4}",        "{2,>=4}",        },
+        { __LINE__,  {3_sw,3_sw,">"},   {3_sw},            1,   false,  false,  true,   ">=3",    "{}",     "{>=3}",        "{>=4}",        "{>=3}",          },
+        { __LINE__,  {3_sw,3_sw,">"},   {4_sw},            1,   true,   true,   true,   ">=4",    "4",      "{>=4}",        "{>=5}",        "{>=5}",          },
+        { __LINE__,  {3_sw,3_sw,">"},   {5_sw},            -1,  true,   true,   true,   ">=4",    "5",      "{>=4}",        "{4,>=6}",      "{4,>=6}",        },
+        { __LINE__,  {3_sw,3_sw,">"},   {1_sw,1_sw,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=0,>=4}",    "{>=4}",        "{<=0,>=4}",      },
+        { __LINE__,  {3_sw,3_sw,">"},   {2_sw,2_sw,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=1,>=4}",    "{>=4}",        "{<=1,>=4}",      },
+        { __LINE__,  {3_sw,3_sw,">"},   {3_sw,3_sw,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=2,>=4}",    "{>=4}",        "{<=2,>=4}",      },
+        { __LINE__,  {3_sw,3_sw,">"},   {4_sw,4_sw,"<"},   1,   false,  false,  true,   "*",      "{}",     "{*}",          "{>=4}",        "{*}",            },
+        { __LINE__,  {3_sw,3_sw,">"},   {5_sw,5_sw,"<"},   1,   false,  true,   true,   "*",      "4",      "{*}",          "{>=5}",        "{<=3,>=5}",      },
+        { __LINE__,  {3_sw,3_sw,">"},   {1_sw,1_sw,"<="},  1,   false,  false,  false,  "*",      "{}",     "{<=1,>=4}",    "{>=4}",        "{<=1,>=4}",      },
+        { __LINE__,  {3_sw,3_sw,">"},   {2_sw,2_sw,"<="},  1,   false,  false,  false,  "*",      "{}",     "{<=2,>=4}",    "{>=4}",        "{<=2,>=4}",      },
+        { __LINE__,  {3_sw,3_sw,">"},   {3_sw,3_sw,"<="},  1,   false,  false,  true,   "*",      "{}",     "{*}",          "{>=4}",        "{*}",            },
+        { __LINE__,  {3_sw,3_sw,">"},   {4_sw,4_sw,"<="},  1,   false,  true,   true,   "*",      "4",      "{*}",          "{>=5}",        "{<=3,>=5}",      },
+        { __LINE__,  {3_sw,3_sw,">"},   {5_sw,5_sw,"<="},  1,   false,  true,   true,   "*",      "[4,5]",  "{*}",          "{>=6}",        "{<=3,>=6}",      },
+        { __LINE__,  {3_sw,3_sw,">"},   {1_sw,1_sw,">"},   1,   false,  true,   true,   ">=2",    ">=4",    "{>=2}",        "{}",           "{[2,3]}",        },
+        { __LINE__,  {3_sw,3_sw,">"},   {2_sw,2_sw,">"},   1,   false,  true,   true,   ">=3",    ">=4",    "{>=3}",        "{}",           "{3}",            },
+        { __LINE__,  {3_sw,3_sw,">"},   {3_sw,3_sw,">"},   0,   true,   true,   true,   ">=4",    ">=4",    "{>=4}",        "{}",           "{}",             },
+        { __LINE__,  {3_sw,3_sw,">"},   {4_sw,4_sw,">"},   -1,  true,   true,   true,   ">=4",    ">=5",    "{>=4}",        "{4}",          "{4}",            },
+        { __LINE__,  {3_sw,3_sw,">"},   {5_sw,5_sw,">"},   -1,  true,   true,   true,   ">=4",    ">=6",    "{>=4}",        "{[4,5]}",      "{[4,5]}",        },
+        { __LINE__,  {3_sw,3_sw,">="},  {},                1,   false,  false,  false,  ">=3",    "{}",     "{>=3}",        "{>=3}",        "{>=3}",          },
+        { __LINE__,  {3_sw,3_sw,">="},  {0_sw,0_sw,"*"},   1,   false,  true,   true,   "*",      ">=3",    "{*}",          "{}",           "{<=2}",          },
+        { __LINE__,  {3_sw,3_sw,">="},  {1_sw},            1,   false,  false,  false,  ">=1",    "{}",     "{1,>=3}",      "{>=3}",        "{1,>=3}",        },
+        { __LINE__,  {3_sw,3_sw,">="},  {2_sw},            1,   false,  false,  true,   ">=2",    "{}",     "{>=2}",        "{>=3}",        "{>=2}",          },
+        { __LINE__,  {3_sw,3_sw,">="},  {3_sw},            1,   true,   true,   true,   ">=3",    "3",      "{>=3}",        "{>=4}",        "{>=4}",          },
+        { __LINE__,  {3_sw,3_sw,">="},  {4_sw},            -1,  true,   true,   true,   ">=3",    "4",      "{>=3}",        "{3,>=5}",      "{3,>=5}",        },
+        { __LINE__,  {3_sw,3_sw,">="},  {5_sw},            -1,  true,   true,   true,   ">=3",    "5",      "{>=3}",        "{[3,4],>=6}",  "{[3,4],>=6}",    },
+        { __LINE__,  {3_sw,3_sw,">="},  {1_sw,1_sw,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=0,>=3}",    "{>=3}",        "{<=0,>=3}",      },
+        { __LINE__,  {3_sw,3_sw,">="},  {2_sw,2_sw,"<"},   1,   false,  false,  false,  "*",      "{}",     "{<=1,>=3}",    "{>=3}",        "{<=1,>=3}",      },
+        { __LINE__,  {3_sw,3_sw,">="},  {3_sw,3_sw,"<"},   1,   false,  false,  true,   "*",      "{}",     "{*}",          "{>=3}",        "{*}",            },
+        { __LINE__,  {3_sw,3_sw,">="},  {4_sw,4_sw,"<"},   1,   false,  true,   true,   "*",      "3",      "{*}",          "{>=4}",        "{<=2,>=4}",      },
+        { __LINE__,  {3_sw,3_sw,">="},  {5_sw,5_sw,"<"},   1,   false,  true,   true,   "*",      "[3,4]",  "{*}",          "{>=5}",        "{<=2,>=5}",      },
+        { __LINE__,  {3_sw,3_sw,">="},  {1_sw,1_sw,"<="},  1,   false,  false,  false,  "*",      "{}",     "{<=1,>=3}",    "{>=3}",        "{<=1,>=3}",      },
+        { __LINE__,  {3_sw,3_sw,">="},  {2_sw,2_sw,"<="},  1,   false,  false,  true,   "*",      "{}",     "{*}",          "{>=3}",        "{*}",            },
+        { __LINE__,  {3_sw,3_sw,">="},  {3_sw,3_sw,"<="},  1,   false,  true,   true,   "*",      "3",      "{*}",          "{>=4}",        "{<=2,>=4}",      },
+        { __LINE__,  {3_sw,3_sw,">="},  {4_sw,4_sw,"<="},  1,   false,  true,   true,   "*",      "[3,4]",  "{*}",          "{>=5}",        "{<=2,>=5}",      },
+        { __LINE__,  {3_sw,3_sw,">="},  {5_sw,5_sw,"<="},  1,   false,  true,   true,   "*",      "[3,5]",  "{*}",          "{>=6}",        "{<=2,>=6}",      },
+        { __LINE__,  {3_sw,3_sw,">="},  {1_sw,1_sw,">"},   1,   false,  true,   true,   ">=2",    ">=3",    "{>=2}",        "{}",           "{2}",            },
+        { __LINE__,  {3_sw,3_sw,">="},  {2_sw,2_sw,">"},   0,   true,   true,   true,   ">=3",    ">=3",    "{>=3}",        "{}",           "{}",             },
+        { __LINE__,  {3_sw,3_sw,">="},  {3_sw,3_sw,">"},   -1,  true,   true,   true,   ">=3",    ">=4",    "{>=3}",        "{3}",          "{3}",            },
+        { __LINE__,  {3_sw,3_sw,">="},  {4_sw,4_sw,">"},   -1,  true,   true,   true,   ">=3",    ">=5",    "{>=3}",        "{[3,4]}",      "{[3,4]}",        },
+        { __LINE__,  {3_sw,3_sw,">="},  {5_sw,5_sw,">"},   -1,  true,   true,   true,   ">=3",    ">=6",    "{>=3}",        "{[3,5]}",      "{[3,5]}",        },
+        { __LINE__,  {3_sw,3_sw,">="},  {1_sw,1_sw,">="},  1,   false,  true,   true,   ">=1",    ">=3",    "{>=1}",        "{}",           "{[1,2]}",        },
+        { __LINE__,  {3_sw,3_sw,">="},  {2_sw,2_sw,">="},  1,   false,  true,   true,   ">=2",    ">=3",    "{>=2}",        "{}",           "{2}",            },
+        { __LINE__,  {3_sw,3_sw,">="},  {3_sw,3_sw,">="},  0,   true,   true,   true,   ">=3",    ">=3",    "{>=3}",        "{}",           "{}",             },
+        { __LINE__,  {3_sw,3_sw,">="},  {4_sw,4_sw,">="},  -1,  true,   true,   true,   ">=3",    ">=4",    "{>=3}",        "{3}",          "{3}",            },
+        { __LINE__,  {3_sw,3_sw,">="},  {5_sw,5_sw,">="},  -1,  true,   true,   true,   ">=3",    ">=5",    "{>=3}",        "{[3,4]}",      "{[3,4]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {},                1,   false,  false,  false,  "[3,6]",  "{}",     "{[3,6]}",      "{[3,6]}",      "{[3,6]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {0_sw,0_sw,"*"},   1,   false,  true,   true,   "*",      "[3,6]",  "{*}",          "{}",           "{<=2,>=7}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw},            1,   false,  false,  false,  "[1,6]",  "{}",     "{1,[3,6]}",    "{[3,6]}",      "{1,[3,6]}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw},            1,   false,  false,  true,   "[2,6]",  "{}",     "{[2,6]}",      "{[3,6]}",      "{[2,6]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw},            1,   true,   true,   true,   "[3,6]",  "3",      "{[3,6]}",      "{[4,6]}",      "{[4,6]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw},            -1,  true,   true,   true,   "[3,6]",  "4",      "{[3,6]}",      "{3,[5,6]}",    "{3,[5,6]}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw},            -1,  true,   true,   true,   "[3,6]",  "5",      "{[3,6]}",      "{[3,4],6}",    "{[3,4],6}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {6_sw},            -1,  true,   true,   true,   "[3,6]",  "6",      "{[3,6]}",      "{[3,5]}",      "{[3,5]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {7_sw},            -1,  false,  false,  true,   "[3,7]",  "{}",     "{[3,7]}",      "{[3,6]}",      "{[3,7]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {8_sw},            -1,  false,  false,  false,  "[3,8]",  "{}",     "{[3,6],8}",    "{[3,6]}",      "{[3,6],8}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,1_sw,"<"},   1,   false,  false,  false,  "<=6",    "{}",     "{<=0,[3,6]}",  "{[3,6]}",      "{<=0,[3,6]}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,2_sw,"<"},   1,   false,  false,  false,  "<=6",    "{}",     "{<=1,[3,6]}",  "{[3,6]}",      "{<=1,[3,6]}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,3_sw,"<"},   1,   false,  false,  true,   "<=6",    "{}",     "{<=6}",        "{[3,6]}",      "{<=6}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,4_sw,"<"},   1,   false,  true,   true,   "<=6",    "3",      "{<=6}",        "{[4,6]}",      "{<=2,[4,6]}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw,5_sw,"<"},   1,   false,  true,   true,   "<=6",    "[3,4]",  "{<=6}",        "{[5,6]}",      "{<=2,[5,6]}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {6_sw,6_sw,"<"},   1,   false,  true,   true,   "<=6",    "[3,5]",  "{<=6}",        "{6}",          "{<=2,6}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {7_sw,7_sw,"<"},   1,   false,  true,   true,   "<=6",    "[3,6]",  "{<=6}",        "{}",           "{<=2}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {8_sw,8_sw,"<"},   1,   false,  true,   true,   "<=7",    "[3,6]",  "{<=7}",        "{}",           "{<=2,7}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,1_sw,"<="},  1,   false,  false,  false,  "<=6",    "{}",     "{<=1,[3,6]}",  "{[3,6]}",      "{<=1,[3,6]}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,2_sw,"<="},  1,   false,  false,  true,   "<=6",    "{}",     "{<=6}",        "{[3,6]}",      "{<=6}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,3_sw,"<="},  1,   false,  true,   true,   "<=6",    "3",      "{<=6}",        "{[4,6]}",      "{<=2,[4,6]}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,4_sw,"<="},  1,   false,  true,   true,   "<=6",    "[3,4]",  "{<=6}",        "{[5,6]}",      "{<=2,[5,6]}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw,5_sw,"<="},  1,   false,  true,   true,   "<=6",    "[3,5]",  "{<=6}",        "{6}",          "{<=2,6}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {6_sw,6_sw,"<="},  1,   false,  true,   true,   "<=6",    "[3,6]",  "{<=6}",        "{}",           "{<=2}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {7_sw,7_sw,"<="},  1,   false,  true,   true,   "<=7",    "[3,6]",  "{<=7}",        "{}",           "{<=2,7}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {8_sw,8_sw,"<="},  1,   false,  true,   true,   "<=8",    "[3,6]",  "{<=8}",        "{}",           "{<=2,[7,8]}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,1_sw,">"},   1,   false,  true,   true,   ">=2",    "[3,6]",  "{>=2}",        "{}",           "{2,>=7}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,2_sw,">"},   -1,  false,  true,   true,   ">=3",    "[3,6]",  "{>=3}",        "{}",           "{>=7}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,3_sw,">"},   -1,  false,  true,   true,   ">=3",    "[4,6]",  "{>=3}",        "{3}",          "{3,>=7}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,4_sw,">"},   -1,  false,  true,   true,   ">=3",    "[5,6]",  "{>=3}",        "{[3,4]}",      "{[3,4],>=7}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw,5_sw,">"},   -1,  false,  true,   true,   ">=3",    "6",      "{>=3}",        "{[3,5]}",      "{[3,5],>=7}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {6_sw,6_sw,">"},   -1,  false,  false,  true,   ">=3",    "{}",     "{>=3}",        "{[3,6]}",      "{>=3}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {7_sw,7_sw,">"},   -1,  false,  false,  false,  ">=3",    "{}",     "{[3,6],>=8}",  "{[3,6]}",      "{[3,6],>=8}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {8_sw,8_sw,">"},   -1,  false,  false,  false,  ">=3",    "{}",     "{[3,6],>=9}",  "{[3,6]}",      "{[3,6],>=9}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,1_sw,">="},  1,   false,  true,   true,   ">=1",    "[3,6]",  "{>=1}",        "{}",           "{[1,2],>=7}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,2_sw,">="},  1,   false,  true,   true,   ">=2",    "[3,6]",  "{>=2}",        "{}",           "{2,>=7}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,3_sw,">="},  -1,  false,  true,   true,   ">=3",    "[3,6]",  "{>=3}",        "{}",           "{>=7}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,4_sw,">="},  -1,  false,  true,   true,   ">=3",    "[4,6]",  "{>=3}",        "{3}",          "{3,>=7}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw,5_sw,">="},  -1,  false,  true,   true,   ">=3",    "[5,6]",  "{>=3}",        "{[3,4]}",      "{[3,4],>=7}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {6_sw,6_sw,">="},  -1,  false,  true,   true,   ">=3",    "6",      "{>=3}",        "{[3,5]}",      "{[3,5],>=7}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {7_sw,7_sw,">="},  -1,  false,  false,  true,   ">=3",    "{}",     "{>=3}",        "{[3,6]}",      "{>=3}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {8_sw,8_sw,">="},  -1,  false,  false,  false,  ">=3",    "{}",     "{[3,6],>=8}",  "{[3,6]}",      "{[3,6],>=8}",    },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,1_sw,"[]"},  1,   false,  false,  false,  "[1,6]",  "{}",     "{1,[3,6]}",    "{[3,6]}",      "{1,[3,6]}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,2_sw,"[]"},  1,   false,  false,  true,   "[1,6]",  "{}",     "{[1,6]}",      "{[3,6]}",      "{[1,6]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,3_sw,"[]"},  1,   false,  true,   true,   "[1,6]",  "3",      "{[1,6]}",      "{[4,6]}",      "{[1,2],[4,6]}",  },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,4_sw,"[]"},  1,   false,  true,   true,   "[1,6]",  "[3,4]",  "{[1,6]}",      "{[5,6]}",      "{[1,2],[5,6]}",  },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,5_sw,"[]"},  1,   false,  true,   true,   "[1,6]",  "[3,5]",  "{[1,6]}",      "{6}",          "{[1,2],6}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,6_sw,"[]"},  1,   false,  true,   true,   "[1,6]",  "[3,6]",  "{[1,6]}",      "{}",           "{[1,2]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,7_sw,"[]"},  1,   false,  true,   true,   "[1,7]",  "[3,6]",  "{[1,7]}",      "{}",           "{[1,2],7}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {1_sw,8_sw,"[]"},  1,   false,  true,   true,   "[1,8]",  "[3,6]",  "{[1,8]}",      "{}",           "{[1,2],[7,8]}",  },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,2_sw,"[]"},  1,   false,  false,  true,   "[2,6]",  "{}",     "{[2,6]}",      "{[3,6]}",      "{[2,6]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,3_sw,"[]"},  1,   false,  true,   true,   "[2,6]",  "3",      "{[2,6]}",      "{[4,6]}",      "{2,[4,6]}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,4_sw,"[]"},  1,   false,  true,   true,   "[2,6]",  "[3,4]",  "{[2,6]}",      "{[5,6]}",      "{2,[5,6]}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,5_sw,"[]"},  1,   false,  true,   true,   "[2,6]",  "[3,5]",  "{[2,6]}",      "{6}",          "{2,6}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,6_sw,"[]"},  1,   false,  true,   true,   "[2,6]",  "[3,6]",  "{[2,6]}",      "{}",           "{2}",            },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,7_sw,"[]"},  1,   false,  true,   true,   "[2,7]",  "[3,6]",  "{[2,7]}",      "{}",           "{2,7}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {2_sw,8_sw,"[]"},  1,   false,  true,   true,   "[2,8]",  "[3,6]",  "{[2,8]}",      "{}",           "{2,[7,8]}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,3_sw,"[]"},  1,   true,   true,   true,   "[3,6]",  "3",      "{[3,6]}",      "{[4,6]}",      "{[4,6]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,4_sw,"[]"},  1,   true,   true,   true,   "[3,6]",  "[3,4]",  "{[3,6]}",      "{[5,6]}",      "{[5,6]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,5_sw,"[]"},  1,   true,   true,   true,   "[3,6]",  "[3,5]",  "{[3,6]}",      "{6}",          "{6}",            },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,6_sw,"[]"},  0,   true,   true,   true,   "[3,6]",  "[3,6]",  "{[3,6]}",      "{}",           "{}",             },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,7_sw,"[]"},  -1,  false,  true,   true,   "[3,7]",  "[3,6]",  "{[3,7]}",      "{}",           "{7}",            },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {3_sw,8_sw,"[]"},  -1,  false,  true,   true,   "[3,8]",  "[3,6]",  "{[3,8]}",      "{}",           "{[7,8]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,4_sw,"[]"},  -1,  true,   true,   true,   "[3,6]",  "4",      "{[3,6]}",      "{3,[5,6]}",    "{3,[5,6]}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,5_sw,"[]"},  -1,  true,   true,   true,   "[3,6]",  "[4,5]",  "{[3,6]}",      "{3,6}",        "{3,6}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,6_sw,"[]"},  -1,  true,   true,   true,   "[3,6]",  "[4,6]",  "{[3,6]}",      "{3}",          "{3}",            },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,7_sw,"[]"},  -1,  false,  true,   true,   "[3,7]",  "[4,6]",  "{[3,7]}",      "{3}",          "{3,7}",          },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {4_sw,8_sw,"[]"},  -1,  false,  true,   true,   "[3,8]",  "[4,6]",  "{[3,8]}",      "{3}",          "{3,[7,8]}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw,5_sw,"[]"},  -1,  true,   true,   true,   "[3,6]",  "5",      "{[3,6]}",      "{[3,4],6}",    "{[3,4],6}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw,6_sw,"[]"},  -1,  true,   true,   true,   "[3,6]",  "[5,6]",  "{[3,6]}",      "{[3,4]}",      "{[3,4]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw,7_sw,"[]"},  -1,  false,  true,   true,   "[3,7]",  "[5,6]",  "{[3,7]}",      "{[3,4]}",      "{[3,4],7}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {5_sw,8_sw,"[]"},  -1,  false,  true,   true,   "[3,8]",  "[5,6]",  "{[3,8]}",      "{[3,4]}",      "{[3,4],[7,8]}",  },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {6_sw,6_sw,"[]"},  -1,  true,   true,   true,   "[3,6]",  "6",      "{[3,6]}",      "{[3,5]}",      "{[3,5]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {6_sw,7_sw,"[]"},  -1,  false,  true,   true,   "[3,7]",  "6",      "{[3,7]}",      "{[3,5]}",      "{[3,5],7}",      },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {6_sw,8_sw,"[]"},  -1,  false,  true,   true,   "[3,8]",  "6",      "{[3,8]}",      "{[3,5]}",      "{[3,5],[7,8]}",  },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {7_sw,7_sw,"[]"},  -1,  false,  false,  true,   "[3,7]",  "{}",     "{[3,7]}",      "{[3,6]}",      "{[3,7]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {7_sw,8_sw,"[]"},  -1,  false,  false,  true,   "[3,8]",  "{}",     "{[3,8]}",      "{[3,6]}",      "{[3,8]}",        },
+        { __LINE__,  {3_sw,6_sw,"[]"},  {8_sw,8_sw,"[]"},  -1,  false,  false,  false,  "[3,8]",  "{}",     "{[3,6],8}",    "{[3,6]}",      "{[3,6],8}",      },
 
     };
 

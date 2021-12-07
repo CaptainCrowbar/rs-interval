@@ -1,0 +1,23 @@
+#pragma once
+
+#include <ostream>
+
+class Stepwise {
+public:
+    constexpr Stepwise(int n = 0) noexcept: value_(n) {}
+    constexpr Stepwise& operator++() noexcept { ++value_; return *this; }
+    constexpr Stepwise operator++(int) noexcept { auto old = *this; ++value_; return old; }
+    constexpr Stepwise& operator--() noexcept { --value_; return *this; }
+    constexpr Stepwise operator--(int) noexcept { auto old = *this; --value_; return old; }
+    constexpr bool operator==(Stepwise s) const noexcept { return value_ == s.value_; }
+    constexpr bool operator!=(Stepwise s) const noexcept { return value_ != s.value_; }
+    constexpr bool operator<(Stepwise s) const noexcept { return value_ < s.value_; }
+    constexpr bool operator>(Stepwise s) const noexcept { return value_ > s.value_; }
+    constexpr bool operator<=(Stepwise s) const noexcept { return value_ <= s.value_; }
+    constexpr bool operator>=(Stepwise s) const noexcept { return value_ >= s.value_; }
+    friend std::ostream& operator<<(std::ostream& out, Stepwise s) { return out << s.value_; }
+private:
+    int value_;
+};
+
+constexpr Stepwise operator""_sw(unsigned long long n) noexcept { return Stepwise(int(n)); }

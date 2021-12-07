@@ -5,11 +5,6 @@
 using namespace RS;
 using namespace RS::Intervals;
 
-// TODO
-template <> struct IntervalTraits<int> {
-    static constexpr IntervalCategory category = IntervalCategory::integral;
-};
-
 using IntervalType = Interval<int>;
 using MapType = IntervalMap<int, std::string>;
 

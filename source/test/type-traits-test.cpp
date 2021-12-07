@@ -1,4 +1,5 @@
 #include "rs-interval/type-traits.hpp"
+#include "test/stepwise.hpp"
 #include "test/unit-test.hpp"
 #include <chrono>
 #include <complex>
@@ -63,6 +64,7 @@ void test_rs_interval_type_traits() {
     TEST_EQUAL(interval_category<std::vector<int>::const_iterator>, IntervalCategory::stepwise);
     TEST_EQUAL(interval_category<std::vector<int>::iterator>, IntervalCategory::stepwise);
     TEST_EQUAL(interval_category<std::chrono::microseconds>, IntervalCategory::stepwise);
+    TEST_EQUAL(interval_category<Stepwise>, IntervalCategory::stepwise);
 
     TEST_EQUAL(interval_category<int>, IntervalCategory::integral);
     TEST_EQUAL(interval_category<const int>, IntervalCategory::integral);

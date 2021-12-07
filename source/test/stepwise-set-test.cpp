@@ -1,4 +1,5 @@
 #include "rs-interval/interval.hpp"
+#include "test/stepwise.hpp"
 #include "test/unit-test.hpp"
 #include <iostream>
 #include <random>
@@ -8,13 +9,8 @@
 using namespace RS;
 using namespace RS::Intervals;
 
-// TODO
-template <> struct IntervalTraits<int> {
-    static constexpr IntervalCategory category = IntervalCategory::stepwise;
-};
-
-using IntervalType = Interval<int>;
-using SetType = IntervalSet<int>;
+using IntervalType = Interval<Stepwise>;
+using SetType = IntervalSet<Stepwise>;
 
 void test_rs_stepwise_interval_set_construct_insert_erase() {
 
@@ -24,20 +20,20 @@ void test_rs_stepwise_interval_set_construct_insert_erase() {
     std::string str;
 
     TEST(set.empty());
-    TRY(set = 42);
+    TRY(set = 42_sw);
     TEST_EQUAL(set.size(), 1u);
     TRY(it = set.begin());
     TEST_EQUAL(it->str(), "42");
     TRY(++it);
     TEST(it == set.end());
-    TRY((in = {5,10}));
+    TRY((in = {5_sw,10_sw}));
     TRY(set = in);
     TEST_EQUAL(set.size(), 1u);
     TRY(it = set.begin());
     TEST_EQUAL(it->str(), "[5,10]");
     TRY(++it);
     TEST(it == set.end());
-    TRY((set = {{5,10},{15,20},{25,30}}));
+    TRY((set = {{5_sw,10_sw},{15_sw,20_sw},{25_sw,30_sw}}));
     TRY(it = set.begin());
     TEST_EQUAL(it->str(), "[5,10]");
     TRY(++it);
@@ -47,49 +43,49 @@ void test_rs_stepwise_interval_set_construct_insert_erase() {
     TRY(++it);
     TEST(it == set.end());
 
-    TRY((set = {}));                                      TRY(str = set.str());  TEST_EQUAL(str, "{}");
-    TRY((set = {{3,6,"()"}}));                            TRY(str = set.str());  TEST_EQUAL(str, "{[4,5]}");
-    TRY((set = {{0,5,"()"},{10,15,"()"},{20,25,"()"}}));  TRY(str = set.str());  TEST_EQUAL(str, "{[1,4],[11,14],[21,24]}");
+    TRY((set = {}));                                                        TRY(str = set.str());  TEST_EQUAL(str, "{}");
+    TRY((set = {{3_sw,6_sw,"()"}}));                                        TRY(str = set.str());  TEST_EQUAL(str, "{[4,5]}");
+    TRY((set = {{0_sw,5_sw,"()"},{10_sw,15_sw,"()"},{20_sw,25_sw,"()"}}));  TRY(str = set.str());  TEST_EQUAL(str, "{[1,4],[11,14],[21,24]}");
 
-    TRY((set = {{3,6},{9,12},{15,18}}));
+    TRY((set = {{3_sw,6_sw},{9_sw,12_sw},{15_sw,18_sw}}));
     TRY(inv = set.inverse());
     TRY(str = set.str());
     TEST_EQUAL(str, "{[3,6],[9,12],[15,18]}");
     TRY(str = inv.str());
     TEST_EQUAL(str, "{<=2,[7,8],[13,14],>=19}");
 
-    TEST(! set.contains(1));   TEST(inv.contains(1));
-    TEST(! set.contains(2));   TEST(inv.contains(2));
-    TEST(set.contains(3));     TEST(! inv.contains(3));
-    TEST(set.contains(4));     TEST(! inv.contains(4));
-    TEST(set.contains(5));     TEST(! inv.contains(5));
-    TEST(set.contains(6));     TEST(! inv.contains(6));
-    TEST(! set.contains(7));   TEST(inv.contains(7));
-    TEST(! set.contains(8));   TEST(inv.contains(8));
-    TEST(set.contains(9));     TEST(! inv.contains(9));
-    TEST(set.contains(10));    TEST(! inv.contains(10));
-    TEST(set.contains(11));    TEST(! inv.contains(11));
-    TEST(set.contains(12));    TEST(! inv.contains(12));
-    TEST(! set.contains(13));  TEST(inv.contains(13));
-    TEST(! set.contains(14));  TEST(inv.contains(14));
-    TEST(set.contains(15));    TEST(! inv.contains(15));
-    TEST(set.contains(16));    TEST(! inv.contains(16));
-    TEST(set.contains(17));    TEST(! inv.contains(17));
-    TEST(set.contains(18));    TEST(! inv.contains(18));
-    TEST(! set.contains(19));  TEST(inv.contains(19));
-    TEST(! set.contains(20));  TEST(inv.contains(20));
+    TEST(! set.contains(1_sw));   TEST(inv.contains(1_sw));
+    TEST(! set.contains(2_sw));   TEST(inv.contains(2_sw));
+    TEST(set.contains(3_sw));     TEST(! inv.contains(3_sw));
+    TEST(set.contains(4_sw));     TEST(! inv.contains(4_sw));
+    TEST(set.contains(5_sw));     TEST(! inv.contains(5_sw));
+    TEST(set.contains(6_sw));     TEST(! inv.contains(6_sw));
+    TEST(! set.contains(7_sw));   TEST(inv.contains(7_sw));
+    TEST(! set.contains(8_sw));   TEST(inv.contains(8_sw));
+    TEST(set.contains(9_sw));     TEST(! inv.contains(9_sw));
+    TEST(set.contains(10_sw));    TEST(! inv.contains(10_sw));
+    TEST(set.contains(11_sw));    TEST(! inv.contains(11_sw));
+    TEST(set.contains(12_sw));    TEST(! inv.contains(12_sw));
+    TEST(! set.contains(13_sw));  TEST(inv.contains(13_sw));
+    TEST(! set.contains(14_sw));  TEST(inv.contains(14_sw));
+    TEST(set.contains(15_sw));    TEST(! inv.contains(15_sw));
+    TEST(set.contains(16_sw));    TEST(! inv.contains(16_sw));
+    TEST(set.contains(17_sw));    TEST(! inv.contains(17_sw));
+    TEST(set.contains(18_sw));    TEST(! inv.contains(18_sw));
+    TEST(! set.contains(19_sw));  TEST(inv.contains(19_sw));
+    TEST(! set.contains(20_sw));  TEST(inv.contains(20_sw));
 
     TRY(set.clear());
     TEST(set.empty());
 
-    TRY((set.insert({10,20})));       TRY(str = set.str());  TEST_EQUAL(str, "{[10,20]}");
-    TRY((set.insert({20,30,"()"})));  TRY(str = set.str());  TEST_EQUAL(str, "{[10,29]}");
-    TRY((set.erase({5,10,"()"})));    TRY(str = set.str());  TEST_EQUAL(str, "{[10,29]}");
-    TRY((set.erase({5,10})));         TRY(str = set.str());  TEST_EQUAL(str, "{[11,29]}");
-    TRY((set.erase({12,14})));        TRY(str = set.str());  TEST_EQUAL(str, "{11,[15,29]}");
-    TRY((set.erase({16,18,"()"})));   TRY(str = set.str());  TEST_EQUAL(str, "{11,[15,16],[18,29]}");
-    TRY((set.insert({9,11})));        TRY(str = set.str());  TEST_EQUAL(str, "{[9,11],[15,16],[18,29]}");
-    TRY((set.insert({29,31,"()"})));  TRY(str = set.str());  TEST_EQUAL(str, "{[9,11],[15,16],[18,30]}");
+    TRY((set.insert({10_sw,20_sw})));       TRY(str = set.str());  TEST_EQUAL(str, "{[10,20]}");
+    TRY((set.insert({20_sw,30_sw,"()"})));  TRY(str = set.str());  TEST_EQUAL(str, "{[10,29]}");
+    TRY((set.erase({5_sw,10_sw,"()"})));    TRY(str = set.str());  TEST_EQUAL(str, "{[10,29]}");
+    TRY((set.erase({5_sw,10_sw})));         TRY(str = set.str());  TEST_EQUAL(str, "{[11,29]}");
+    TRY((set.erase({12_sw,14_sw})));        TRY(str = set.str());  TEST_EQUAL(str, "{11,[15,29]}");
+    TRY((set.erase({16_sw,18_sw,"()"})));   TRY(str = set.str());  TEST_EQUAL(str, "{11,[15,16],[18,29]}");
+    TRY((set.insert({9_sw,11_sw})));        TRY(str = set.str());  TEST_EQUAL(str, "{[9,11],[15,16],[18,29]}");
+    TRY((set.insert({29_sw,31_sw,"()"})));  TRY(str = set.str());  TEST_EQUAL(str, "{[9,11],[15,16],[18,30]}");
 
 }
 
@@ -114,8 +110,8 @@ void test_rs_stepwise_interval_set_operations() {
             vec[j].clear();
             int size = random_int(1, max_size)(rng);
             for (int k = 0; k < size; ++k) {
-                int a = random_int(1, max_value)(rng);
-                int b = random_int(1, max_value)(rng);
+                Stepwise a = random_int(1, max_value)(rng);
+                Stepwise b = random_int(1, max_value)(rng);
                 auto l = IntervalBound(random_int(0, 3)(rng));
                 auto r = IntervalBound(random_int(0, 3)(rng));
                 if ((l == IntervalBound::empty) == (r == IntervalBound::empty)) {
@@ -142,10 +138,11 @@ void test_rs_stepwise_interval_set_operations() {
             bool u_expect = member[0] || member[1], u_test = false;
             bool d_expect = member[0] && ! member[1], d_test = false;
             bool sd_expect = member[0] != member[1], sd_test = false;
-            TRY(i_test = i_set(x));
-            TRY(u_test = u_set(x));
-            TRY(d_test = d_set(x));
-            TRY(sd_test = sd_set(x));
+            Stepwise sx = x;
+            TRY(i_test = i_set(sx));
+            TRY(u_test = u_set(sx));
+            TRY(d_test = d_set(sx));
+            TRY(sd_test = sd_set(sx));
             TEST_EQUAL(i_test, i_expect);
             TEST_EQUAL(u_test, u_expect);
             TEST_EQUAL(d_test, d_expect);

@@ -11,11 +11,6 @@ using namespace RS::Intervals;
 using IntervalType = Interval<int>;
 using SetType = IntervalSet<int>;
 
-// TODO
-template <> struct IntervalTraits<int> {
-    static constexpr IntervalCategory category = IntervalCategory::integral;
-};
-
 void test_rs_integral_interval_basic_properties() {
 
     IntervalType in;

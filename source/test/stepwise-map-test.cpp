@@ -1,17 +1,13 @@
 #include "rs-interval/interval.hpp"
+#include "test/stepwise.hpp"
 #include "test/unit-test.hpp"
 #include <string>
 
 using namespace RS;
 using namespace RS::Intervals;
 
-// TODO
-template <> struct IntervalTraits<int> {
-    static constexpr IntervalCategory category = IntervalCategory::stepwise;
-};
-
-using IntervalType = Interval<int>;
-using MapType = IntervalMap<int, std::string>;
+using IntervalType = Interval<Stepwise>;
+using MapType = IntervalMap<Stepwise, std::string>;
 
 void test_rs_stepwise_interval_map() {
 
@@ -21,91 +17,91 @@ void test_rs_stepwise_interval_map() {
     TEST(map.empty());
     TEST_EQUAL(map.size(), 0u);
     TEST_EQUAL(map.default_value(), "");
-    TEST_EQUAL(map[42], "");
+    TEST_EQUAL(map[42_sw], "");
     TEST_EQUAL(map.str(), "{}");
 
-    TRY(map.insert(IntervalType(2,2,"<="), "alpha"));
-    TRY(map.insert(IntervalType(3,7,"()"), "bravo"));
-    TRY(map.insert(IntervalType(8,8,">="), "charlie"));
+    TRY(map.insert(IntervalType(2_sw,2_sw,"<="), "alpha"));
+    TRY(map.insert(IntervalType(3_sw,7_sw,"()"), "bravo"));
+    TRY(map.insert(IntervalType(8_sw,8_sw,">="), "charlie"));
     TEST_EQUAL(map.size(), 3u);
-    TEST_EQUAL(map[1], "alpha");
-    TEST_EQUAL(map[2], "alpha");
-    TEST_EQUAL(map[3], "");
-    TEST_EQUAL(map[4], "bravo");
-    TEST_EQUAL(map[5], "bravo");
-    TEST_EQUAL(map[6], "bravo");
-    TEST_EQUAL(map[7], "");
-    TEST_EQUAL(map[8], "charlie");
-    TEST_EQUAL(map[9], "charlie");
+    TEST_EQUAL(map[1_sw], "alpha");
+    TEST_EQUAL(map[2_sw], "alpha");
+    TEST_EQUAL(map[3_sw], "");
+    TEST_EQUAL(map[4_sw], "bravo");
+    TEST_EQUAL(map[5_sw], "bravo");
+    TEST_EQUAL(map[6_sw], "bravo");
+    TEST_EQUAL(map[7_sw], "");
+    TEST_EQUAL(map[8_sw], "charlie");
+    TEST_EQUAL(map[9_sw], "charlie");
     TRY(map.default_value("nil"));
-    TEST_EQUAL(map[1], "alpha");
-    TEST_EQUAL(map[2], "alpha");
-    TEST_EQUAL(map[3], "nil");
-    TEST_EQUAL(map[4], "bravo");
-    TEST_EQUAL(map[5], "bravo");
-    TEST_EQUAL(map[6], "bravo");
-    TEST_EQUAL(map[7], "nil");
-    TEST_EQUAL(map[8], "charlie");
-    TEST_EQUAL(map[9], "charlie");
+    TEST_EQUAL(map[1_sw], "alpha");
+    TEST_EQUAL(map[2_sw], "alpha");
+    TEST_EQUAL(map[3_sw], "nil");
+    TEST_EQUAL(map[4_sw], "bravo");
+    TEST_EQUAL(map[5_sw], "bravo");
+    TEST_EQUAL(map[6_sw], "bravo");
+    TEST_EQUAL(map[7_sw], "nil");
+    TEST_EQUAL(map[8_sw], "charlie");
+    TEST_EQUAL(map[9_sw], "charlie");
     TEST_EQUAL(map.str(), "{<=2:alpha,[4,6]:bravo,>=8:charlie}");
 
-    TEST(map.contains(1));
-    TEST(map.contains(2));
-    TEST(! map.contains(3));
-    TEST(map.contains(4));
-    TEST(map.contains(5));
-    TEST(map.contains(6));
-    TEST(! map.contains(7));
-    TEST(map.contains(8));
-    TEST(map.contains(9));
+    TEST(map.contains(1_sw));
+    TEST(map.contains(2_sw));
+    TEST(! map.contains(3_sw));
+    TEST(map.contains(4_sw));
+    TEST(map.contains(5_sw));
+    TEST(map.contains(6_sw));
+    TEST(! map.contains(7_sw));
+    TEST(map.contains(8_sw));
+    TEST(map.contains(9_sw));
 
-    TRY(it = map.find(1));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "alpha");
-    TRY(it = map.find(2));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "alpha");
-    TRY(it = map.find(3));  TEST(it == map.end());
-    TRY(it = map.find(4));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.find(5));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.find(6));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.find(7));  TEST(it == map.end());
-    TRY(it = map.find(8));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
-    TRY(it = map.find(9));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.find(1_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "alpha");
+    TRY(it = map.find(2_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "alpha");
+    TRY(it = map.find(3_sw));  TEST(it == map.end());
+    TRY(it = map.find(4_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.find(5_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.find(6_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.find(7_sw));  TEST(it == map.end());
+    TRY(it = map.find(8_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.find(9_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
 
-    TRY(it = map.lower_bound(1));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "alpha");
-    TRY(it = map.lower_bound(2));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "alpha");
-    TRY(it = map.lower_bound(3));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.lower_bound(4));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.lower_bound(5));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.lower_bound(6));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.lower_bound(7));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
-    TRY(it = map.lower_bound(8));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
-    TRY(it = map.lower_bound(9));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.lower_bound(1_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "alpha");
+    TRY(it = map.lower_bound(2_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "alpha");
+    TRY(it = map.lower_bound(3_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.lower_bound(4_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.lower_bound(5_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.lower_bound(6_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.lower_bound(7_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.lower_bound(8_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.lower_bound(9_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
 
-    TRY(it = map.upper_bound(1));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.upper_bound(2));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.upper_bound(3));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
-    TRY(it = map.upper_bound(4));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
-    TRY(it = map.upper_bound(5));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
-    TRY(it = map.upper_bound(6));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
-    TRY(it = map.upper_bound(7));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
-    TRY(it = map.upper_bound(8));  TEST(it == map.end());
-    TRY(it = map.upper_bound(9));  TEST(it == map.end());
+    TRY(it = map.upper_bound(1_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.upper_bound(2_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.upper_bound(3_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "bravo");
+    TRY(it = map.upper_bound(4_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.upper_bound(5_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.upper_bound(6_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.upper_bound(7_sw));  REQUIRE(it != map.end());  TEST_EQUAL(it->second, "charlie");
+    TRY(it = map.upper_bound(8_sw));  TEST(it == map.end());
+    TRY(it = map.upper_bound(9_sw));  TEST(it == map.end());
 
     TRY(map.clear());
     TEST(map.empty());
     TRY((map = {
-        {IntervalType(20,20,"<="), "alpha"},
-        {IntervalType(30,70,"()"), "bravo"},
-        {IntervalType(80,80,">="), "charlie"},
+        {IntervalType(20_sw,20_sw,"<="), "alpha"},
+        {IntervalType(30_sw,70_sw,"()"), "bravo"},
+        {IntervalType(80_sw,80_sw,">="), "charlie"},
     }));
     TEST_EQUAL(map.size(), 3u);
     TEST_EQUAL(map.str(), "{<=20:alpha,[31,69]:bravo,>=80:charlie}");
 
     TRY(map.clear());
     TRY(map.default_value("nil"));
-    TRY(map.insert(IntervalType(10,10,"<="), "alpha"));
-    TRY(map.insert(IntervalType(1,5,"[]"), "bravo"));
-    TRY(map.insert(IntervalType(5,6,"[]"), "charlie"));
-    TRY(map.insert(IntervalType(2,3,"[]"), "delta"));
-    TRY(map.insert(IntervalType(7,8,"[]"), "charlie"));
+    TRY(map.insert(IntervalType(10_sw,10_sw,"<="), "alpha"));
+    TRY(map.insert(IntervalType(1_sw,5_sw,"[]"), "bravo"));
+    TRY(map.insert(IntervalType(5_sw,6_sw,"[]"), "charlie"));
+    TRY(map.insert(IntervalType(2_sw,3_sw,"[]"), "delta"));
+    TRY(map.insert(IntervalType(7_sw,8_sw,"[]"), "charlie"));
     TEST_EQUAL(map.size(), 6u);
     TEST_EQUAL(map.str(),
         "{<=0:alpha,"
@@ -114,23 +110,23 @@ void test_rs_stepwise_interval_map() {
         "4:bravo,"
         "[5,8]:charlie,"
         "[9,10]:alpha}");
-    TEST_EQUAL(map[0], "alpha");
-    TEST_EQUAL(map[1], "bravo");
-    TEST_EQUAL(map[2], "delta");
-    TEST_EQUAL(map[3], "delta");
-    TEST_EQUAL(map[4], "bravo");
-    TEST_EQUAL(map[5], "charlie");
-    TEST_EQUAL(map[6], "charlie");
-    TEST_EQUAL(map[7], "charlie");
-    TEST_EQUAL(map[8], "charlie");
-    TEST_EQUAL(map[9], "alpha");
-    TEST_EQUAL(map[10], "alpha");
-    TEST_EQUAL(map[11], "nil");
-    TEST_EQUAL(map[12], "nil");
+    TEST_EQUAL(map[0_sw], "alpha");
+    TEST_EQUAL(map[1_sw], "bravo");
+    TEST_EQUAL(map[2_sw], "delta");
+    TEST_EQUAL(map[3_sw], "delta");
+    TEST_EQUAL(map[4_sw], "bravo");
+    TEST_EQUAL(map[5_sw], "charlie");
+    TEST_EQUAL(map[6_sw], "charlie");
+    TEST_EQUAL(map[7_sw], "charlie");
+    TEST_EQUAL(map[8_sw], "charlie");
+    TEST_EQUAL(map[9_sw], "alpha");
+    TEST_EQUAL(map[10_sw], "alpha");
+    TEST_EQUAL(map[11_sw], "nil");
+    TEST_EQUAL(map[12_sw], "nil");
 
-    TRY(map.erase(IntervalType(1,2,"[]")));
-    TRY(map.erase(IntervalType(6,7,"[]")));
-    TRY(map.erase(IntervalType(10,10,">=")));
+    TRY(map.erase(IntervalType(1_sw,2_sw,"[]")));
+    TRY(map.erase(IntervalType(6_sw,7_sw,"[]")));
+    TRY(map.erase(IntervalType(10_sw,10_sw,">=")));
     TEST_EQUAL(map.size(), 6u);
     TEST_EQUAL(map.str(),
         "{<=0:alpha,"
@@ -139,18 +135,18 @@ void test_rs_stepwise_interval_map() {
         "5:charlie,"
         "8:charlie,"
         "9:alpha}");
-    TEST_EQUAL(map[0], "alpha");
-    TEST_EQUAL(map[1], "nil");
-    TEST_EQUAL(map[2], "nil");
-    TEST_EQUAL(map[3], "delta");
-    TEST_EQUAL(map[4], "bravo");
-    TEST_EQUAL(map[5], "charlie");
-    TEST_EQUAL(map[6], "nil");
-    TEST_EQUAL(map[7], "nil");
-    TEST_EQUAL(map[8], "charlie");
-    TEST_EQUAL(map[9], "alpha");
-    TEST_EQUAL(map[10], "nil");
-    TEST_EQUAL(map[11], "nil");
-    TEST_EQUAL(map[12], "nil");
+    TEST_EQUAL(map[0_sw], "alpha");
+    TEST_EQUAL(map[1_sw], "nil");
+    TEST_EQUAL(map[2_sw], "nil");
+    TEST_EQUAL(map[3_sw], "delta");
+    TEST_EQUAL(map[4_sw], "bravo");
+    TEST_EQUAL(map[5_sw], "charlie");
+    TEST_EQUAL(map[6_sw], "nil");
+    TEST_EQUAL(map[7_sw], "nil");
+    TEST_EQUAL(map[8_sw], "charlie");
+    TEST_EQUAL(map[9_sw], "alpha");
+    TEST_EQUAL(map[10_sw], "nil");
+    TEST_EQUAL(map[11_sw], "nil");
+    TEST_EQUAL(map[12_sw], "nil");
 
 }
