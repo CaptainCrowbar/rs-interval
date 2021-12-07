@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_interval_enumeration)
     UNIT_TEST(rs_interval_type_traits)
 
-    // ordered-test.cpp
+    // ordered-basic-test.cpp
     UNIT_TEST(rs_ordered_interval_basic_properties)
     UNIT_TEST(rs_ordered_interval_construction)
     UNIT_TEST(rs_ordered_interval_inverse)
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     // ordered-map-test.cpp
     UNIT_TEST(rs_ordered_interval_map)
 
-    // stepwise-test.cpp
+    // stepwise-basic-test.cpp
     UNIT_TEST(rs_stepwise_interval_basic_properties)
     UNIT_TEST(rs_stepwise_interval_construction)
     UNIT_TEST(rs_stepwise_interval_iterators)
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     // stepwise-map-test.cpp
     UNIT_TEST(rs_stepwise_interval_map)
 
-    // integral-test.cpp
+    // integral-basic-test.cpp
     UNIT_TEST(rs_integral_interval_basic_properties)
     UNIT_TEST(rs_integral_interval_construction)
     UNIT_TEST(rs_integral_interval_iterators)
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
     // integral-arithmetic-test.cpp
     UNIT_TEST(rs_integral_interval_arithmetic)
 
-    // continuous-test.cpp
+    // continuous-basic-test.cpp
     UNIT_TEST(rs_continuous_interval_basic_properties)
     UNIT_TEST(rs_continuous_interval_construction)
     UNIT_TEST(rs_continuous_interval_inverse)

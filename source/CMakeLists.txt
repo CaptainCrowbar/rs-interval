@@ -16,17 +16,17 @@ find_package(Threads REQUIRED)
 add_executable(${unittest}
     test/format-test.cpp
     test/type-traits-test.cpp
-    test/ordered-test.cpp
+    test/ordered-basic-test.cpp
     test/ordered-set-test.cpp
     test/ordered-map-test.cpp
-    test/stepwise-test.cpp
+    test/stepwise-basic-test.cpp
     test/stepwise-set-test.cpp
     test/stepwise-map-test.cpp
-    test/integral-test.cpp
+    test/integral-basic-test.cpp
     test/integral-set-test.cpp
     test/integral-map-test.cpp
     test/integral-arithmetic-test.cpp
-    test/continuous-test.cpp
+    test/continuous-basic-test.cpp
     test/continuous-set-test.cpp
     test/continuous-map-test.cpp
     test/continuous-arithmetic-test.cpp
