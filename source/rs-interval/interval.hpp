@@ -1,7 +1,7 @@
 #pragma once
 
+#include "rs-interval/format.hpp"
 #include <algorithm>
-#include <cstdio>
 #include <functional>
 #include <initializer_list>
 #include <iterator>
@@ -9,7 +9,6 @@
 #include <map>
 #include <ostream>
 #include <set>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -20,106 +19,6 @@
 #include <vector>
 
 namespace RS::Intervals {
-
-    // Implementation details
-
-    namespace Detail {
-
-        template <typename T, typename = void> struct HasAdlToStringFunction: std::false_type {};
-        template <typename T> struct HasAdlToStringFunction<T, std::void_t<decltype(to_string(std::declval<T>()))>>: std::true_type {};
-        template <typename T> constexpr bool has_adl_to_string_function = HasAdlToStringFunction<T>::value;
-
-        template <typename T, typename = void> struct HasStdToStringFunction: std::false_type {};
-        template <typename T> struct HasStdToStringFunction<T, std::void_t<decltype(std::to_string(std::declval<T>()))>>: std::true_type {};
-        template <typename T> constexpr bool has_std_to_string_function = HasStdToStringFunction<T>::value;
-
-        inline void fix_exp_format(std::string& str) noexcept {
-            size_t pos1 = str.find_first_of("Ee");
-            if (pos1 == std::string::npos)
-                return;
-            ++pos1;
-            if (str[pos1] == '-')
-                ++pos1;
-            size_t pos2 = str.find_first_not_of("+0", pos1);
-            if (pos2 == std::string::npos)
-                pos2 = str.size() - 1;
-            str.erase(pos1, pos2 - pos1);
-        }
-
-        template <typename T>
-        std::string format_with_spec(T t, const char* fmt, int prec) {
-            std::string buf(15, '\0');
-            int rc = 0;
-            for (;;) {
-                rc = std::snprintf(buf.data(), buf.size(), fmt, prec, t);
-                if (rc < int(buf.size()))
-                    break;
-                buf.resize(rc + 1);
-            }
-            return buf.substr(0, rc);
-        }
-
-        template <typename T>
-        std::string format_floating_point(T t, char mode, int prec) {
-            if (prec < 0)
-                prec = 6;
-            std::string s;
-            if constexpr (sizeof(T) <= sizeof(double)) {
-                double t2 = t;
-                switch (mode) {
-                    case 'E':            s = format_with_spec(t2, "%.*E", prec); break;
-                    case 'e':            s = format_with_spec(t2, "%.*e", prec); break;
-                    case 'F': case 'f':  s = format_with_spec(t2, "%.*f", prec); break;
-                    case 'G':            s = format_with_spec(t2, "%.*G", prec); break;
-                    case 'g': case 0:    s = format_with_spec(t2, "%.*g", prec); break;
-                    default:             throw std::invalid_argument("Invalid floating point mode: " + std::string{mode});
-                }
-            } else {
-                long double t2 = t;
-                switch (mode) {
-                    case 'E':            s = format_with_spec(t2, "%.*LE", prec); break;
-                    case 'e':            s = format_with_spec(t2, "%.*Le", prec); break;
-                    case 'F': case 'f':  s = format_with_spec(t2, "%.*Lf", prec); break;
-                    case 'G':            s = format_with_spec(t2, "%.*LG", prec); break;
-                    case 'g': case 0:    s = format_with_spec(t2, "%.*Lg", prec); break;
-                    default:             throw std::invalid_argument("Invalid floating point mode: " + std::string{mode});
-                }
-            }
-            if (mode != 'F' && mode != 'f')
-                fix_exp_format(s);
-            return s;
-        }
-
-        template <typename T>
-        std::string format_via_stream(const T& t) {
-            std::ostringstream out;
-            out << t;
-            return out.str();
-        }
-
-        template <typename T>
-        std::string format_value(const T& t, char mode = 0, int prec = -1) {
-            if constexpr (std::is_same_v<T, bool>)
-                return t ? "true" : "false";
-            else if constexpr (std::is_same_v<T, char>)
-                return std::string{t};
-            else if constexpr (std::is_integral_v<T>)
-                return std::to_string(t);
-            else if constexpr (std::is_floating_point_v<T>)
-                return Detail::format_floating_point(t, mode, prec);
-            else if constexpr (std::is_constructible_v<std::string, T> && std::is_pointer_v<T>)
-                return t == nullptr ? "null" : std::string(t);
-            else if constexpr (std::is_constructible_v<std::string, T>)
-                return std::string(t);
-            else if constexpr (Detail::has_adl_to_string_function<T>)
-                return to_string(t);
-            else if constexpr (Detail::has_std_to_string_function<T>)
-                return std::to_string(t);
-            else
-                return Detail::format_via_stream<T>(t);
-        }
-
-    }
 
     // Forward declarations
 
@@ -750,7 +649,7 @@ namespace RS::Intervals {
         IntervalSet<T> set_union(const Interval& b) const;
         IntervalSet<T> set_difference(const Interval& b) const;
         IntervalSet<T> set_symmetric_difference(const Interval& b) const;
-        std::string str(char mode = 0, int prec = -1) const;
+        std::string str(const std::string& mode = {}) const;
         void swap(Interval& in) noexcept { this->do_swap(in); }
         static Interval all() noexcept { return Interval(T(), IntervalBound::unbound, IntervalBound::unbound); }
     };
@@ -992,21 +891,21 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        std::string Interval<T>::str(char mode, int prec) const {
+        std::string Interval<T>::str(const std::string& mode) const {
             using namespace Detail;
             if (this->empty())
                 return "{}";
             else if (this->is_universal())
                 return "*";
             else if (this->is_single())
-                return format_value(this->min(), mode, prec);
+                return format_object(this->min(), mode);
             else if (! this->is_left_bounded())
-                return (this->is_right_closed() ? "<=" : "<") + format_value(this->max(), mode, prec);
+                return (this->is_right_closed() ? "<=" : "<") + format_object(this->max(), mode);
             else if (! this->is_right_bounded())
-                return (this->is_left_closed() ? ">=" : ">") + format_value(this->min(), mode, prec);
+                return (this->is_left_closed() ? ">=" : ">") + format_object(this->min(), mode);
             else
-                return (this->is_left_closed() ? '[' : '(') + format_value(this->min(), mode, prec) + ','
-                    + format_value(this->max(), mode, prec) + (this->is_right_closed() ? ']' : ')');
+                return (this->is_left_closed() ? '[' : '(') + format_object(this->min(), mode) + ','
+                    + format_object(this->max(), mode) + (this->is_right_closed() ? ']' : ')');
         }
 
     template <typename T> bool operator==(const Interval<T>& a, const Interval<T>& b) noexcept { return a.compare(b) == 0; }
@@ -1072,7 +971,7 @@ namespace RS::Intervals {
         IntervalSet set_difference(const IntervalSet& b) const;
         IntervalSet set_symmetric_difference(const IntervalSet& b) const;
         size_t hash() const noexcept;
-        std::string str(char mode = 0, int prec = -1) const;
+        std::string str(const std::string& mode = {}) const;
         void swap(IntervalSet& set) noexcept { con_.swap(set.con_); }
     private:
         container_type con_;
@@ -1188,13 +1087,13 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        std::string IntervalSet<T>::str(char mode, int prec) const {
+        std::string IntervalSet<T>::str(const std::string& mode) const {
             using namespace Detail;
             if (empty())
                 return "{}";
             std::string s = "{";
             for (auto& t: *this)
-                s += format_value(t, mode, prec) + ',';
+                s += format_object(t, mode) + ',';
             s.back() = '}';
             return s;
         }
@@ -1261,8 +1160,8 @@ namespace RS::Intervals {
         void insert(const value_type& v) { insert(v.first, v.second); }
         void erase(const interval_type& in);
         size_t hash() const noexcept;
-        std::string str() const { return str(0, -1, 0, -1); }
-        std::string str(char kmode, int kprec, char vmode, int vprec) const;
+        std::string str() const { return str({}, {}); }
+        std::string str(const std::string& kmode, const std::string& vmode) const;
         void swap(IntervalMap& map) noexcept { con_.swap(map.con_); std::swap(def_, map.def_); }
     private:
         container_type con_;
@@ -1355,13 +1254,13 @@ namespace RS::Intervals {
         }
 
         template <typename K, typename T>
-        std::string IntervalMap<K, T>::str(char kmode, int kprec, char vmode, int vprec) const {
+        std::string IntervalMap<K, T>::str(const std::string& kmode, const std::string& vmode) const {
             using namespace Detail;
             if (empty())
                 return "{}";
             std::string s = "{";
             for (auto& [k,v]: *this)
-                s += format_value(k, kmode, kprec) + ':'+ format_value(v, vmode, vprec) + ',';
+                s += format_object(k, kmode) + ':'+ format_object(v, vmode) + ',';
             s.back() = '}';
             return s;
         }

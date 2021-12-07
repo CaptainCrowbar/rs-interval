@@ -14,7 +14,7 @@ include_directories(.)
 find_package(Threads REQUIRED)
 
 add_executable(${unittest}
-    test/formatting-test.cpp
+    test/format-test.cpp
     test/interval-basic-test.cpp
     test/interval-ordered-test.cpp
     test/interval-ordered-set-test.cpp
