@@ -108,9 +108,9 @@ namespace RS::Intervals {
             else if constexpr (std::is_floating_point_v<T>)
                 return Detail::format_floating_point(t, mode, prec);
             else if constexpr (std::is_constructible_v<std::string, T> && std::is_pointer_v<T>)
-                return t == nullptr ? "null" : static_cast<std::string>(t);
+                return t == nullptr ? "null" : std::string(t);
             else if constexpr (std::is_constructible_v<std::string, T>)
-                return static_cast<std::string>(t);
+                return std::string(t);
             else if constexpr (Detail::has_adl_to_string_function<T>)
                 return to_string(t);
             else if constexpr (Detail::has_std_to_string_function<T>)

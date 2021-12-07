@@ -354,6 +354,26 @@ namespace std {
         FAIL_TEST("Unexpected exception"); \
     }
 
+// Fail if the first expression is outside the range
+
+#define TEST_IN_RANGE(expr, min, max) \
+    try { \
+        auto rs_unit_test_expr = (expr); \
+        auto rs_unit_test_min = (min); \
+        auto rs_unit_test_max = (max); \
+        if (rs_unit_test_expr < rs_unit_test_min || rs_unit_test_expr > rs_unit_test_max) \
+            FAIL_TEST("Expression is out of range: " \
+                << # expr << " = " << rs_unit_test_expr << " vs " \
+                << # min << " = " << rs_unit_test_min << "," \
+                << # max << " = " << rs_unit_test_max); \
+    } \
+    catch (const std::exception& ex) { \
+        FAIL_TEST("Unexpected exception: " << ex.what()); \
+    } \
+    catch (...) { \
+        FAIL_TEST("Unexpected exception"); \
+    }
+
 // Fail if two floating point values are not within epsilon of each other
 
 #define TEST_NEAR(lhs, rhs, epsilon) \

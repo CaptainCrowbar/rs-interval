@@ -4,9 +4,11 @@ int main(int argc, char** argv) {
 
     RS::UnitTest::begin_tests(argc, argv);
 
+    // formatting-test.cpp
+    UNIT_TEST(rs_interval_format_floating_point)
+
     // interval-basic-test.cpp
     UNIT_TEST(rs_interval_basic_type_traits)
-    UNIT_TEST(rs_interval_format_floating_point)
 
     // interval-ordered-test.cpp
     UNIT_TEST(rs_interval_ordered_basic_properties)
