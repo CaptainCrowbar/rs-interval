@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 using namespace RS;
@@ -155,5 +156,12 @@ void test_rs_stepwise_interval_set_operations() {
         }
 
     }
+
+}
+
+void test_rs_stepwise_interval_set_hashing() {
+
+    std::unordered_set<SetType> set;
+    TEST(set.empty());
 
 }

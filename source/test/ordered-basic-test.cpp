@@ -2,6 +2,7 @@
 #include "test/unit-test.hpp"
 #include <iostream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 using namespace RS;
@@ -422,5 +423,16 @@ void test_rs_ordered_interval_binary_operations() {
             std::cout << "... [" << t.line << "] " << t.lhs << " " << t.rhs << "\n";
 
     }
+
+}
+
+void test_rs_ordered_interval_hashing() {
+
+    std::unordered_set<IntervalType> set;
+
+    TRY(set.insert(IntervalType("a")));
+    TRY(set.insert(IntervalType("b", "c")));
+    TRY(set.insert(IntervalType("d", "d", ">")));
+    TEST_EQUAL(set.size(), 3u);
 
 }

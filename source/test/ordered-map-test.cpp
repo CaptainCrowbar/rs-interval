@@ -1,6 +1,7 @@
 #include "rs-interval.hpp"
 #include "test/unit-test.hpp"
 #include <string>
+#include <unordered_set>
 
 using namespace RS;
 using namespace RS::Intervals;
@@ -147,5 +148,12 @@ void test_rs_ordered_interval_map() {
     TEST_EQUAL(map["j"], "nil");
     TEST_EQUAL(map["k"], "nil");
     TEST_EQUAL(map["l"], "nil");
+
+}
+
+void test_rs_ordered_interval_map_hashing() {
+
+    std::unordered_set<MapType> map;
+    TEST(map.empty());
 
 }

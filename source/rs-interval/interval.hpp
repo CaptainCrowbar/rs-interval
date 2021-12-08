@@ -19,9 +19,32 @@
 
 namespace RS::Intervals {
 
+    // Forward declarations
+
+    template <typename T> class Interval;
+    template <typename T> class IntervalSet;
+    template <typename K, typename T> class IntervalMap;
+
     // Implementation details
 
     namespace Detail {
+
+        constexpr size_t hash_mix(size_t h1, size_t h2) noexcept {
+            return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+        }
+
+        template <typename T>
+        size_t std_hash(const T& t) noexcept {
+            return std::hash<T>()(t);
+        }
+
+        template <typename Range>
+        size_t hash_range(const Range& range) noexcept {
+            size_t h = 0;
+            for (auto& x: range)
+                h = hash_mix(h, std_hash(x));
+            return h;
+        }
 
         inline std::pair<IntervalBound, IntervalBound> parse_interval_mode(std::string_view mode) {
             using namespace std::literals;
@@ -43,12 +66,6 @@ namespace RS::Intervals {
         }
 
     }
-
-    // Forward declarations
-
-    template <typename T> class Interval;
-    template <typename T> class IntervalSet;
-    template <typename K, typename T> class IntervalMap;
 
     // Base class for intervals with the same value type
 
@@ -92,7 +109,12 @@ namespace RS::Intervals {
 
         template <typename T>
         size_t IntervalTypeBase<T>::hash() const noexcept {
-            return hash_value(min_, max_, int(left_), int(right_));
+            using namespace Detail;
+            size_t h = std::hash<T>()(min_);
+            h = hash_mix(h, std::hash<T>()(max_));
+            h = hash_mix(h, std::hash<int>()(int(left_)));
+            h = hash_mix(h, std::hash<int>()(int(right_)));
+            return h;
         }
 
         template <typename T>
@@ -171,7 +193,6 @@ namespace RS::Intervals {
     class IntervalCategoryBase<T, IntervalCategory::ordered>:
     public IntervalTypeBase<T> {};
 
-    // TODO
     template <typename T>
     class IntervalCategoryBase<T, IntervalCategory::stepwise>:
     public IntervalTypeBase<T> {
@@ -244,7 +265,6 @@ namespace RS::Intervals {
             IntervalTypeBase<T>::adjust_bounds();
         }
 
-    // TODO
     template <typename T>
     class IntervalCategoryBase<T, IntervalCategory::integral>:
     public IntervalTypeBase<T> {
@@ -881,8 +901,7 @@ namespace RS::Intervals {
 
         template <typename T>
         size_t IntervalSet<T>::hash() const noexcept {
-            // TODO
-            return hash_range(con_);
+            return Detail::hash_range(con_);
         }
 
         template <typename T>
@@ -1046,10 +1065,7 @@ namespace RS::Intervals {
 
         template <typename K, typename T>
         size_t IntervalMap<K, T>::hash() const noexcept {
-            size_t h = std::hash<T>()(def_);
-            for (auto& [k,t]: con_)
-                hash_combine(h, k, t);
-            return h;
+            return Detail::hash_range(con_);
         }
 
         template <typename K, typename T>

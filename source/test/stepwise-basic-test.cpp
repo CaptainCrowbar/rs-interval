@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iterator>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 using namespace RS;
@@ -342,5 +343,16 @@ void test_rs_stepwise_interval_binary_operations() {
             std::cout << "... [" << t.line << "] " << t.lhs << " " << t.rhs << "\n";
 
     }
+
+}
+
+void test_rs_stepwise_interval_hashing() {
+
+    std::unordered_set<IntervalType> set;
+
+    TRY(set.insert(IntervalType(1_sw)));
+    TRY(set.insert(IntervalType(2_sw, 3_sw)));
+    TRY(set.insert(IntervalType(4_sw, 4_sw, ">")));
+    TEST_EQUAL(set.size(), 3u);
 
 }
