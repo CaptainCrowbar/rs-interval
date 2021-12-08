@@ -24,10 +24,10 @@ namespace RS::Intervals {
     // Floating point
     //      Default is "gz6"
     //      Mode:
-    //          d = Decimal format (prec = significant digits)
-    //          e = Exponential (scientific) format (prec = significant digits)
-    //          f = Fixed point format (prec = decimal places)
-    //          g = Use 'd' if 1e-3<=|value|<1e6 or value=0, otherwise 'e'
+    //          D,d = Decimal format (prec = significant digits)
+    //          E,e = Exponential (scientific) format (prec = significant digits)
+    //          F,f = Fixed point format (prec = decimal places)
+    //          G,g = Use D/d if 1e-3<=|value|<1e6 or value=0, otherwise E/e
     //      Options:
     //          s = Always show a sign
     //          z = Strip trailing zeroes
@@ -54,7 +54,7 @@ namespace RS::Intervals {
         }
 
         inline std::string trim_exponent(const std::string& str) {
-            size_t begin_cut = str.find('e');
+            size_t begin_cut = str.find_first_of("Ee");
             if (begin_cut == npos)
                 return str;
             ++begin_cut;
@@ -92,7 +92,7 @@ namespace RS::Intervals {
             prec = std::max(prec, 1);
             auto full_str = native_format("%.*e", x, prec - 1);
             size_t sig_pos = size_t(full_str[0] == '-');
-            size_t exp_pos = full_str.find('e', sig_pos);
+            size_t exp_pos = full_str.find_first_of("Ee", sig_pos);
             auto result = full_str.substr(sig_pos, exp_pos - sig_pos);
             if (result[1] == '.')
                 result.erase(1, 1);
@@ -110,9 +110,12 @@ namespace RS::Intervals {
             return result;
         }
 
-        inline std::string format_float_e(double x, int prec) {
+        inline std::string format_float_e(double x, int prec, char mode) {
             prec = std::max(prec, 1);
-            return trim_exponent(native_format("%.*e", x, prec - 1));
+            if (mode >= 'a')
+                return trim_exponent(native_format("%.*e", x, prec - 1));
+            else
+                return trim_exponent(native_format("%.*E", x, prec - 1));
         }
 
         inline std::string format_float_f(double x, int prec) {
@@ -120,12 +123,12 @@ namespace RS::Intervals {
             return native_format("%.*f", x, prec);
         }
 
-        inline std::string format_float_g(double x, int prec) {
+        inline std::string format_float_g(double x, int prec, char mode) {
             auto y = std::abs(x);
             if (y == 0 || (y >= 1e-3 && y < 1e6))
                 return format_float_d(x, prec);
             else
-                return format_float_e(x, prec);
+                return format_float_e(x, prec, mode);
         }
 
     }
@@ -133,7 +136,7 @@ namespace RS::Intervals {
     inline std::string format_float(double x, const std::string& spec = {}) {
 
         if (spec.empty())
-            return Detail::trim_zeros(Detail::format_float_g(x, 6));
+            return Detail::trim_zeros(Detail::format_float_g(x, 6, 'g'));
 
         char mode = spec[0];
         bool opt_sign = spec.find('s') != npos;
@@ -143,10 +146,10 @@ namespace RS::Intervals {
         std::string result;
 
         switch (mode) {
-            case 'd':  result = Detail::format_float_d(x, prec); break;
-            case 'e':  result = Detail::format_float_e(x, prec); break;
-            case 'f':  result = Detail::format_float_f(x, prec); break;
-            default:   result = Detail::format_float_g(x, prec); break;
+            case 'D': case 'd':  result = Detail::format_float_d(x, prec); break;
+            case 'E': case 'e':  result = Detail::format_float_e(x, prec, mode); break;
+            case 'F': case 'f':  result = Detail::format_float_f(x, prec); break;
+            default:             result = Detail::format_float_g(x, prec, mode); break;
         }
 
         if (opt_sign && result[0] != '-')

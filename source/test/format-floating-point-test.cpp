@@ -61,6 +61,12 @@ void test_rs_interval_format_floating_point_with_significant_digits() {
     x = 0;               TRY(s = format_float(x, "dsz"));  TEST_EQUAL(s, "+0");
     x = 123.456;         TRY(s = format_float(x, "dsz"));  TEST_EQUAL(s, "+123.456");
     x = -123.456;        TRY(s = format_float(x, "dsz"));  TEST_EQUAL(s, "-123.456");
+    x = 0;               TRY(s = format_float(x, "D"));    TEST_EQUAL(s, "0.00000");
+    x = 100;             TRY(s = format_float(x, "D"));    TEST_EQUAL(s, "100.000");
+    x = 123.456;         TRY(s = format_float(x, "D"));    TEST_EQUAL(s, "123.456");
+    x = -123.456;        TRY(s = format_float(x, "D"));    TEST_EQUAL(s, "-123.456");
+    x = 123456000.0;     TRY(s = format_float(x, "D"));    TEST_EQUAL(s, "123456000");
+    x = 0.000000123456;  TRY(s = format_float(x, "D"));    TEST_EQUAL(s, "0.000000123456");
 
 }
 
@@ -103,6 +109,12 @@ void test_rs_interval_format_floating_point_with_scientific_notation() {
     x = 123.456;         TRY(s = format_float(x, "ez0"));  TEST_EQUAL(s, "1e2");
     x = 123.456;         TRY(s = format_float(x, "ez2"));  TEST_EQUAL(s, "1.2e2");
     x = 123.456;         TRY(s = format_float(x, "ez8"));  TEST_EQUAL(s, "1.23456e2");
+    x = 0;               TRY(s = format_float(x, "E"));    TEST_EQUAL(s, "0.00000E0");
+    x = 100;             TRY(s = format_float(x, "E"));    TEST_EQUAL(s, "1.00000E2");
+    x = 123.456;         TRY(s = format_float(x, "E"));    TEST_EQUAL(s, "1.23456E2");
+    x = -123.456;        TRY(s = format_float(x, "E"));    TEST_EQUAL(s, "-1.23456E2");
+    x = 123456000.0;     TRY(s = format_float(x, "E"));    TEST_EQUAL(s, "1.23456E8");
+    x = 0.000000123456;  TRY(s = format_float(x, "E"));    TEST_EQUAL(s, "1.23456E-7");
 
 }
 
@@ -137,6 +149,10 @@ void test_rs_interval_format_floating_point_with_fixed_point() {
     x = 123.456;         TRY(s = format_float(x, "fz0"));  TEST_EQUAL(s, "123");
     x = 123.456;         TRY(s = format_float(x, "fz2"));  TEST_EQUAL(s, "123.46");
     x = 123.456;         TRY(s = format_float(x, "fz4"));  TEST_EQUAL(s, "123.456");
+    x = 0;               TRY(s = format_float(x, "F"));    TEST_EQUAL(s, "0.000000");
+    x = 100;             TRY(s = format_float(x, "F"));    TEST_EQUAL(s, "100.000000");
+    x = 123.456;         TRY(s = format_float(x, "F"));    TEST_EQUAL(s, "123.456000");
+    x = -123.456;        TRY(s = format_float(x, "F"));    TEST_EQUAL(s, "-123.456000");
 
 }
 
@@ -196,5 +212,11 @@ void test_rs_interval_format_floating_point_with_general_format() {
     x = 0.000000123456;  TRY(s = format_float(x, "gz0"));  TEST_EQUAL(s, "1e-7");
     x = 0.000000123456;  TRY(s = format_float(x, "gz4"));  TEST_EQUAL(s, "1.235e-7");
     x = 0.000000123456;  TRY(s = format_float(x, "gz8"));  TEST_EQUAL(s, "1.23456e-7");
+    x = 0;               TRY(s = format_float(x, "G"));    TEST_EQUAL(s, "0.00000");
+    x = 100;             TRY(s = format_float(x, "G"));    TEST_EQUAL(s, "100.000");
+    x = 123.456;         TRY(s = format_float(x, "G"));    TEST_EQUAL(s, "123.456");
+    x = -123.456;        TRY(s = format_float(x, "G"));    TEST_EQUAL(s, "-123.456");
+    x = 123456000.0;     TRY(s = format_float(x, "G"));    TEST_EQUAL(s, "1.23456E8");
+    x = 0.000000123456;  TRY(s = format_float(x, "G"));    TEST_EQUAL(s, "1.23456E-7");
 
 }
