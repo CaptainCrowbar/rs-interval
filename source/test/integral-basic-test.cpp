@@ -6,24 +6,27 @@
 #include <unordered_set>
 #include <vector>
 
-using namespace RS;
 using namespace RS::Intervals;
 
 using IntervalType = Interval<int>;
 using SetType = IntervalSet<int>;
+using IB = IntervalBound;
+using IC = IntervalCategory;
+using IM = IntervalMatch;
+using IO = IntervalOrder;
 
 void test_rs_integral_interval_basic_properties() {
 
     IntervalType in;
 
     TEST_TYPE(IntervalType::value_type, int);
-    TEST_EQUAL(IntervalType::category, IntervalCategory::integral);
+    TEST_EQUAL(IntervalType::category, IC::integral);
     TEST(in.empty());
     TEST_EQUAL(in.size(), 0u);
     TEST(! in);
     TEST_EQUAL(in.str(), "{}");
-    TEST_EQUAL(in.match(0), IntervalMatch::empty);
-    TEST_EQUAL(in.match(42), IntervalMatch::empty);
+    TEST_EQUAL(in.match(0), IM::empty);
+    TEST_EQUAL(in.match(42), IM::empty);
     TEST(! in(0));
     TEST(! in(42));
 
@@ -34,61 +37,61 @@ void test_rs_integral_interval_construction() {
     IntervalType in;
     std::string str;
 
-    TRY(in = IntervalType());                                                   TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1));                                                  TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = IntervalType(1, IntervalBound::closed, IntervalBound::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = IntervalType(1, IntervalBound::closed, IntervalBound::open));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1, IntervalBound::open, IntervalBound::closed));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1, IntervalBound::closed, IntervalBound::unbound));   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = IntervalType(1, IntervalBound::unbound, IntervalBound::closed));   TRY(str = in.str());  TEST_EQUAL(str, "<=1");
-    TRY(in = IntervalType(1, IntervalBound::open, IntervalBound::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = IntervalType(1, IntervalBound::unbound, IntervalBound::open));     TRY(str = in.str());  TEST_EQUAL(str, "<=0");
-    TRY(in = IntervalType(1, IntervalBound::unbound, IntervalBound::unbound));  TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType(1, 5));                                               TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, IntervalBound::closed));                        TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, IntervalBound::open));                          TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = IntervalType(1, 5, IntervalBound::closed, IntervalBound::open));   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = IntervalType(1, 5, IntervalBound::open, IntervalBound::closed));   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = IntervalType(1, 5, "[]"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, "()"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = IntervalType(1, 5, "[)"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = IntervalType(1, 5, "(]"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = IntervalType(1, 5, "<"));                                          TRY(str = in.str());  TEST_EQUAL(str, "<=4");
-    TRY(in = IntervalType(1, 5, "<="));                                         TRY(str = in.str());  TEST_EQUAL(str, "<=5");
-    TRY(in = IntervalType(1, 5, ">"));                                          TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = IntervalType(1, 5, ">="));                                         TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = IntervalType(1, 5, "*"));                                          TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType(5, 1));                                               TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = IntervalType());                             TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = IntervalType(1));                            TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = IntervalType(1, IB::closed, IB::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = IntervalType(1, IB::closed, IB::open));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = IntervalType(1, IB::open, IB::closed));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = IntervalType(1, IB::closed, IB::unbound));   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = IntervalType(1, IB::unbound, IB::closed));   TRY(str = in.str());  TEST_EQUAL(str, "<=1");
+    TRY(in = IntervalType(1, IB::open, IB::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = IntervalType(1, IB::unbound, IB::open));     TRY(str = in.str());  TEST_EQUAL(str, "<=0");
+    TRY(in = IntervalType(1, IB::unbound, IB::unbound));  TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = IntervalType(1, 5));                         TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = IntervalType(1, 5, IB::closed));             TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = IntervalType(1, 5, IB::open));               TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = IntervalType(1, 5, IB::closed, IB::open));   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = IntervalType(1, 5, IB::open, IB::closed));   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = IntervalType(1, 5, "[]"));                   TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = IntervalType(1, 5, "()"));                   TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = IntervalType(1, 5, "[)"));                   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = IntervalType(1, 5, "(]"));                   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = IntervalType(1, 5, "<"));                    TRY(str = in.str());  TEST_EQUAL(str, "<=4");
+    TRY(in = IntervalType(1, 5, "<="));                   TRY(str = in.str());  TEST_EQUAL(str, "<=5");
+    TRY(in = IntervalType(1, 5, ">"));                    TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = IntervalType(1, 5, ">="));                   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = IntervalType(1, 5, "*"));                    TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = IntervalType(5, 1));                         TRY(str = in.str());  TEST_EQUAL(str, "{}");
 
-    TRY(in = make_interval(1));                                                  TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = make_interval(1, IntervalBound::closed, IntervalBound::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = make_interval(1, IntervalBound::closed, IntervalBound::open));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = make_interval(1, IntervalBound::open, IntervalBound::closed));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = make_interval(1, IntervalBound::closed, IntervalBound::unbound));   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = make_interval(1, IntervalBound::unbound, IntervalBound::closed));   TRY(str = in.str());  TEST_EQUAL(str, "<=1");
-    TRY(in = make_interval(1, IntervalBound::open, IntervalBound::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = make_interval(1, IntervalBound::unbound, IntervalBound::open));     TRY(str = in.str());  TEST_EQUAL(str, "<=0");
-    TRY(in = make_interval(1, IntervalBound::unbound, IntervalBound::unbound));  TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = make_interval(1, 5));                                               TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = make_interval(1, 5, IntervalBound::closed));                        TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = make_interval(1, 5, IntervalBound::open));                          TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = make_interval(1, 5, IntervalBound::closed, IntervalBound::open));   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = make_interval(1, 5, IntervalBound::open, IntervalBound::closed));   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = make_interval(1, 5, "[]"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = make_interval(1, 5, "()"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = make_interval(1, 5, "[)"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = make_interval(1, 5, "(]"));                                         TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = make_interval(1, 5, "<"));                                          TRY(str = in.str());  TEST_EQUAL(str, "<=4");
-    TRY(in = make_interval(1, 5, "<="));                                         TRY(str = in.str());  TEST_EQUAL(str, "<=5");
-    TRY(in = make_interval(1, 5, ">"));                                          TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = make_interval(1, 5, ">="));                                         TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = make_interval(1, 5, "*"));                                          TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = make_interval(5, 1));                                               TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = make_interval(1));                            TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = make_interval(1, IB::closed, IB::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = make_interval(1, IB::closed, IB::open));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = make_interval(1, IB::open, IB::closed));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = make_interval(1, IB::closed, IB::unbound));   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = make_interval(1, IB::unbound, IB::closed));   TRY(str = in.str());  TEST_EQUAL(str, "<=1");
+    TRY(in = make_interval(1, IB::open, IB::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = make_interval(1, IB::unbound, IB::open));     TRY(str = in.str());  TEST_EQUAL(str, "<=0");
+    TRY(in = make_interval(1, IB::unbound, IB::unbound));  TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = make_interval(1, 5));                         TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = make_interval(1, 5, IB::closed));             TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = make_interval(1, 5, IB::open));               TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = make_interval(1, 5, IB::closed, IB::open));   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = make_interval(1, 5, IB::open, IB::closed));   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = make_interval(1, 5, "[]"));                   TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = make_interval(1, 5, "()"));                   TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = make_interval(1, 5, "[)"));                   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = make_interval(1, 5, "(]"));                   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = make_interval(1, 5, "<"));                    TRY(str = in.str());  TEST_EQUAL(str, "<=4");
+    TRY(in = make_interval(1, 5, "<="));                   TRY(str = in.str());  TEST_EQUAL(str, "<=5");
+    TRY(in = make_interval(1, 5, ">"));                    TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = make_interval(1, 5, ">="));                   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = make_interval(1, 5, "*"));                    TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = make_interval(5, 1));                         TRY(str = in.str());  TEST_EQUAL(str, "{}");
 
-    TRY(in = ordered_interval(5, 1, IntervalBound::closed));                       TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = ordered_interval(5, 1, IntervalBound::open));                         TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = ordered_interval(5, 1, IntervalBound::closed, IntervalBound::open));  TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = ordered_interval(5, 1, IntervalBound::open, IntervalBound::closed));  TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = ordered_interval(5, 1, IB::closed));            TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = ordered_interval(5, 1, IB::open));              TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = ordered_interval(5, 1, IB::closed, IB::open));  TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = ordered_interval(5, 1, IB::open, IB::closed));  TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
 
 }
 

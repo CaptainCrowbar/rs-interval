@@ -6,12 +6,15 @@
 #include <unordered_set>
 #include <vector>
 
-using namespace RS;
 using namespace RS::Intervals;
 using namespace std::literals;
 
 using IntervalType = Interval<std::string>;
 using SetType = IntervalSet<std::string>;
+using IB = IntervalBound;
+using IC = IntervalCategory;
+using IM = IntervalMatch;
+using IO = IntervalOrder;
 
 void test_rs_ordered_interval_set_construct_insert_erase() {
 
@@ -108,9 +111,9 @@ void test_rs_ordered_interval_set_operations() {
             for (int k = 0; k < size; ++k) {
                 auto a = std::string(2, char(random_int('a', 'z')(rng)));
                 auto b = std::string(2, char(random_int('a', 'z')(rng)));
-                auto l = IntervalBound(random_int(0, 3)(rng));
-                auto r = IntervalBound(random_int(0, 3)(rng));
-                if ((l == IntervalBound::empty) == (r == IntervalBound::empty)) {
+                auto l = IB(random_int(0, 3)(rng));
+                auto r = IB(random_int(0, 3)(rng));
+                if ((l == IB::empty) == (r == IB::empty)) {
                     TRY(in = IntervalType(a, b, l, r));
                     TRY(set[j].insert(in));
                     vec[j].push_back(in);

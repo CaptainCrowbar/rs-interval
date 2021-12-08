@@ -6,11 +6,14 @@
 #include <unordered_set>
 #include <vector>
 
-using namespace RS;
 using namespace RS::Intervals;
 
 using IntervalType = Interval<int>;
 using SetType = IntervalSet<int>;
+using IB = IntervalBound;
+using IC = IntervalCategory;
+using IM = IntervalMatch;
+using IO = IntervalOrder;
 
 void test_rs_integral_interval_set_construct_insert_erase() {
 
@@ -112,9 +115,9 @@ void test_rs_integral_interval_set_operations() {
             for (int k = 0; k < size; ++k) {
                 int a = random_int(1, max_value)(rng);
                 int b = random_int(1, max_value)(rng);
-                auto l = IntervalBound(random_int(0, 3)(rng));
-                auto r = IntervalBound(random_int(0, 3)(rng));
-                if ((l == IntervalBound::empty) == (r == IntervalBound::empty)) {
+                auto l = IB(random_int(0, 3)(rng));
+                auto r = IB(random_int(0, 3)(rng));
+                if ((l == IB::empty) == (r == IB::empty)) {
                     TRY(in = IntervalType(a, b, l, r));
                     TRY(set[j].insert(in));
                     vec[j].push_back(in);

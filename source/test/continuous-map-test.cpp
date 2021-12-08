@@ -3,11 +3,14 @@
 #include <string>
 #include <unordered_set>
 
-using namespace RS;
 using namespace RS::Intervals;
 
 using IntervalType = Interval<double>;
 using MapType = IntervalMap<double, std::string>;
+using IB = IntervalBound;
+using IC = IntervalCategory;
+using IM = IntervalMatch;
+using IO = IntervalOrder;
 
 void test_rs_continuous_interval_map() {
 

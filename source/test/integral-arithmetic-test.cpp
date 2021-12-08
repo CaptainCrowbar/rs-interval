@@ -2,11 +2,14 @@
 #include "test/unit-test.hpp"
 #include <string>
 
-using namespace RS;
 using namespace RS::Intervals;
 
 using IntervalType = Interval<int>;
 using SetType = IntervalSet<int>;
+using IB = IntervalBound;
+using IC = IntervalCategory;
+using IM = IntervalMatch;
+using IO = IntervalOrder;
 
 void test_rs_integral_interval_arithmetic() {
 
