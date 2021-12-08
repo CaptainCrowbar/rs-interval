@@ -346,42 +346,42 @@ namespace RS::Intervals {
     class IntervalArithmeticBase {
     public:
         IntervalType operator+() const { auto& a = static_cast<const IntervalType&>(*this); return a; }
-        IntervalType operator-() const { auto& a = static_cast<const IntervalType&>(*this); return negative(a); }
-        IntervalType& operator+=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = add(a, b); return a; }
-        IntervalType& operator+=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = add(a, b); return a; }
-        IntervalType& operator-=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = subtract(a, b); return a; }
-        IntervalType& operator-=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = subtract(a, b); return a; }
-        IntervalType& operator*=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = multiply(a, b); return a; }
-        IntervalType& operator*=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = multiply(a, b); return a; }
-        IntervalType& operator/=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = divide(a, b); return a; }
-        IntervalType& operator/=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = divide(a, b); return a; }
-        friend IntervalType operator+(const IntervalType& a, const IntervalType& b) { return add(a, b); }
-        friend IntervalType operator+(const IntervalType& a, const T& b) { return add(a, b); }
-        friend IntervalType operator+(const T& a, const IntervalType& b) { return add(b, a); }
-        friend IntervalType operator-(const IntervalType& a, const IntervalType& b) { return subtract(a, b); }
-        friend IntervalType operator-(const IntervalType& a, const T& b) { return subtract(a, b); }
-        friend IntervalType operator-(const T& a, const IntervalType& b) { return subtract(a, b); }
-        friend IntervalType operator*(const IntervalType& a, const IntervalType& b) { return multiply(a, b); }
-        friend IntervalType operator*(const IntervalType& a, const T& b) { return multiply(a, b); }
-        friend IntervalType operator*(const T& a, const IntervalType& b) { return multiply(b, a); }
-        friend IntervalType operator/(const IntervalType& a, const IntervalType& b) { return divide(a, b); }
-        friend IntervalType operator/(const IntervalType& a, const T& b) { return divide(a, b); }
-        friend IntervalType operator/(const T& a, const IntervalType& b) { return divide(a, b); }
+        IntervalType operator-() const { auto& a = static_cast<const IntervalType&>(*this); return negative_interval(a); }
+        IntervalType& operator+=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = add_intervals(a, b); return a; }
+        IntervalType& operator+=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = add_intervals(a, b); return a; }
+        IntervalType& operator-=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = subtract_intervals(a, b); return a; }
+        IntervalType& operator-=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = subtract_intervals(a, b); return a; }
+        IntervalType& operator*=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = multiply_intervals(a, b); return a; }
+        IntervalType& operator*=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = multiply_intervals(a, b); return a; }
+        IntervalType& operator/=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = divide_intervals(a, b); return a; }
+        IntervalType& operator/=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = divide_intervals(a, b); return a; }
+        friend IntervalType operator+(const IntervalType& a, const IntervalType& b) { return add_intervals(a, b); }
+        friend IntervalType operator+(const IntervalType& a, const T& b) { return add_intervals(a, b); }
+        friend IntervalType operator+(const T& a, const IntervalType& b) { return add_intervals(b, a); }
+        friend IntervalType operator-(const IntervalType& a, const IntervalType& b) { return subtract_intervals(a, b); }
+        friend IntervalType operator-(const IntervalType& a, const T& b) { return subtract_intervals(a, b); }
+        friend IntervalType operator-(const T& a, const IntervalType& b) { return subtract_intervals(a, b); }
+        friend IntervalType operator*(const IntervalType& a, const IntervalType& b) { return multiply_intervals(a, b); }
+        friend IntervalType operator*(const IntervalType& a, const T& b) { return multiply_intervals(a, b); }
+        friend IntervalType operator*(const T& a, const IntervalType& b) { return multiply_intervals(b, a); }
+        friend IntervalType operator/(const IntervalType& a, const IntervalType& b) { return divide_intervals(a, b); }
+        friend IntervalType operator/(const IntervalType& a, const T& b) { return divide_intervals(a, b); }
+        friend IntervalType operator/(const T& a, const IntervalType& b) { return divide_intervals(a, b); }
     private:
-        static IntervalType negative(const IntervalType& a);
-        static IntervalType add(const IntervalType& a, const IntervalType& b);
-        static IntervalType subtract(const IntervalType& a, const IntervalType& b);
-        static IntervalType multiply(const IntervalType& a, const IntervalType& b);
-        static IntervalType divide(const IntervalType& a, const IntervalType& b);
+        static IntervalType negative_interval(const IntervalType& a);
+        static IntervalType add_intervals(const IntervalType& a, const IntervalType& b);
+        static IntervalType subtract_intervals(const IntervalType& a, const IntervalType& b);
+        static IntervalType multiply_intervals(const IntervalType& a, const IntervalType& b);
+        static IntervalType divide_intervals(const IntervalType& a, const IntervalType& b);
     };
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::negative(const IntervalType& a) {
+        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::negative_interval(const IntervalType& a) {
             return IntervalType(- a.max(), - a.min(), a.right(), a.left());
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::add(const IntervalType& a, const IntervalType& b) {
+        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::add_intervals(const IntervalType& a, const IntervalType& b) {
             if (a.empty() || b.empty())
                 return {};
             if (a.is_universal() || b.is_universal())
@@ -394,20 +394,12 @@ namespace RS::Intervals {
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::subtract(const IntervalType& a, const IntervalType& b) {
-            if (a.empty() || b.empty())
-                return {};
-            if (a.is_universal() || b.is_universal())
-                return IntervalType::all();
-            IntervalBound l = std::max(a.left(), b.right());
-            IntervalBound r = std::max(a.right(), b.left());
-            T t = l == IntervalBound::unbound ? T() : a.min() - b.max();
-            T u = r == IntervalBound::unbound ? T() : a.max() - b.min();
-            return IntervalType(t, u, l, r);
+        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::subtract_intervals(const IntervalType& a, const IntervalType& b) {
+            return add_intervals(a, negative_interval(b));
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply(const IntervalType& a, const IntervalType& b) {
+        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
             if (a.empty() || b.empty())
                 return {};
             if ((a.is_single() && a.min() == T()) || (b.is_single() && b.min() == T()))
@@ -421,7 +413,7 @@ namespace RS::Intervals {
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::divide(const IntervalType& a, const IntervalType& b) {
+        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::divide_intervals(const IntervalType& a, const IntervalType& b) {
             // TODO
             (void)a;
             (void)b;
