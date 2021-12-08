@@ -88,9 +88,11 @@ namespace RS::Intervals {
                 return str;
         }
 
-        inline std::string format_float_d(double x, int prec) {
+        template <typename T>
+        std::string format_float_d(T x, int prec) {
+            static constexpr const char* pattern = sizeof(T) > sizeof(double) ? "%.*Le" : "%.*e";
             prec = std::max(prec, 1);
-            auto full_str = native_format("%.*e", x, prec - 1);
+            std::string full_str = native_format(pattern, x, prec - 1);
             size_t sig_pos = size_t(full_str[0] == '-');
             size_t exp_pos = full_str.find_first_of("Ee", sig_pos);
             auto result = full_str.substr(sig_pos, exp_pos - sig_pos);
@@ -110,20 +112,23 @@ namespace RS::Intervals {
             return result;
         }
 
-        inline std::string format_float_e(double x, int prec, char mode) {
+        template <typename T>
+        std::string format_float_e(T x, int prec, char mode) {
+            static constexpr const char* lcase = sizeof(T) > sizeof(double) ? "%.*Le" : "%.*e";
+            static constexpr const char* ucase = sizeof(T) > sizeof(double) ? "%.*LE" : "%.*E";
             prec = std::max(prec, 1);
-            if (mode >= 'a')
-                return trim_exponent(native_format("%.*e", x, prec - 1));
-            else
-                return trim_exponent(native_format("%.*E", x, prec - 1));
+            return trim_exponent(native_format(mode >= 'a' ? lcase : ucase, x, prec - 1));
         }
 
-        inline std::string format_float_f(double x, int prec) {
+        template <typename T>
+        std::string format_float_f(T x, int prec) {
+            static constexpr const char* pattern = sizeof(T) > sizeof(double) ? "%.*Lf" : "%.*f";
             prec = std::max(prec, 0);
-            return native_format("%.*f", x, prec);
+            return native_format(pattern, x, prec);
         }
 
-        inline std::string format_float_g(double x, int prec, char mode) {
+        template <typename T>
+        std::string format_float_g(T x, int prec, char mode) {
             auto y = std::abs(x);
             if (y == 0 || (y >= 1e-3 && y < 1e6))
                 return format_float_d(x, prec);
@@ -133,7 +138,8 @@ namespace RS::Intervals {
 
     }
 
-    inline std::string format_float(double x, const std::string& spec = {}) {
+    template <typename T>
+    std::string format_float(T x, const std::string& spec = {}) {
 
         if (spec.empty())
             return Detail::trim_zeros(Detail::format_float_g(x, 6, 'g'));
@@ -166,12 +172,14 @@ namespace RS::Intervals {
 
         static_assert(std::numeric_limits<T>::is_integer);
 
+        using floating_type = std::conditional_t<(sizeof(T) >= sizeof(double)), long double, double>;
+
         static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
 
         char mode = spec[0];
 
         if (mode >= 'd' && mode <= 'f')
-            return format_float(double(x), spec);
+            return format_float(floating_type(x), spec);
 
         bool opt_sign = spec.find('s') != npos;
         T base = mode == 'X' || mode == 'x' ? 16 : 10;
