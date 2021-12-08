@@ -17,8 +17,8 @@ namespace RS::Intervals {
     //      Default is "n1"
     //      Floating point specs can also be used
     //      Mode:
-    //          n = Decimal
-    //          x = Hexadecimal
+    //          N,n = Decimal
+    //          X,x = Hexadecimal
     //      Options:
     //          s = Always show a sign
     // Floating point
@@ -171,7 +171,7 @@ namespace RS::Intervals {
             return format_float(double(x), spec);
 
         bool opt_sign = spec.find('s') != npos;
-        T base = mode == 'x' ? 16 : 10;
+        T base = mode == 'X' || mode == 'x' ? 16 : 10;
         size_t pos = spec.find_first_of("0123456789");
         int prec = pos == npos ? 1 : Detail::str_to_int(spec.substr(pos));
         std::string result;
@@ -183,7 +183,13 @@ namespace RS::Intervals {
         }
 
         while (x != 0 || result.size() < size_t(prec)) {
-            result += "0123456789abcdef"[x % base];
+            int rem = int(x % base);
+            if (rem < 10)
+                result += char('0' + rem);
+            else if (mode == 'X')
+                result += char('A' + rem - 10);
+            else
+                result += char('a' + rem - 10);
             x /= base;
         }
 

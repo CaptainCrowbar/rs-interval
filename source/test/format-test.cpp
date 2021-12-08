@@ -46,6 +46,11 @@ void test_rs_interval_format_integer() {
     n = -42;         TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "-002a");
     n = 123456789;   TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "75bcd15");
     n = -123456789;  TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "-75bcd15");
+    n = 0;           TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "0");
+    n = 42;          TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "2A");
+    n = -42;         TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "-2A");
+    n = 123456789;   TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "75BCD15");
+    n = -123456789;  TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "-75BCD15");
 
     u = 0;           TRY(s = format_integer(u));        TEST_EQUAL(s, "0");
     u = 42;          TRY(s = format_integer(u));        TEST_EQUAL(s, "42");
@@ -67,6 +72,9 @@ void test_rs_interval_format_integer() {
     u = 0;           TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "0000");
     u = 42;          TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "002a");
     u = 123456789;   TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "75bcd15");
+    u = 0;           TRY(s = format_integer(u, "X"));   TEST_EQUAL(s, "0");
+    u = 42;          TRY(s = format_integer(u, "X"));   TEST_EQUAL(s, "2A");
+    u = 123456789;   TRY(s = format_integer(u, "X"));   TEST_EQUAL(s, "75BCD15");
 
 }
 
