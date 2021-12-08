@@ -38,5 +38,5 @@ target_link_libraries(${unittest}
     PRIVATE Threads::Threads
 )
 
-file(GLOB headers "${library}/*.hpp")
-install(FILES ${headers} DESTINATION include/${library})
+file(GLOB subheaders "${library}/*.hpp")
+install(FILES ${library}.hpp ${subheaders} DESTINATION include/${library})
