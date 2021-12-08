@@ -1,84 +1,10 @@
 #include "rs-interval/format.hpp"
 #include "test/unit-test.hpp"
-#include <map>
 #include <string>
-#include <vector>
 
 using namespace RS::Intervals;
-using namespace RS::Intervals::Detail;
 
-void test_rs_interval_format_integer() {
-
-    int n;
-    unsigned u;
-    std::string s;
-
-    n = 0;           TRY(s = format_integer(n));        TEST_EQUAL(s, "0");
-    n = 42;          TRY(s = format_integer(n));        TEST_EQUAL(s, "42");
-    n = -42;         TRY(s = format_integer(n));        TEST_EQUAL(s, "-42");
-    n = 123456789;   TRY(s = format_integer(n));        TEST_EQUAL(s, "123456789");
-    n = -123456789;  TRY(s = format_integer(n));        TEST_EQUAL(s, "-123456789");
-    n = 0;           TRY(s = format_integer(n, "n"));   TEST_EQUAL(s, "0");
-    n = 42;          TRY(s = format_integer(n, "n"));   TEST_EQUAL(s, "42");
-    n = -42;         TRY(s = format_integer(n, "n"));   TEST_EQUAL(s, "-42");
-    n = 123456789;   TRY(s = format_integer(n, "n"));   TEST_EQUAL(s, "123456789");
-    n = -123456789;  TRY(s = format_integer(n, "n"));   TEST_EQUAL(s, "-123456789");
-    n = 0;           TRY(s = format_integer(n, "ns"));  TEST_EQUAL(s, "+0");
-    n = 42;          TRY(s = format_integer(n, "ns"));  TEST_EQUAL(s, "+42");
-    n = -42;         TRY(s = format_integer(n, "ns"));  TEST_EQUAL(s, "-42");
-    n = 123456789;   TRY(s = format_integer(n, "ns"));  TEST_EQUAL(s, "+123456789");
-    n = -123456789;  TRY(s = format_integer(n, "ns"));  TEST_EQUAL(s, "-123456789");
-    n = 0;           TRY(s = format_integer(n, "n4"));  TEST_EQUAL(s, "0000");
-    n = 42;          TRY(s = format_integer(n, "n4"));  TEST_EQUAL(s, "0042");
-    n = -42;         TRY(s = format_integer(n, "n4"));  TEST_EQUAL(s, "-0042");
-    n = 123456789;   TRY(s = format_integer(n, "n4"));  TEST_EQUAL(s, "123456789");
-    n = -123456789;  TRY(s = format_integer(n, "n4"));  TEST_EQUAL(s, "-123456789");
-    n = 0;           TRY(s = format_integer(n, "n0"));  TEST_EQUAL(s, "");
-    n = 42;          TRY(s = format_integer(n, "n0"));  TEST_EQUAL(s, "42");
-    n = -42;         TRY(s = format_integer(n, "n0"));  TEST_EQUAL(s, "-42");
-    n = 0;           TRY(s = format_integer(n, "x"));   TEST_EQUAL(s, "0");
-    n = 42;          TRY(s = format_integer(n, "x"));   TEST_EQUAL(s, "2a");
-    n = -42;         TRY(s = format_integer(n, "x"));   TEST_EQUAL(s, "-2a");
-    n = 123456789;   TRY(s = format_integer(n, "x"));   TEST_EQUAL(s, "75bcd15");
-    n = -123456789;  TRY(s = format_integer(n, "x"));   TEST_EQUAL(s, "-75bcd15");
-    n = 0;           TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "0000");
-    n = 42;          TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "002a");
-    n = -42;         TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "-002a");
-    n = 123456789;   TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "75bcd15");
-    n = -123456789;  TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "-75bcd15");
-    n = 0;           TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "0");
-    n = 42;          TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "2A");
-    n = -42;         TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "-2A");
-    n = 123456789;   TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "75BCD15");
-    n = -123456789;  TRY(s = format_integer(n, "X"));   TEST_EQUAL(s, "-75BCD15");
-
-    u = 0;           TRY(s = format_integer(u));        TEST_EQUAL(s, "0");
-    u = 42;          TRY(s = format_integer(u));        TEST_EQUAL(s, "42");
-    u = 123456789;   TRY(s = format_integer(u));        TEST_EQUAL(s, "123456789");
-    u = 0;           TRY(s = format_integer(u, "n"));   TEST_EQUAL(s, "0");
-    u = 42;          TRY(s = format_integer(u, "n"));   TEST_EQUAL(s, "42");
-    u = 123456789;   TRY(s = format_integer(u, "n"));   TEST_EQUAL(s, "123456789");
-    u = 0;           TRY(s = format_integer(u, "ns"));  TEST_EQUAL(s, "+0");
-    u = 42;          TRY(s = format_integer(u, "ns"));  TEST_EQUAL(s, "+42");
-    u = 123456789;   TRY(s = format_integer(u, "ns"));  TEST_EQUAL(s, "+123456789");
-    u = 0;           TRY(s = format_integer(u, "n4"));  TEST_EQUAL(s, "0000");
-    u = 42;          TRY(s = format_integer(u, "n4"));  TEST_EQUAL(s, "0042");
-    u = 123456789;   TRY(s = format_integer(u, "n4"));  TEST_EQUAL(s, "123456789");
-    u = 0;           TRY(s = format_integer(u, "n0"));  TEST_EQUAL(s, "");
-    u = 42;          TRY(s = format_integer(u, "n0"));  TEST_EQUAL(s, "42");
-    u = 0;           TRY(s = format_integer(u, "x"));   TEST_EQUAL(s, "0");
-    u = 42;          TRY(s = format_integer(u, "x"));   TEST_EQUAL(s, "2a");
-    u = 123456789;   TRY(s = format_integer(u, "x"));   TEST_EQUAL(s, "75bcd15");
-    u = 0;           TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "0000");
-    u = 42;          TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "002a");
-    u = 123456789;   TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "75bcd15");
-    u = 0;           TRY(s = format_integer(u, "X"));   TEST_EQUAL(s, "0");
-    u = 42;          TRY(s = format_integer(u, "X"));   TEST_EQUAL(s, "2A");
-    u = 123456789;   TRY(s = format_integer(u, "X"));   TEST_EQUAL(s, "75BCD15");
-
-}
-
-void test_rs_interval_format_floating_point() {
+void test_rs_interval_format_floating_point_with_significant_digits() {
 
     double x;
     std::string s;
@@ -109,7 +35,6 @@ void test_rs_interval_format_floating_point() {
     x = 0;               TRY(s = format_float(x, "ds"));   TEST_EQUAL(s, "+0.00000");
     x = 123.456;         TRY(s = format_float(x, "ds"));   TEST_EQUAL(s, "+123.456");
     x = -123.456;        TRY(s = format_float(x, "ds"));   TEST_EQUAL(s, "-123.456");
-
     x = 0;               TRY(s = format_float(x, "dz"));   TEST_EQUAL(s, "0");
     x = 0;               TRY(s = format_float(x, "dz0"));  TEST_EQUAL(s, "0");
     x = 0;               TRY(s = format_float(x, "dz4"));  TEST_EQUAL(s, "0");
@@ -136,6 +61,13 @@ void test_rs_interval_format_floating_point() {
     x = 0;               TRY(s = format_float(x, "dsz"));  TEST_EQUAL(s, "+0");
     x = 123.456;         TRY(s = format_float(x, "dsz"));  TEST_EQUAL(s, "+123.456");
     x = -123.456;        TRY(s = format_float(x, "dsz"));  TEST_EQUAL(s, "-123.456");
+
+}
+
+void test_rs_interval_format_floating_point_with_scientific_notation() {
+
+    double x;
+    std::string s;
 
     x = 0;               TRY(s = format_float(x, "e"));    TEST_EQUAL(s, "0.00000e0");
     x = 0;               TRY(s = format_float(x, "e0"));   TEST_EQUAL(s, "0e0");
@@ -172,6 +104,13 @@ void test_rs_interval_format_floating_point() {
     x = 123.456;         TRY(s = format_float(x, "ez2"));  TEST_EQUAL(s, "1.2e2");
     x = 123.456;         TRY(s = format_float(x, "ez8"));  TEST_EQUAL(s, "1.23456e2");
 
+}
+
+void test_rs_interval_format_floating_point_with_fixed_point() {
+
+    double x;
+    std::string s;
+
     x = 0;               TRY(s = format_float(x, "f"));    TEST_EQUAL(s, "0.000000");
     x = 0;               TRY(s = format_float(x, "f0"));   TEST_EQUAL(s, "0");
     x = 0;               TRY(s = format_float(x, "f2"));   TEST_EQUAL(s, "0.00");
@@ -198,6 +137,13 @@ void test_rs_interval_format_floating_point() {
     x = 123.456;         TRY(s = format_float(x, "fz0"));  TEST_EQUAL(s, "123");
     x = 123.456;         TRY(s = format_float(x, "fz2"));  TEST_EQUAL(s, "123.46");
     x = 123.456;         TRY(s = format_float(x, "fz4"));  TEST_EQUAL(s, "123.456");
+
+}
+
+void test_rs_interval_format_floating_point_with_general_format() {
+
+    double x;
+    std::string s;
 
     x = 0;               TRY(s = format_float(x, "g"));    TEST_EQUAL(s, "0.00000");
     x = 0;               TRY(s = format_float(x, "g0"));   TEST_EQUAL(s, "0");
@@ -250,25 +196,5 @@ void test_rs_interval_format_floating_point() {
     x = 0.000000123456;  TRY(s = format_float(x, "gz0"));  TEST_EQUAL(s, "1e-7");
     x = 0.000000123456;  TRY(s = format_float(x, "gz4"));  TEST_EQUAL(s, "1.235e-7");
     x = 0.000000123456;  TRY(s = format_float(x, "gz8"));  TEST_EQUAL(s, "1.23456e-7");
-
-}
-
-void test_rs_interval_format_ranges() {
-
-    std::vector<int> vec;
-    std::map<int, std::string> map;
-    std::string s;
-
-    vec = {};         TRY(s = format_object(vec));  TEST_EQUAL(s, "[]");
-    vec = {1};        TRY(s = format_object(vec));  TEST_EQUAL(s, "[1]");
-    vec = {1,2};      TRY(s = format_object(vec));  TEST_EQUAL(s, "[1,2]");
-    vec = {1,2,3};    TRY(s = format_object(vec));  TEST_EQUAL(s, "[1,2,3]");
-    vec = {1,2,3,4};  TRY(s = format_object(vec));  TEST_EQUAL(s, "[1,2,3,4]");
-
-    map = {};                                         TRY(s = format_object(map));  TEST_EQUAL(s, "{}");
-    map = {{1,"abc"}};                                TRY(s = format_object(map));  TEST_EQUAL(s, "{1:abc}");
-    map = {{1,"abc"},{2,"def"}};                      TRY(s = format_object(map));  TEST_EQUAL(s, "{1:abc,2:def}");
-    map = {{1,"abc"},{2,"def"},{3,"ghi"}};            TRY(s = format_object(map));  TEST_EQUAL(s, "{1:abc,2:def,3:ghi}");
-    map = {{1,"abc"},{2,"def"},{3,"ghi"},{4,"jkl"}};  TRY(s = format_object(map));  TEST_EQUAL(s, "{1:abc,2:def,3:ghi,4:jkl}");
 
 }

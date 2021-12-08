@@ -4,14 +4,20 @@ int main(int argc, char** argv) {
 
     RS::UnitTest::begin_tests(argc, argv);
 
-    // format-test.cpp
-    UNIT_TEST(rs_interval_format_integer)
-    UNIT_TEST(rs_interval_format_floating_point)
-    UNIT_TEST(rs_interval_format_ranges)
-
     // type-traits-test.cpp
     UNIT_TEST(rs_interval_enumeration)
     UNIT_TEST(rs_interval_type_traits)
+
+    // format-integer-test.cpp
+    UNIT_TEST(rs_interval_format_signed_integers)
+    UNIT_TEST(rs_interval_format_unsigned_integers)
+    UNIT_TEST(rs_interval_format_ranges)
+
+    // format-floating-point-test.cpp
+    UNIT_TEST(rs_interval_format_floating_point_with_significant_digits)
+    UNIT_TEST(rs_interval_format_floating_point_with_scientific_notation)
+    UNIT_TEST(rs_interval_format_floating_point_with_fixed_point)
+    UNIT_TEST(rs_interval_format_floating_point_with_general_format)
 
     // ordered-basic-test.cpp
     UNIT_TEST(rs_ordered_interval_basic_properties)
