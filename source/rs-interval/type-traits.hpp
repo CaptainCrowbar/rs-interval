@@ -130,6 +130,23 @@ namespace RS::Intervals {
         template <typename T> constexpr bool is_range = (HasAdlBeginFunction<T>::value && HasAdlEndFunction<T>::value)
             || (HasStdBeginFunction<T>::value && HasStdEndFunction<T>::value);
 
+        template <typename T, bool UseAdl = HasAdlBeginFunction<T>::value, bool UseStd = HasStdBeginFunction<T>::value> struct RangeValueType
+            { using type = void; };
+        template <typename T, bool UseStd> struct RangeValueType<T, true, UseStd>
+            { using type = std::decay_t<decltype(*begin(std::declval<T>()))>; };
+        template <typename T> struct RangeValueType<T, false, true>
+            { using type = std::decay_t<decltype(*std::begin(std::declval<T>()))>; };
+
+        template <typename T, typename = void> struct HasFirstMember: std::false_type {};
+        template <typename T> struct HasFirstMember<T,
+            std::void_t<decltype(std::declval<T>().first)>>: std::true_type {};
+        template <typename T, typename = void> struct HasSecondMember: std::false_type {};
+        template <typename T> struct HasSecondMember<T,
+            std::void_t<decltype(std::declval<T>().second)>>: std::true_type {};
+        template <typename T> constexpr bool is_pairlike = HasFirstMember<T>::value && HasSecondMember<T>::value;
+
+        template <typename T> constexpr bool is_maplike = is_range<T> && is_pairlike<typename RangeValueType<T>::type>;
+
         inline std::vector<std::string> split_string(const std::string& str, const std::string& chars = ascii_whitespace) {
             std::vector<std::string> vec;
             size_t i = 0, j = 0;

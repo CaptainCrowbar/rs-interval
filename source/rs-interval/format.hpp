@@ -32,8 +32,6 @@ namespace RS::Intervals {
     //          z = Strip trailing zeroes
 
     template <typename T> std::string format_object(const T& t, const std::string& spec = {});
-    std::string format_integer(int64_t x, const std::string& spec = {});
-    std::string format_float(double x, const std::string& spec = {});
 
     namespace Detail {
 
@@ -131,7 +129,35 @@ namespace RS::Intervals {
 
     }
 
-    inline std::string format_integer(int64_t x, const std::string& spec) {
+    inline std::string format_float(double x, const std::string& spec = {}) {
+
+        if (spec.empty())
+            return Detail::trim_zeros(Detail::format_float_g(x, 6));
+
+        char mode = spec[0];
+        bool opt_sign = spec.find('s') != npos;
+        bool opt_ztrim = spec.find('z') != npos;
+        size_t pos = spec.find_first_of("0123456789");
+        int prec = pos == npos ? 6 : Detail::str_to_int(spec.substr(pos));
+        std::string result;
+
+        switch (mode) {
+            case 'd':  result = Detail::format_float_d(x, prec); break;
+            case 'e':  result = Detail::format_float_e(x, prec); break;
+            case 'f':  result = Detail::format_float_f(x, prec); break;
+            default:   result = Detail::format_float_g(x, prec); break;
+        }
+
+        if (opt_sign && result[0] != '-')
+            result.insert(0, 1, '+');
+        if (opt_ztrim)
+            result = Detail::trim_zeros(result);
+
+        return result;
+
+    }
+
+    inline std::string format_integer(int64_t x, const std::string& spec = {}) {
 
         char mode = spec[0];
 
@@ -161,45 +187,27 @@ namespace RS::Intervals {
 
     }
 
-    inline std::string format_float(double x, const std::string& spec) {
-
-        if (spec.empty())
-            return Detail::trim_zeros(Detail::format_float_g(x, 6));
-
-        char mode = spec[0];
-        bool opt_sign = spec.find('s') != npos;
-        bool opt_ztrim = spec.find('z') != npos;
-        size_t pos = spec.find_first_of("0123456789");
-        int prec = pos == npos ? 6 : Detail::str_to_int(spec.substr(pos));
-        std::string result;
-
-        switch (mode) {
-            case 'd':  result = Detail::format_float_d(x, prec); break;
-            case 'e':  result = Detail::format_float_e(x, prec); break;
-            case 'f':  result = Detail::format_float_f(x, prec); break;
-            default:   result = Detail::format_float_g(x, prec); break;
-        }
-
-        if (opt_sign && result[0] != '-')
-            result.insert(0, 1, '+');
-        if (opt_ztrim)
-            result = Detail::trim_zeros(result);
-
-        return result;
-
+    template <typename Range>
+    std::string format_range(const Range& r, const std::string& spec = {}) {
+        std::string s = "[";
+        for (auto& x: r)
+            s += format_object(x, spec) + ',';
+        if (s.size() > 1)
+            s.pop_back();
+        s += ']';
+        return s;
     }
 
     template <typename Range>
-    std::string format_range(const Range& r, const std::string& spec = {},
-            const std::string& prefix = {}, const std::string& delimiter = ",", const std::string& suffix = {}) {
-        std::string s = prefix;
-        for (auto& x: r) {
-            s += format_object(x, spec);
-            s += delimiter;
+    std::string format_map(const Range& r, const std::string& spec = {}) {
+        std::string s = "{";
+        for (auto& [k,v]: r) {
+            s += format_object(k, spec) + ':';
+            s += format_object(v, spec) + ',';
         }
-        if (s.size() > prefix.size())
-            s.resize(s.size() - delimiter.size());
-        s += suffix;
+        if (s.size() > 1)
+            s.pop_back();
+        s += '}';
         return s;
     }
 
@@ -215,13 +223,13 @@ namespace RS::Intervals {
         if constexpr (std::is_same_v<T, std::nullptr_t>)
             return "null";
         else if constexpr (std::is_same_v<T, bool>)
-            return t ? "yes" : "no";
+            return spec[0] == 'y' ? (t ? "yes" : "no") : (t ? "true" : "false");
         else if constexpr (std::is_same_v<T, char>)
             return std::string{t};
         else if constexpr (std::is_integral_v<T>)
             return format_integer(t, spec);
         else if constexpr (std::is_floating_point_v<T>)
-            return format_float(double(t), spec);
+            return format_float(t, spec);
         else if constexpr (Detail::has_str_method<T>)
             return t.str();
         else if constexpr (Detail::has_adl_to_string_function<T>)
@@ -232,6 +240,8 @@ namespace RS::Intervals {
             return t ? std::string(t) : "null";
         else if constexpr (std::is_constructible_v<std::string, T>)
             return std::string(t);
+        else if constexpr (Detail::is_maplike<T>)
+            return format_map(t, spec);
         else if constexpr (Detail::is_range<T>)
             return format_range(t, spec);
         else

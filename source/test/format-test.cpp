@@ -1,11 +1,13 @@
 #include "rs-interval/format.hpp"
 #include "test/unit-test.hpp"
+#include <map>
 #include <string>
+#include <vector>
 
 using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
 
-void test_rs_format_interval_integer() {
+void test_rs_interval_format_integer() {
 
     int n;
     std::string s;
@@ -46,7 +48,7 @@ void test_rs_format_interval_integer() {
 
 }
 
-void test_rs_format_interval_floating_point() {
+void test_rs_interval_format_floating_point() {
 
     double x;
     std::string s;
@@ -218,5 +220,25 @@ void test_rs_format_interval_floating_point() {
     x = 0.000000123456;  TRY(s = format_float(x, "gz0"));  TEST_EQUAL(s, "1e-7");
     x = 0.000000123456;  TRY(s = format_float(x, "gz4"));  TEST_EQUAL(s, "1.235e-7");
     x = 0.000000123456;  TRY(s = format_float(x, "gz8"));  TEST_EQUAL(s, "1.23456e-7");
+
+}
+
+void test_rs_interval_format_ranges() {
+
+    std::vector<int> vec;
+    std::map<int, std::string> map;
+    std::string s;
+
+    vec = {};         TRY(s = format_object(vec));  TEST_EQUAL(s, "[]");
+    vec = {1};        TRY(s = format_object(vec));  TEST_EQUAL(s, "[1]");
+    vec = {1,2};      TRY(s = format_object(vec));  TEST_EQUAL(s, "[1,2]");
+    vec = {1,2,3};    TRY(s = format_object(vec));  TEST_EQUAL(s, "[1,2,3]");
+    vec = {1,2,3,4};  TRY(s = format_object(vec));  TEST_EQUAL(s, "[1,2,3,4]");
+
+    map = {};                                         TRY(s = format_object(map));  TEST_EQUAL(s, "{}");
+    map = {{1,"abc"}};                                TRY(s = format_object(map));  TEST_EQUAL(s, "{1:abc}");
+    map = {{1,"abc"},{2,"def"}};                      TRY(s = format_object(map));  TEST_EQUAL(s, "{1:abc,2:def}");
+    map = {{1,"abc"},{2,"def"},{3,"ghi"}};            TRY(s = format_object(map));  TEST_EQUAL(s, "{1:abc,2:def,3:ghi}");
+    map = {{1,"abc"},{2,"def"},{3,"ghi"},{4,"jkl"}};  TRY(s = format_object(map));  TEST_EQUAL(s, "{1:abc,2:def,3:ghi,4:jkl}");
 
 }

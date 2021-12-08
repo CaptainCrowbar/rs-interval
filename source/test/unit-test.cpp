@@ -5,8 +5,9 @@ int main(int argc, char** argv) {
     RS::UnitTest::begin_tests(argc, argv);
 
     // format-test.cpp
-    UNIT_TEST(rs_format_interval_integer)
-    UNIT_TEST(rs_format_interval_floating_point)
+    UNIT_TEST(rs_interval_format_integer)
+    UNIT_TEST(rs_interval_format_floating_point)
+    UNIT_TEST(rs_interval_format_ranges)
 
     // type-traits-test.cpp
     UNIT_TEST(rs_interval_enumeration)
