@@ -13,7 +13,8 @@
 namespace RS::Intervals {
 
     // Format spec is "<mode>[<options>][<prec>]"
-    // Integer
+
+    //  Integer
     //      Default is "n1"
     //      Floating point specs can also be used
     //      Mode:
@@ -21,7 +22,8 @@ namespace RS::Intervals {
     //          X,x = Hexadecimal
     //      Options:
     //          s = Always show a sign
-    // Floating point
+
+    //  Floating point
     //      Default is "gz6"
     //      Mode:
     //          D,d = Decimal format (prec = significant digits)
@@ -30,6 +32,7 @@ namespace RS::Intervals {
     //          G,g = Use D/d if 1e-3<=|value|<1e6 or value=0, otherwise E/e
     //      Options:
     //          s = Always show a sign
+    //          S = Always show a sign on exponent
     //          z = Strip trailing zeroes
 
     template <typename T> std::string format_object(const T& t, const std::string& spec = {});
@@ -53,12 +56,13 @@ namespace RS::Intervals {
             return result;
         }
 
-        inline std::string trim_exponent(const std::string& str) {
+        inline std::string trim_exponent(const std::string& str, bool xsign) {
             size_t begin_cut = str.find_first_of("Ee");
             if (begin_cut == npos)
                 return str;
             ++begin_cut;
-            if (str[begin_cut] == '-')
+            bool neg = str[begin_cut] == '-';
+            if (neg)
                 ++begin_cut;
             size_t end_cut = begin_cut;
             if (str[end_cut] == '+')
@@ -67,7 +71,11 @@ namespace RS::Intervals {
                 ++end_cut;
             if (end_cut == str.size())
                 --end_cut;
-            return str.substr(0, begin_cut) + str.substr(end_cut);
+            auto result = str.substr(0, begin_cut);
+            if (xsign && ! neg)
+                result += '+';
+            result += str.substr(end_cut);
+            return result;
         }
 
         inline std::string trim_zeros(const std::string& str) {
@@ -113,11 +121,11 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        std::string format_float_e(T x, int prec, char mode) {
+        std::string format_float_e(T x, int prec, bool cap, bool xsign) {
             static constexpr const char* lcase = sizeof(T) > sizeof(double) ? "%.*Le" : "%.*e";
             static constexpr const char* ucase = sizeof(T) > sizeof(double) ? "%.*LE" : "%.*E";
             prec = std::max(prec, 1);
-            return trim_exponent(native_format(mode >= 'a' ? lcase : ucase, x, prec - 1));
+            return trim_exponent(native_format(cap ? ucase : lcase, x, prec - 1), xsign);
         }
 
         template <typename T>
@@ -128,12 +136,12 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        std::string format_float_g(T x, int prec, char mode) {
+        std::string format_float_g(T x, int prec, bool cap, bool xsign) {
             auto y = std::abs(x);
             if (y == 0 || (y >= 1e-3 && y < 1e6))
                 return format_float_d(x, prec);
             else
-                return format_float_e(x, prec, mode);
+                return format_float_e(x, prec, cap, xsign);
         }
 
     }
@@ -142,10 +150,12 @@ namespace RS::Intervals {
     std::string format_float(T x, const std::string& spec = {}) {
 
         if (spec.empty())
-            return Detail::trim_zeros(Detail::format_float_g(x, 6, 'g'));
+            return Detail::trim_zeros(Detail::format_float_g(x, 6, false, false));
 
         char mode = spec[0];
+        bool opt_ucase = mode <= 'Z';
         bool opt_sign = spec.find('s') != npos;
+        bool opt_xsign = spec.find('S') != npos;
         bool opt_ztrim = spec.find('z') != npos;
         size_t pos = spec.find_first_of("0123456789");
         int prec = pos == npos ? 6 : Detail::str_to_int(spec.substr(pos));
@@ -153,9 +163,9 @@ namespace RS::Intervals {
 
         switch (mode) {
             case 'D': case 'd':  result = Detail::format_float_d(x, prec); break;
-            case 'E': case 'e':  result = Detail::format_float_e(x, prec, mode); break;
+            case 'E': case 'e':  result = Detail::format_float_e(x, prec, opt_ucase, opt_xsign); break;
             case 'F': case 'f':  result = Detail::format_float_f(x, prec); break;
-            default:             result = Detail::format_float_g(x, prec, mode); break;
+            default:             result = Detail::format_float_g(x, prec, opt_ucase, opt_xsign); break;
         }
 
         if (opt_sign && result[0] != '-')
