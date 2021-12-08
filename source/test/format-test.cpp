@@ -10,6 +10,7 @@ using namespace RS::Intervals::Detail;
 void test_rs_interval_format_integer() {
 
     int n;
+    unsigned u;
     std::string s;
 
     n = 0;           TRY(s = format_integer(n));        TEST_EQUAL(s, "0");
@@ -45,6 +46,27 @@ void test_rs_interval_format_integer() {
     n = -42;         TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "-002a");
     n = 123456789;   TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "75bcd15");
     n = -123456789;  TRY(s = format_integer(n, "x4"));  TEST_EQUAL(s, "-75bcd15");
+
+    u = 0;           TRY(s = format_integer(u));        TEST_EQUAL(s, "0");
+    u = 42;          TRY(s = format_integer(u));        TEST_EQUAL(s, "42");
+    u = 123456789;   TRY(s = format_integer(u));        TEST_EQUAL(s, "123456789");
+    u = 0;           TRY(s = format_integer(u, "n"));   TEST_EQUAL(s, "0");
+    u = 42;          TRY(s = format_integer(u, "n"));   TEST_EQUAL(s, "42");
+    u = 123456789;   TRY(s = format_integer(u, "n"));   TEST_EQUAL(s, "123456789");
+    u = 0;           TRY(s = format_integer(u, "ns"));  TEST_EQUAL(s, "+0");
+    u = 42;          TRY(s = format_integer(u, "ns"));  TEST_EQUAL(s, "+42");
+    u = 123456789;   TRY(s = format_integer(u, "ns"));  TEST_EQUAL(s, "+123456789");
+    u = 0;           TRY(s = format_integer(u, "n4"));  TEST_EQUAL(s, "0000");
+    u = 42;          TRY(s = format_integer(u, "n4"));  TEST_EQUAL(s, "0042");
+    u = 123456789;   TRY(s = format_integer(u, "n4"));  TEST_EQUAL(s, "123456789");
+    u = 0;           TRY(s = format_integer(u, "n0"));  TEST_EQUAL(s, "");
+    u = 42;          TRY(s = format_integer(u, "n0"));  TEST_EQUAL(s, "42");
+    u = 0;           TRY(s = format_integer(u, "x"));   TEST_EQUAL(s, "0");
+    u = 42;          TRY(s = format_integer(u, "x"));   TEST_EQUAL(s, "2a");
+    u = 123456789;   TRY(s = format_integer(u, "x"));   TEST_EQUAL(s, "75bcd15");
+    u = 0;           TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "0000");
+    u = 42;          TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "002a");
+    u = 123456789;   TRY(s = format_integer(u, "x4"));  TEST_EQUAL(s, "75bcd15");
 
 }
 

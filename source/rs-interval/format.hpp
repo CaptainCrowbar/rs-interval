@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -157,26 +158,36 @@ namespace RS::Intervals {
 
     }
 
-    inline std::string format_integer(int64_t x, const std::string& spec = {}) {
+    template <typename T>
+    std::string format_integer(T x, const std::string& spec = {}) {
+
+        static_assert(std::numeric_limits<T>::is_integer);
+
+        static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
 
         char mode = spec[0];
 
         if (mode >= 'd' && mode <= 'f')
             return format_float(double(x), spec);
 
-        int64_t base = mode == 'x' ? 16 : 10;
         bool opt_sign = spec.find('s') != npos;
+        T base = mode == 'x' ? 16 : 10;
         size_t pos = spec.find_first_of("0123456789");
         int prec = pos == npos ? 1 : Detail::str_to_int(spec.substr(pos));
         std::string result;
-        int64_t quo = std::abs(x);
-
-        while (quo != 0 || result.size() < size_t(prec)) {
-            result += "0123456789abcdef"[quo % base];
-            quo /= base;
+        bool neg = false;
+        if constexpr (is_signed) {
+            neg = x < 0;
+            if (neg)
+                x = - x;
         }
 
-        if (x < 0)
+        while (x != 0 || result.size() < size_t(prec)) {
+            result += "0123456789abcdef"[x % base];
+            x /= base;
+        }
+
+        if (neg)
             result += '-';
         else if (opt_sign)
             result += '+';
