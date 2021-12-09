@@ -8,8 +8,8 @@
 
 using namespace RS::Intervals;
 
-using IntervalType = Interval<double>;
-using SetType = IntervalSet<double>;
+using Itv = Interval<double>;
+using Set = IntervalSet<double>;
 using IB = IntervalBound;
 using IC = IntervalCategory;
 using IM = IntervalMatch;
@@ -17,9 +17,9 @@ using IO = IntervalOrder;
 
 void test_rs_continuous_interval_set_construct_insert_erase() {
 
-    SetType set, inv;
-    SetType::iterator it;
-    IntervalType in;
+    Set set, inv;
+    Set::iterator it;
+    Itv in;
     std::string str;
 
     TEST(set.empty());
@@ -91,10 +91,10 @@ void test_rs_continuous_interval_set_operations() {
 
     using random_int = std::uniform_int_distribution<int>;
 
-    SetType set[2], i_set, u_set, d_set, sd_set;
-    std::vector<IntervalType> vec[2];
-    SetType::iterator it;
-    IntervalType in;
+    Set set[2], i_set, u_set, d_set, sd_set;
+    std::vector<Itv> vec[2];
+    Set::iterator it;
+    Itv in;
     std::minstd_rand rng(42);
 
     static constexpr int iterations = 1000;
@@ -113,7 +113,7 @@ void test_rs_continuous_interval_set_operations() {
                 auto l = IB(random_int(0, 3)(rng));
                 auto r = IB(random_int(0, 3)(rng));
                 if ((l == IB::empty) == (r == IB::empty)) {
-                    TRY(in = IntervalType(a, b, l, r));
+                    TRY(in = Itv(a, b, l, r));
                     TRY(set[j].insert(in));
                     vec[j].push_back(in);
                 }
@@ -158,7 +158,7 @@ void test_rs_continuous_interval_set_operations() {
 
 void test_rs_continuous_interval_set_hashing() {
 
-    std::unordered_set<SetType> set;
+    std::unordered_set<Set> set;
     TEST(set.empty());
 
 }

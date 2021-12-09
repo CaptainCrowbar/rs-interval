@@ -8,8 +8,8 @@
 
 using namespace RS::Intervals;
 
-using IntervalType = Interval<int>;
-using SetType = IntervalSet<int>;
+using Itv = Interval<int>;
+using Set = IntervalSet<int>;
 using IB = IntervalBound;
 using IC = IntervalCategory;
 using IM = IntervalMatch;
@@ -17,10 +17,10 @@ using IO = IntervalOrder;
 
 void test_rs_integral_interval_basic_properties() {
 
-    IntervalType in;
+    Itv in;
 
-    TEST_TYPE(IntervalType::value_type, int);
-    TEST_EQUAL(IntervalType::category, IC::integral);
+    TEST_TYPE(Itv::value_type, int);
+    TEST_EQUAL(Itv::category, IC::integral);
     TEST(in.empty());
     TEST_EQUAL(in.size(), 0u);
     TEST(! in);
@@ -34,34 +34,34 @@ void test_rs_integral_interval_basic_properties() {
 
 void test_rs_integral_interval_construction() {
 
-    IntervalType in;
+    Itv in;
     std::string str;
 
-    TRY(in = IntervalType());                             TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1));                            TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = IntervalType(1, IB::closed, IB::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = IntervalType(1, IB::closed, IB::open));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1, IB::open, IB::closed));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType(1, IB::closed, IB::unbound));   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = IntervalType(1, IB::unbound, IB::closed));   TRY(str = in.str());  TEST_EQUAL(str, "<=1");
-    TRY(in = IntervalType(1, IB::open, IB::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = IntervalType(1, IB::unbound, IB::open));     TRY(str = in.str());  TEST_EQUAL(str, "<=0");
-    TRY(in = IntervalType(1, IB::unbound, IB::unbound));  TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType(1, 5));                         TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, IB::closed));             TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, IB::open));               TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = IntervalType(1, 5, IB::closed, IB::open));   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = IntervalType(1, 5, IB::open, IB::closed));   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = IntervalType(1, 5, "[]"));                   TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
-    TRY(in = IntervalType(1, 5, "()"));                   TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
-    TRY(in = IntervalType(1, 5, "[)"));                   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
-    TRY(in = IntervalType(1, 5, "(]"));                   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
-    TRY(in = IntervalType(1, 5, "<"));                    TRY(str = in.str());  TEST_EQUAL(str, "<=4");
-    TRY(in = IntervalType(1, 5, "<="));                   TRY(str = in.str());  TEST_EQUAL(str, "<=5");
-    TRY(in = IntervalType(1, 5, ">"));                    TRY(str = in.str());  TEST_EQUAL(str, ">=2");
-    TRY(in = IntervalType(1, 5, ">="));                   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
-    TRY(in = IntervalType(1, 5, "*"));                    TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType(5, 1));                         TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv());                             TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv(1));                            TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = Itv(1, IB::closed, IB::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = Itv(1, IB::closed, IB::open));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv(1, IB::open, IB::closed));      TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv(1, IB::closed, IB::unbound));   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = Itv(1, IB::unbound, IB::closed));   TRY(str = in.str());  TEST_EQUAL(str, "<=1");
+    TRY(in = Itv(1, IB::open, IB::unbound));     TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = Itv(1, IB::unbound, IB::open));     TRY(str = in.str());  TEST_EQUAL(str, "<=0");
+    TRY(in = Itv(1, IB::unbound, IB::unbound));  TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = Itv(1, 5));                         TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = Itv(1, 5, IB::closed));             TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = Itv(1, 5, IB::open));               TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = Itv(1, 5, IB::closed, IB::open));   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = Itv(1, 5, IB::open, IB::closed));   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = Itv(1, 5, "[]"));                   TRY(str = in.str());  TEST_EQUAL(str, "[1,5]");
+    TRY(in = Itv(1, 5, "()"));                   TRY(str = in.str());  TEST_EQUAL(str, "[2,4]");
+    TRY(in = Itv(1, 5, "[)"));                   TRY(str = in.str());  TEST_EQUAL(str, "[1,4]");
+    TRY(in = Itv(1, 5, "(]"));                   TRY(str = in.str());  TEST_EQUAL(str, "[2,5]");
+    TRY(in = Itv(1, 5, "<"));                    TRY(str = in.str());  TEST_EQUAL(str, "<=4");
+    TRY(in = Itv(1, 5, "<="));                   TRY(str = in.str());  TEST_EQUAL(str, "<=5");
+    TRY(in = Itv(1, 5, ">"));                    TRY(str = in.str());  TEST_EQUAL(str, ">=2");
+    TRY(in = Itv(1, 5, ">="));                   TRY(str = in.str());  TEST_EQUAL(str, ">=1");
+    TRY(in = Itv(1, 5, "*"));                    TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = Itv(5, 1));                         TRY(str = in.str());  TEST_EQUAL(str, "{}");
 
     TRY(in = make_interval(1));                            TRY(str = in.str());  TEST_EQUAL(str, "1");
     TRY(in = make_interval(1, IB::closed, IB::closed));    TRY(str = in.str());  TEST_EQUAL(str, "1");
@@ -97,13 +97,13 @@ void test_rs_integral_interval_construction() {
 
 void test_rs_integral_interval_iterators() {
 
-    IntervalType in;
-    IntervalType::iterator it1 = {}, it2 = {};
+    Itv in;
+    Itv::iterator it1 = {}, it2 = {};
     ptrdiff_t diff = 0;
 
     TRY(in = {});           TEST_EQUAL(in.size(), 0u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 0);
     TRY(in = 1);            TEST_EQUAL(in.size(), 1u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 1);
-    TRY(in = IntervalType(1, 5));  TEST_EQUAL(in.size(), 5u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 5);
+    TRY(in = Itv(1, 5));  TEST_EQUAL(in.size(), 5u);  TRY(it1 = in.begin());  TRY(it2 = in.end());  TRY(diff = std::distance(it1, it2));  TEST_EQUAL(diff, 5);
 
     TEST_EQUAL(*it1, 1);  TRY(++it1);
     TEST_EQUAL(*it1, 2);  TRY(++it1);
@@ -116,12 +116,12 @@ void test_rs_integral_interval_iterators() {
 
 void test_rs_integral_interval_inverse() {
 
-    IntervalType in;
-    SetType set;
+    Itv in;
+    Set set;
     std::string str;
 
     TRY((in = {}));                   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{*}");
-    TRY((in = IntervalType::all()));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
+    TRY((in = Itv::all()));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
     TRY((in = 42));                   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=41,>=43}");
     TRY((in = {42,42,"<"}));          TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=42}");
     TRY((in = {42,42,"<="}));         TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=43}");
@@ -138,8 +138,8 @@ void test_rs_integral_interval_binary_operations() {
 
     struct test_info {
         int line;
-        IntervalType lhs;
-        IntervalType rhs;
+        Itv lhs;
+        Itv rhs;
         int compare;
         bool includes;
         bool overlaps;
@@ -350,11 +350,11 @@ void test_rs_integral_interval_binary_operations() {
 
 void test_rs_integral_interval_hashing() {
 
-    std::unordered_set<IntervalType> set;
+    std::unordered_set<Itv> set;
 
-    TRY(set.insert(IntervalType(1)));
-    TRY(set.insert(IntervalType(2, 3)));
-    TRY(set.insert(IntervalType(4, 4, ">")));
+    TRY(set.insert(Itv(1)));
+    TRY(set.insert(Itv(2, 3)));
+    TRY(set.insert(Itv(4, 4, ">")));
     TEST_EQUAL(set.size(), 3u);
 
 }

@@ -21,27 +21,24 @@ namespace RS::Intervals {
         using key_type = K;
         using mapped_type = T;
         using interval_type = Interval<K>;
-    private:
-        using container_type = std::map<interval_type, T>;
-    public:
-        using iterator = typename container_type::const_iterator;
-        using value_type = typename container_type::value_type;
+        using iterator = typename std::map<Interval<K>, T>::const_iterator;
+        using value_type = typename std::map<Interval<K>, T>::value_type;
         static constexpr auto category = interval_category<K>;
         IntervalMap() = default;
-        explicit IntervalMap(const T& defval): con_(), def_(defval) {}
+        explicit IntervalMap(const T& defval): map_(), def_(defval) {}
         IntervalMap(std::initializer_list<value_type> list) { for (auto& v: list) insert(v); }
         const T& operator[](const K& key) const;
-        auto begin() const noexcept { return con_.begin(); }
-        auto end() const noexcept { return con_.end(); }
-        bool empty() const noexcept { return con_.empty(); }
-        size_t size() const noexcept { return con_.size(); }
+        auto begin() const noexcept { return map_.begin(); }
+        auto end() const noexcept { return map_.end(); }
+        bool empty() const noexcept { return map_.empty(); }
+        size_t size() const noexcept { return map_.size(); }
         const T& default_value() const noexcept { return def_; }
         void default_value(const T& defval) { def_ = defval; }
         bool contains(const K& key) const { return do_find(key).second; }
         iterator find(const K& key) const;
         iterator lower_bound(const K& key) const { return do_find(key).first; }
         iterator upper_bound(const K& key) const;
-        void clear() noexcept { con_.clear(); }
+        void clear() noexcept { map_.clear(); }
         void reset(const T& defval = {}) { def_ = defval; clear(); }
         void insert(const interval_type& in, const T& t);
         void insert(const value_type& v) { insert(v.first, v.second); }
@@ -49,9 +46,9 @@ namespace RS::Intervals {
         size_t hash() const noexcept;
         std::string str() const { return str({}, {}); }
         std::string str(const std::string& kmode, const std::string& vmode) const;
-        void swap(IntervalMap& map) noexcept { con_.swap(map.con_); std::swap(def_, map.def_); }
+        void swap(IntervalMap& map) noexcept { map_.swap(map.map_); std::swap(def_, map.def_); }
     private:
-        container_type con_;
+        std::map<Interval<K>, T> map_;
         T def_ = T();
         std::pair<iterator, bool> do_find(const K& key) const;
     };
@@ -81,12 +78,12 @@ namespace RS::Intervals {
             if (in.empty())
                 return;
             auto key = in;
-            auto i = con_.upper_bound(key);
-            if (i != con_.begin())
+            auto i = map_.upper_bound(key);
+            if (i != map_.begin())
                 --i;
             std::vector<value_type> add;
             std::vector<iterator> del;
-            for (; i != con_.end(); ++i) {
+            for (; i != map_.end(); ++i) {
                 auto ord = key.order(i->first);
                 if (ord <= IntervalOrder::a_below_b) {
                     break;
@@ -103,21 +100,21 @@ namespace RS::Intervals {
                 }
             }
             for (auto& d: del)
-                con_.erase(d);
+                map_.erase(d);
             for (auto& a: add)
-                con_.insert(a);
-            con_.insert({key, t});
+                map_.insert(a);
+            map_.insert({key, t});
         }
 
         template <typename K, typename T>
         void IntervalMap<K, T>::erase(const interval_type& in) {
             if (empty() || in.empty())
                 return;
-            auto i = con_.lower_bound(in);
-            if (i != con_.begin())
+            auto i = map_.lower_bound(in);
+            if (i != map_.begin())
                 --i;
             std::vector<value_type> vec;
-            while (i != con_.end()) {
+            while (i != map_.end()) {
                 auto ord = in.order(i->first);
                 if (ord <= IntervalOrder::a_touches_b)
                     break;
@@ -126,15 +123,15 @@ namespace RS::Intervals {
                     auto temp = j->first.set_difference(in);
                     for (auto& t: temp)
                         vec.push_back({t, j->second});
-                    con_.erase(j);
+                    map_.erase(j);
                 }
             }
-            con_.insert(vec.begin(), vec.end());
+            map_.insert(vec.begin(), vec.end());
         }
 
         template <typename K, typename T>
         size_t IntervalMap<K, T>::hash() const noexcept {
-            return Detail::hash_range(con_);
+            return Detail::hash_range(map_);
         }
 
         template <typename K, typename T>
@@ -154,10 +151,10 @@ namespace RS::Intervals {
             if (empty())
                 return {end(), false};
             interval_type in(key);
-            auto it = con_.lower_bound(in);
-            if (it != con_.begin())
+            auto it = map_.lower_bound(in);
+            if (it != map_.begin())
                 --it;
-            for (; it != con_.end(); ++it) {
+            for (; it != map_.end(); ++it) {
                 auto m = it->first.match(key);
                 if (m != IntervalMatch::high)
                     return {it, m == IntervalMatch::match};

@@ -18,29 +18,26 @@ namespace RS::Intervals {
     class IntervalSet:
     public Detail::LessThanComparable<IntervalSet<T>> {
     public:
-        using value_type = T;
+        using iterator = typename std::set<Interval<T>>::const_iterator;
         using interval_type = Interval<T>;
-    private:
-        using container_type = std::set<interval_type>;
-    public:
-        using iterator = typename container_type::const_iterator;
+        using value_type = T;
         static constexpr auto category = interval_category<T>;
         IntervalSet() = default;
-        IntervalSet(const T& t): con_{{t}} {}
-        IntervalSet(const interval_type& in): con_{in} {}
-        IntervalSet(std::initializer_list<interval_type> list): con_(list) {}
+        IntervalSet(const T& t): set_{{t}} {}
+        IntervalSet(const interval_type& in): set_{in} {}
+        IntervalSet(std::initializer_list<interval_type> list): set_(list) {}
         bool operator()(const T& t) const { return contains(t); }
         IntervalSet operator~() const { return inverse(); }
         IntervalSet& operator&=(const IntervalSet<T>& b) { *this = set_intersection(b); return *this; }
         IntervalSet& operator|=(const IntervalSet<T>& b) { *this = set_union(b); return *this; }
         IntervalSet& operator-=(const IntervalSet<T>& b) { *this = set_difference(b); return *this; }
         IntervalSet& operator^=(const IntervalSet<T>& b) { *this = set_symmetric_difference(b); return *this; }
-        auto begin() const noexcept { return con_.begin(); }
-        auto end() const noexcept { return con_.end(); }
-        bool empty() const noexcept { return con_.empty(); }
-        size_t size() const noexcept { return con_.size(); }
+        auto begin() const noexcept { return set_.begin(); }
+        auto end() const noexcept { return set_.end(); }
+        bool empty() const noexcept { return set_.empty(); }
+        size_t size() const noexcept { return set_.size(); }
         bool contains(const T& t) const;
-        void clear() noexcept { con_.clear(); }
+        void clear() noexcept { set_.clear(); }
         void insert(const interval_type& in);
         void erase(const interval_type& in);
         IntervalSet inverse() const;
@@ -50,18 +47,18 @@ namespace RS::Intervals {
         IntervalSet set_symmetric_difference(const IntervalSet& b) const;
         size_t hash() const noexcept;
         std::string str(const std::string& mode = {}) const;
-        void swap(IntervalSet& set) noexcept { con_.swap(set.con_); }
+        void swap(IntervalSet& set) noexcept { set_.swap(set.set_); }
     private:
-        container_type con_;
+        std::set<Interval<T>> set_;
     };
 
         template <typename T>
         bool IntervalSet<T>::contains(const T& t) const {
             interval_type in(t);
-            auto i = con_.lower_bound(in);
-            if (i != con_.begin())
+            auto i = set_.lower_bound(in);
+            if (i != set_.begin())
                 --i;
-            for (; i != con_.end(); ++i) {
+            for (; i != set_.end(); ++i) {
                 auto m = i->match(t);
                 if (m == IntervalMatch::match)
                     return true;
@@ -75,33 +72,33 @@ namespace RS::Intervals {
         void IntervalSet<T>::insert(const interval_type& in) {
             if (in.empty())
                 return;
-            auto i = con_.lower_bound(in);
-            if (i != con_.begin())
+            auto i = set_.lower_bound(in);
+            if (i != set_.begin())
                 --i;
             auto add = in;
-            while (i != con_.end()) {
+            while (i != set_.end()) {
                 auto ord = in.order(*i);
                 if (ord <= IntervalOrder::a_below_b)
                     break;
                 auto j = i++;
                 if (ord <= IntervalOrder::b_touches_a) {
                     add = add.envelope(*j);
-                    con_.erase(j);
+                    set_.erase(j);
                 }
             }
-            con_.insert(add);
+            set_.insert(add);
         }
 
         template <typename T>
         void IntervalSet<T>::erase(const interval_type& in) {
             if (empty() || in.empty())
                 return;
-            auto i = con_.lower_bound(in);
-            if (i != con_.begin())
+            auto i = set_.lower_bound(in);
+            if (i != set_.begin())
                 --i;
             IntervalSet temp;
             std::vector<interval_type> vec;
-            while (i != con_.end()) {
+            while (i != set_.end()) {
                 auto ord = in.order(*i);
                 if (ord <= IntervalOrder::a_touches_b)
                     break;
@@ -109,10 +106,10 @@ namespace RS::Intervals {
                 if (ord <= IntervalOrder::b_overlaps_a) {
                     temp = j->set_difference(in);
                     std::copy(temp.begin(), temp.end(), std::back_inserter(vec));
-                    con_.erase(j);
+                    set_.erase(j);
                 }
             }
-            con_.insert(vec.begin(), vec.end());
+            set_.insert(vec.begin(), vec.end());
         }
 
         template <typename T>
@@ -120,13 +117,13 @@ namespace RS::Intervals {
             if (empty())
                 return interval_type::all();
             IntervalSet result;
-            auto i = con_.begin();
+            auto i = set_.begin();
             if (i->is_left_bounded())
-                result.con_.insert({{}, i->min(), IntervalBound::unbound, ~ i->left()});
-            for (auto j = std::next(i), end = con_.end(); j != end; i = j++)
-                result.con_.insert({i->max(), j->min(), ~ i->right(), ~ j->left()});
+                result.set_.insert({{}, i->min(), IntervalBound::unbound, ~ i->left()});
+            for (auto j = std::next(i), end = set_.end(); j != end; i = j++)
+                result.set_.insert({i->max(), j->min(), ~ i->right(), ~ j->left()});
             if (i->is_right_bounded())
-                result.con_.insert({i->max(), {}, ~ i->right(), IntervalBound::unbound});
+                result.set_.insert({i->max(), {}, ~ i->right(), IntervalBound::unbound});
             return result;
         }
 
@@ -160,7 +157,7 @@ namespace RS::Intervals {
 
         template <typename T>
         size_t IntervalSet<T>::hash() const noexcept {
-            return Detail::hash_range(con_);
+            return Detail::hash_range(set_);
         }
 
         template <typename T>

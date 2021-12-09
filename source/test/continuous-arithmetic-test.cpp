@@ -6,8 +6,8 @@
 
 using namespace RS::Intervals;
 
-using IntervalType = Interval<double>;
-using SetType = IntervalSet<double>;
+using Itv = Interval<double>;
+using Set = IntervalSet<double>;
 using IB = IntervalBound;
 using IC = IntervalCategory;
 using IM = IntervalMatch;
@@ -15,46 +15,46 @@ using IO = IntervalOrder;
 
 void test_rs_continuous_interval_arithmetic() {
 
-    IntervalType in;
+    Itv in;
     std::string str;
 
-    TRY(in = + IntervalType());          TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = + IntervalType::all());     TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = + IntervalType(1));         TRY(str = in.str());  TEST_EQUAL(str, "1");
-    TRY(in = - IntervalType());          TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = - IntervalType::all());     TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = - IntervalType(1));         TRY(str = in.str());  TEST_EQUAL(str, "-1");
-    TRY(in = - IntervalType(1,5,"[]"));  TRY(str = in.str());  TEST_EQUAL(str, "[-5,-1]");
-    TRY(in = - IntervalType(1,5,"()"));  TRY(str = in.str());  TEST_EQUAL(str, "(-5,-1)");
-    TRY(in = - IntervalType(1,5,"[)"));  TRY(str = in.str());  TEST_EQUAL(str, "(-5,-1]");
-    TRY(in = - IntervalType(1,5,"(]"));  TRY(str = in.str());  TEST_EQUAL(str, "[-5,-1)");
-    TRY(in = - IntervalType(0,5,"<"));   TRY(str = in.str());  TEST_EQUAL(str, ">-5");
-    TRY(in = - IntervalType(0,5,"<="));  TRY(str = in.str());  TEST_EQUAL(str, ">=-5");
-    TRY(in = - IntervalType(5,0,">"));   TRY(str = in.str());  TEST_EQUAL(str, "<-5");
-    TRY(in = - IntervalType(5,0,">="));  TRY(str = in.str());  TEST_EQUAL(str, "<=-5");
+    TRY(in = + Itv());          TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = + Itv::all());     TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = + Itv(1));         TRY(str = in.str());  TEST_EQUAL(str, "1");
+    TRY(in = - Itv());          TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = - Itv::all());     TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = - Itv(1));         TRY(str = in.str());  TEST_EQUAL(str, "-1");
+    TRY(in = - Itv(1,5,"[]"));  TRY(str = in.str());  TEST_EQUAL(str, "[-5,-1]");
+    TRY(in = - Itv(1,5,"()"));  TRY(str = in.str());  TEST_EQUAL(str, "(-5,-1)");
+    TRY(in = - Itv(1,5,"[)"));  TRY(str = in.str());  TEST_EQUAL(str, "(-5,-1]");
+    TRY(in = - Itv(1,5,"(]"));  TRY(str = in.str());  TEST_EQUAL(str, "[-5,-1)");
+    TRY(in = - Itv(0,5,"<"));   TRY(str = in.str());  TEST_EQUAL(str, ">-5");
+    TRY(in = - Itv(0,5,"<="));  TRY(str = in.str());  TEST_EQUAL(str, ">=-5");
+    TRY(in = - Itv(5,0,">"));   TRY(str = in.str());  TEST_EQUAL(str, "<-5");
+    TRY(in = - Itv(5,0,">="));  TRY(str = in.str());  TEST_EQUAL(str, "<=-5");
 
-    TRY(in = IntervalType() + 42);           TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType::all() + 42);      TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType(5) + 42);          TRY(str = in.str());  TEST_EQUAL(str, "47");
-    TRY(in = IntervalType(5,10,"[]") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "[47,52]");
-    TRY(in = IntervalType(5,10,"()") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "(47,52)");
-    TRY(in = IntervalType(5,10,"[)") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "[47,52)");
-    TRY(in = IntervalType(5,10,"(]") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "(47,52]");
-    TRY(in = IntervalType(5,10,"<") + 42);   TRY(str = in.str());  TEST_EQUAL(str, "<52");
-    TRY(in = IntervalType(5,10,"<=") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "<=52");
-    TRY(in = IntervalType(5,10,">") + 42);   TRY(str = in.str());  TEST_EQUAL(str, ">47");
-    TRY(in = IntervalType(5,10,">=") + 42);  TRY(str = in.str());  TEST_EQUAL(str, ">=47");
+    TRY(in = Itv() + 42);           TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv::all() + 42);      TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = Itv(5) + 42);          TRY(str = in.str());  TEST_EQUAL(str, "47");
+    TRY(in = Itv(5,10,"[]") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "[47,52]");
+    TRY(in = Itv(5,10,"()") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "(47,52)");
+    TRY(in = Itv(5,10,"[)") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "[47,52)");
+    TRY(in = Itv(5,10,"(]") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "(47,52]");
+    TRY(in = Itv(5,10,"<") + 42);   TRY(str = in.str());  TEST_EQUAL(str, "<52");
+    TRY(in = Itv(5,10,"<=") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "<=52");
+    TRY(in = Itv(5,10,">") + 42);   TRY(str = in.str());  TEST_EQUAL(str, ">47");
+    TRY(in = Itv(5,10,">=") + 42);  TRY(str = in.str());  TEST_EQUAL(str, ">=47");
 
     struct test_info {
         int line;
-        IntervalType lhs;
-        IntervalType rhs;
-        IntervalType add;
-        IntervalType sub1;
-        IntervalType sub2;
-        IntervalType mul;
-        IntervalType div1;
-        IntervalType div2;
+        Itv lhs;
+        Itv rhs;
+        Itv add;
+        Itv sub1;
+        Itv sub2;
+        Itv mul;
+        Itv div1;
+        Itv div2;
     };
 
     static const std::vector<test_info> tests = {
@@ -129,7 +129,7 @@ void test_rs_continuous_interval_arithmetic() {
 
     };
 
-    IntervalType a, b, c;
+    Itv a, b, c;
 
     for (auto& t: tests) {
 

@@ -5,8 +5,8 @@
 
 using namespace RS::Intervals;
 
-using IntervalType = Interval<std::string>;
-using MapType = IntervalMap<std::string, std::string>;
+using Itv = Interval<std::string>;
+using Map = IntervalMap<std::string, std::string>;
 using IB = IntervalBound;
 using IC = IntervalCategory;
 using IM = IntervalMatch;
@@ -14,8 +14,8 @@ using IO = IntervalOrder;
 
 void test_rs_ordered_interval_map() {
 
-    MapType map;
-    MapType::iterator it;
+    Map map;
+    Map::iterator it;
 
     TEST(map.empty());
     TEST_EQUAL(map.size(), 0u);
@@ -23,9 +23,9 @@ void test_rs_ordered_interval_map() {
     TEST_EQUAL(map["hello"], "");
     TEST_EQUAL(map.str(), "{}");
 
-    TRY(map.insert(IntervalType("b","b","<="), "alpha"));
-    TRY(map.insert(IntervalType("c","g","()"), "bravo"));
-    TRY(map.insert(IntervalType("h","h",">="), "charlie"));
+    TRY(map.insert(Itv("b","b","<="), "alpha"));
+    TRY(map.insert(Itv("c","g","()"), "bravo"));
+    TRY(map.insert(Itv("h","h",">="), "charlie"));
     TEST_EQUAL(map.size(), 3u);
     TEST_EQUAL(map["a"], "alpha");
     TEST_EQUAL(map["b"], "alpha");
@@ -91,20 +91,20 @@ void test_rs_ordered_interval_map() {
     TRY(map.clear());
     TEST(map.empty());
     TRY((map = {
-        {IntervalType("bb","bb","<="), "alpha"},
-        {IntervalType("cc","gg","()"), "bravo"},
-        {IntervalType("hh","hh",">="), "charlie"},
+        {Itv("bb","bb","<="), "alpha"},
+        {Itv("cc","gg","()"), "bravo"},
+        {Itv("hh","hh",">="), "charlie"},
     }));
     TEST_EQUAL(map.size(), 3u);
     TEST_EQUAL(map.str(), "{<=bb:alpha,(cc,gg):bravo,>=hh:charlie}");
 
     TRY(map.clear());
     TRY(map.default_value("nil"));
-    TRY(map.insert(IntervalType("j","j","<="), "alpha"));
-    TRY(map.insert(IntervalType("a","e","[]"), "bravo"));
-    TRY(map.insert(IntervalType("e","f","[]"), "charlie"));
-    TRY(map.insert(IntervalType("a","d","()"), "delta"));
-    TRY(map.insert(IntervalType("f","h","[]"), "charlie"));
+    TRY(map.insert(Itv("j","j","<="), "alpha"));
+    TRY(map.insert(Itv("a","e","[]"), "bravo"));
+    TRY(map.insert(Itv("e","f","[]"), "charlie"));
+    TRY(map.insert(Itv("a","d","()"), "delta"));
+    TRY(map.insert(Itv("f","h","[]"), "charlie"));
     TEST_EQUAL(map.size(), 6u);
     TEST_EQUAL(map.str(),
         "{<a:alpha,"
@@ -127,9 +127,9 @@ void test_rs_ordered_interval_map() {
     TEST_EQUAL(map["k"], "nil");
     TEST_EQUAL(map["l"], "nil");
 
-    TRY(map.erase(IntervalType("a","b","[]")));
-    TRY(map.erase(IntervalType("f","h","()")));
-    TRY(map.erase(IntervalType("j","j",">=")));
+    TRY(map.erase(Itv("a","b","[]")));
+    TRY(map.erase(Itv("f","h","()")));
+    TRY(map.erase(Itv("j","j",">=")));
     TEST_EQUAL(map.size(), 6u);
     TEST_EQUAL(map.str(),
         "{<a:alpha,"
@@ -156,7 +156,7 @@ void test_rs_ordered_interval_map() {
 
 void test_rs_ordered_interval_map_hashing() {
 
-    std::unordered_set<MapType> map;
+    std::unordered_set<Map> map;
     TEST(map.empty());
 
 }

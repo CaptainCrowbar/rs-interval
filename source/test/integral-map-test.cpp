@@ -5,8 +5,8 @@
 
 using namespace RS::Intervals;
 
-using IntervalType = Interval<int>;
-using MapType = IntervalMap<int, std::string>;
+using Itv = Interval<int>;
+using Map = IntervalMap<int, std::string>;
 using IB = IntervalBound;
 using IC = IntervalCategory;
 using IM = IntervalMatch;
@@ -14,8 +14,8 @@ using IO = IntervalOrder;
 
 void test_rs_integral_interval_map() {
 
-    MapType map;
-    MapType::iterator it;
+    Map map;
+    Map::iterator it;
 
     TEST(map.empty());
     TEST_EQUAL(map.size(), 0u);
@@ -23,9 +23,9 @@ void test_rs_integral_interval_map() {
     TEST_EQUAL(map[42], "");
     TEST_EQUAL(map.str(), "{}");
 
-    TRY(map.insert(IntervalType(2,2,"<="), "alpha"));
-    TRY(map.insert(IntervalType(3,7,"()"), "bravo"));
-    TRY(map.insert(IntervalType(8,8,">="), "charlie"));
+    TRY(map.insert(Itv(2,2,"<="), "alpha"));
+    TRY(map.insert(Itv(3,7,"()"), "bravo"));
+    TRY(map.insert(Itv(8,8,">="), "charlie"));
     TEST_EQUAL(map.size(), 3u);
     TEST_EQUAL(map[1], "alpha");
     TEST_EQUAL(map[2], "alpha");
@@ -91,20 +91,20 @@ void test_rs_integral_interval_map() {
     TRY(map.clear());
     TEST(map.empty());
     TRY((map = {
-        {IntervalType(20,20,"<="), "alpha"},
-        {IntervalType(30,70,"()"), "bravo"},
-        {IntervalType(80,80,">="), "charlie"},
+        {Itv(20,20,"<="), "alpha"},
+        {Itv(30,70,"()"), "bravo"},
+        {Itv(80,80,">="), "charlie"},
     }));
     TEST_EQUAL(map.size(), 3u);
     TEST_EQUAL(map.str(), "{<=20:alpha,[31,69]:bravo,>=80:charlie}");
 
     TRY(map.clear());
     TRY(map.default_value("nil"));
-    TRY(map.insert(IntervalType(10,10,"<="), "alpha"));
-    TRY(map.insert(IntervalType(1,5,"[]"), "bravo"));
-    TRY(map.insert(IntervalType(5,6,"[]"), "charlie"));
-    TRY(map.insert(IntervalType(2,3,"[]"), "delta"));
-    TRY(map.insert(IntervalType(7,8,"[]"), "charlie"));
+    TRY(map.insert(Itv(10,10,"<="), "alpha"));
+    TRY(map.insert(Itv(1,5,"[]"), "bravo"));
+    TRY(map.insert(Itv(5,6,"[]"), "charlie"));
+    TRY(map.insert(Itv(2,3,"[]"), "delta"));
+    TRY(map.insert(Itv(7,8,"[]"), "charlie"));
     TEST_EQUAL(map.size(), 6u);
     TEST_EQUAL(map.str(),
         "{<=0:alpha,"
@@ -127,9 +127,9 @@ void test_rs_integral_interval_map() {
     TEST_EQUAL(map[11], "nil");
     TEST_EQUAL(map[12], "nil");
 
-    TRY(map.erase(IntervalType(1,2,"[]")));
-    TRY(map.erase(IntervalType(6,7,"[]")));
-    TRY(map.erase(IntervalType(10,10,">=")));
+    TRY(map.erase(Itv(1,2,"[]")));
+    TRY(map.erase(Itv(6,7,"[]")));
+    TRY(map.erase(Itv(10,10,">=")));
     TEST_EQUAL(map.size(), 6u);
     TEST_EQUAL(map.str(),
         "{<=0:alpha,"
@@ -156,7 +156,7 @@ void test_rs_integral_interval_map() {
 
 void test_rs_integral_interval_map_hashing() {
 
-    std::unordered_set<MapType> map;
+    std::unordered_set<Map> map;
     TEST(map.empty());
 
 }

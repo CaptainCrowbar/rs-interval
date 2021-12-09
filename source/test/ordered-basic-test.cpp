@@ -8,8 +8,8 @@
 using namespace RS::Intervals;
 using namespace std::literals;
 
-using IntervalType = Interval<std::string>;
-using SetType = IntervalSet<std::string>;
+using Itv = Interval<std::string>;
+using Set = IntervalSet<std::string>;
 using IB = IntervalBound;
 using IC = IntervalCategory;
 using IM = IntervalMatch;
@@ -17,10 +17,10 @@ using IO = IntervalOrder;
 
 void test_rs_ordered_interval_basic_properties() {
 
-    IntervalType in;
+    Itv in;
 
-    TEST_TYPE(IntervalType::value_type, std::string);
-    TEST_EQUAL(IntervalType::category, IC::ordered);
+    TEST_TYPE(Itv::value_type, std::string);
+    TEST_EQUAL(Itv::category, IC::ordered);
     TEST(in.empty());
     TEST(! in);
     TEST_EQUAL(in.str(), "{}");
@@ -33,34 +33,34 @@ void test_rs_ordered_interval_basic_properties() {
 
 void test_rs_ordered_interval_construction() {
 
-    IntervalType in;
+    Itv in;
     std::string str;
 
-    TRY(in = IntervalType());                                TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType("a"));                             TRY(str = in.str());  TEST_EQUAL(str, "a");
-    TRY(in = IntervalType("a", IB::closed, IB::closed));     TRY(str = in.str());  TEST_EQUAL(str, "a");
-    TRY(in = IntervalType("a", IB::closed, IB::open));       TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType("a", IB::open, IB::closed));       TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = IntervalType("a", IB::closed, IB::unbound));    TRY(str = in.str());  TEST_EQUAL(str, ">=a");
-    TRY(in = IntervalType("a", IB::unbound, IB::closed));    TRY(str = in.str());  TEST_EQUAL(str, "<=a");
-    TRY(in = IntervalType("a", IB::open, IB::unbound));      TRY(str = in.str());  TEST_EQUAL(str, ">a");
-    TRY(in = IntervalType("a", IB::unbound, IB::open));      TRY(str = in.str());  TEST_EQUAL(str, "<a");
-    TRY(in = IntervalType("a", IB::unbound, IB::unbound));   TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType("a", "z"));                        TRY(str = in.str());  TEST_EQUAL(str, "[a,z]");
-    TRY(in = IntervalType("a", "z", IB::closed));            TRY(str = in.str());  TEST_EQUAL(str, "[a,z]");
-    TRY(in = IntervalType("a", "z", IB::open));              TRY(str = in.str());  TEST_EQUAL(str, "(a,z)");
-    TRY(in = IntervalType("a", "z", IB::closed, IB::open));  TRY(str = in.str());  TEST_EQUAL(str, "[a,z)");
-    TRY(in = IntervalType("a", "z", IB::open, IB::closed));  TRY(str = in.str());  TEST_EQUAL(str, "(a,z]");
-    TRY(in = IntervalType("a", "z", "[]"));                  TRY(str = in.str());  TEST_EQUAL(str, "[a,z]");
-    TRY(in = IntervalType("a", "z", "()"));                  TRY(str = in.str());  TEST_EQUAL(str, "(a,z)");
-    TRY(in = IntervalType("a", "z", "[)"));                  TRY(str = in.str());  TEST_EQUAL(str, "[a,z)");
-    TRY(in = IntervalType("a", "z", "(]"));                  TRY(str = in.str());  TEST_EQUAL(str, "(a,z]");
-    TRY(in = IntervalType("a", "z", "<"));                   TRY(str = in.str());  TEST_EQUAL(str, "<z");
-    TRY(in = IntervalType("a", "z", "<="));                  TRY(str = in.str());  TEST_EQUAL(str, "<=z");
-    TRY(in = IntervalType("a", "z", ">"));                   TRY(str = in.str());  TEST_EQUAL(str, ">a");
-    TRY(in = IntervalType("a", "z", ">="));                  TRY(str = in.str());  TEST_EQUAL(str, ">=a");
-    TRY(in = IntervalType("a", "z", "*"));                   TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = IntervalType("z", "a"));                        TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv());                                TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv("a"));                             TRY(str = in.str());  TEST_EQUAL(str, "a");
+    TRY(in = Itv("a", IB::closed, IB::closed));     TRY(str = in.str());  TEST_EQUAL(str, "a");
+    TRY(in = Itv("a", IB::closed, IB::open));       TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv("a", IB::open, IB::closed));       TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv("a", IB::closed, IB::unbound));    TRY(str = in.str());  TEST_EQUAL(str, ">=a");
+    TRY(in = Itv("a", IB::unbound, IB::closed));    TRY(str = in.str());  TEST_EQUAL(str, "<=a");
+    TRY(in = Itv("a", IB::open, IB::unbound));      TRY(str = in.str());  TEST_EQUAL(str, ">a");
+    TRY(in = Itv("a", IB::unbound, IB::open));      TRY(str = in.str());  TEST_EQUAL(str, "<a");
+    TRY(in = Itv("a", IB::unbound, IB::unbound));   TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = Itv("a", "z"));                        TRY(str = in.str());  TEST_EQUAL(str, "[a,z]");
+    TRY(in = Itv("a", "z", IB::closed));            TRY(str = in.str());  TEST_EQUAL(str, "[a,z]");
+    TRY(in = Itv("a", "z", IB::open));              TRY(str = in.str());  TEST_EQUAL(str, "(a,z)");
+    TRY(in = Itv("a", "z", IB::closed, IB::open));  TRY(str = in.str());  TEST_EQUAL(str, "[a,z)");
+    TRY(in = Itv("a", "z", IB::open, IB::closed));  TRY(str = in.str());  TEST_EQUAL(str, "(a,z]");
+    TRY(in = Itv("a", "z", "[]"));                  TRY(str = in.str());  TEST_EQUAL(str, "[a,z]");
+    TRY(in = Itv("a", "z", "()"));                  TRY(str = in.str());  TEST_EQUAL(str, "(a,z)");
+    TRY(in = Itv("a", "z", "[)"));                  TRY(str = in.str());  TEST_EQUAL(str, "[a,z)");
+    TRY(in = Itv("a", "z", "(]"));                  TRY(str = in.str());  TEST_EQUAL(str, "(a,z]");
+    TRY(in = Itv("a", "z", "<"));                   TRY(str = in.str());  TEST_EQUAL(str, "<z");
+    TRY(in = Itv("a", "z", "<="));                  TRY(str = in.str());  TEST_EQUAL(str, "<=z");
+    TRY(in = Itv("a", "z", ">"));                   TRY(str = in.str());  TEST_EQUAL(str, ">a");
+    TRY(in = Itv("a", "z", ">="));                  TRY(str = in.str());  TEST_EQUAL(str, ">=a");
+    TRY(in = Itv("a", "z", "*"));                   TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = Itv("z", "a"));                        TRY(str = in.str());  TEST_EQUAL(str, "{}");
 
     TRY(in = make_interval("a"s));                              TRY(str = in.str());  TEST_EQUAL(str, "a");
     TRY(in = make_interval("a"s, IB::closed, IB::closed));      TRY(str = in.str());  TEST_EQUAL(str, "a");
@@ -96,12 +96,12 @@ void test_rs_ordered_interval_construction() {
 
 void test_rs_ordered_interval_inverse() {
 
-    IntervalType in;
-    SetType set;
+    Itv in;
+    Set set;
     std::string str;
 
     TRY((in = {}));                      TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{*}");
-    TRY((in = IntervalType::all()));     TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
+    TRY((in = Itv::all()));     TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
     TRY((in = {"hello"}));               TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<hello,>hello}");
     TRY((in = {"hello","hello","<"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=hello}");
     TRY((in = {"hello","hello","<="}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>hello}");
@@ -118,8 +118,8 @@ void test_rs_ordered_interval_binary_operations() {
 
     struct test_info {
         int line;
-        IntervalType lhs;
-        IntervalType rhs;
+        Itv lhs;
+        Itv rhs;
         int compare;
         bool includes;
         bool overlaps;
@@ -431,11 +431,11 @@ void test_rs_ordered_interval_binary_operations() {
 
 void test_rs_ordered_interval_hashing() {
 
-    std::unordered_set<IntervalType> set;
+    std::unordered_set<Itv> set;
 
-    TRY(set.insert(IntervalType("a")));
-    TRY(set.insert(IntervalType("b", "c")));
-    TRY(set.insert(IntervalType("d", "d", ">")));
+    TRY(set.insert(Itv("a")));
+    TRY(set.insert(Itv("b", "c")));
+    TRY(set.insert(Itv("d", "d", ">")));
     TEST_EQUAL(set.size(), 3u);
 
 }

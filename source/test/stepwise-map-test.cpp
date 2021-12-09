@@ -6,8 +6,8 @@
 
 using namespace RS::Intervals;
 
-using IntervalType = Interval<Stepwise>;
-using MapType = IntervalMap<Stepwise, std::string>;
+using Itv = Interval<Stepwise>;
+using Map = IntervalMap<Stepwise, std::string>;
 using IB = IntervalBound;
 using IC = IntervalCategory;
 using IM = IntervalMatch;
@@ -15,8 +15,8 @@ using IO = IntervalOrder;
 
 void test_rs_stepwise_interval_map() {
 
-    MapType map;
-    MapType::iterator it;
+    Map map;
+    Map::iterator it;
 
     TEST(map.empty());
     TEST_EQUAL(map.size(), 0u);
@@ -24,9 +24,9 @@ void test_rs_stepwise_interval_map() {
     TEST_EQUAL(map[42_sw], "");
     TEST_EQUAL(map.str(), "{}");
 
-    TRY(map.insert(IntervalType(2_sw,2_sw,"<="), "alpha"));
-    TRY(map.insert(IntervalType(3_sw,7_sw,"()"), "bravo"));
-    TRY(map.insert(IntervalType(8_sw,8_sw,">="), "charlie"));
+    TRY(map.insert(Itv(2_sw,2_sw,"<="), "alpha"));
+    TRY(map.insert(Itv(3_sw,7_sw,"()"), "bravo"));
+    TRY(map.insert(Itv(8_sw,8_sw,">="), "charlie"));
     TEST_EQUAL(map.size(), 3u);
     TEST_EQUAL(map[1_sw], "alpha");
     TEST_EQUAL(map[2_sw], "alpha");
@@ -92,20 +92,20 @@ void test_rs_stepwise_interval_map() {
     TRY(map.clear());
     TEST(map.empty());
     TRY((map = {
-        {IntervalType(20_sw,20_sw,"<="), "alpha"},
-        {IntervalType(30_sw,70_sw,"()"), "bravo"},
-        {IntervalType(80_sw,80_sw,">="), "charlie"},
+        {Itv(20_sw,20_sw,"<="), "alpha"},
+        {Itv(30_sw,70_sw,"()"), "bravo"},
+        {Itv(80_sw,80_sw,">="), "charlie"},
     }));
     TEST_EQUAL(map.size(), 3u);
     TEST_EQUAL(map.str(), "{<=20:alpha,[31,69]:bravo,>=80:charlie}");
 
     TRY(map.clear());
     TRY(map.default_value("nil"));
-    TRY(map.insert(IntervalType(10_sw,10_sw,"<="), "alpha"));
-    TRY(map.insert(IntervalType(1_sw,5_sw,"[]"), "bravo"));
-    TRY(map.insert(IntervalType(5_sw,6_sw,"[]"), "charlie"));
-    TRY(map.insert(IntervalType(2_sw,3_sw,"[]"), "delta"));
-    TRY(map.insert(IntervalType(7_sw,8_sw,"[]"), "charlie"));
+    TRY(map.insert(Itv(10_sw,10_sw,"<="), "alpha"));
+    TRY(map.insert(Itv(1_sw,5_sw,"[]"), "bravo"));
+    TRY(map.insert(Itv(5_sw,6_sw,"[]"), "charlie"));
+    TRY(map.insert(Itv(2_sw,3_sw,"[]"), "delta"));
+    TRY(map.insert(Itv(7_sw,8_sw,"[]"), "charlie"));
     TEST_EQUAL(map.size(), 6u);
     TEST_EQUAL(map.str(),
         "{<=0:alpha,"
@@ -128,9 +128,9 @@ void test_rs_stepwise_interval_map() {
     TEST_EQUAL(map[11_sw], "nil");
     TEST_EQUAL(map[12_sw], "nil");
 
-    TRY(map.erase(IntervalType(1_sw,2_sw,"[]")));
-    TRY(map.erase(IntervalType(6_sw,7_sw,"[]")));
-    TRY(map.erase(IntervalType(10_sw,10_sw,">=")));
+    TRY(map.erase(Itv(1_sw,2_sw,"[]")));
+    TRY(map.erase(Itv(6_sw,7_sw,"[]")));
+    TRY(map.erase(Itv(10_sw,10_sw,">=")));
     TEST_EQUAL(map.size(), 6u);
     TEST_EQUAL(map.str(),
         "{<=0:alpha,"
@@ -157,7 +157,7 @@ void test_rs_stepwise_interval_map() {
 
 void test_rs_stepwise_interval_map_hashing() {
 
-    std::unordered_set<MapType> map;
+    std::unordered_set<Map> map;
     TEST(map.empty());
 
 }
