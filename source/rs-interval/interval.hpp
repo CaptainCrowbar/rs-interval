@@ -2,6 +2,7 @@
 
 #include "rs-interval/format.hpp"
 #include <algorithm>
+#include <array>
 #include <functional>
 #include <iterator>
 #include <ostream>
@@ -400,16 +401,65 @@ namespace RS::Intervals {
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
         IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
-            if (a.empty() || b.empty())
+            if (a.empty() || b.empty()) {
+                // Both intervals are empty
                 return {};
-            if ((a.is_single() && a.min() == T()) || (b.is_single() && b.min() == T()))
+            } else if ((a.is_single() && a.min() == T()) || (b.is_single() && b.min() == T())) {
+                // One of the intervals is singular zero
                 return T();
-            if (a.is_universal() || b.is_universal())
+            } else if (a.is_universal() || b.is_universal()) {
+                // One of the intervals is universal
                 return IntervalType::all();
-            // TODO
-            (void)a;
-            (void)b;
-            return {};
+            } else if (a.is_finite() && b.is_finite()) {
+                // Both intervals are finite
+                std::array<std::pair<T, bool>, 4> points; // (value,closed)
+                points[0].first = a.min() * b.min();
+                points[1].first = a.min() * b.max();
+                points[2].first = a.max() * b.min();
+                points[3].first = a.max() * b.max();
+                points[0].second = a.is_left_closed() && b.is_left_closed();
+                points[1].second = a.is_left_closed() && b.is_right_closed();
+                points[2].second = a.is_right_closed() && b.is_left_closed();
+                points[3].second = a.is_right_closed() && b.is_right_closed();
+                T min_value = points[0].first;
+                T max_value = min_value;
+                T min_closed = points[0].second;
+                T max_closed = min_closed;
+                for (int i = 1; i < 4; ++i) {
+                    if (points[i].first < min_value) {
+                        min_value = points[i].first;
+                        min_closed = points[i].second;
+                    } else if (points[i].first == min_value) {
+                        min_closed = min_closed || points[i].second;
+                    }
+                    if (points[i].first > max_value) {
+                        max_value = points[i].first;
+                        max_closed = points[i].second;
+                    } else if (points[i].first == max_value) {
+                        max_closed = max_closed || points[i].second;
+                    }
+                }
+                auto lbound = min_closed ? IntervalBound::closed : IntervalBound::open;
+                auto rbound = max_closed ? IntervalBound::closed : IntervalBound::open;
+                return IntervalType(min_value, max_value, lbound, rbound);
+            } else if (b.is_finite()) {
+                // LHS is infinite, RHS is finite
+                return multiply_intervals(b, a);
+            } else if (b.is_right_bounded()) {
+                // RHS is unbounded below
+                return multiply_intervals(- a, - b);
+            } else if (! a.is_left_bounded() && a.is_right_bounded()) {
+                // LHS is unbounded below
+                return - multiply_intervals(- a, b);
+            } else if (a.is_finite()) {
+                // LHS is finite, RHS is unbounded above
+                // TODO
+                return {};
+            } else {
+                // Both intervals are unbounded above
+                // TODO
+                return {};
+            }
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
