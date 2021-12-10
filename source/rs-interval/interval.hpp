@@ -87,11 +87,21 @@ namespace RS::Intervals {
         size_t hash() const noexcept;
         IntervalMatch match(const T& t) const;
     protected:
-        struct boundary_point {
-            Detail::BoundaryType flag;
+        struct boundary_point:
+        public Detail::LessThanComparable<boundary_point> {
             T value;
-            bool operator<(const boundary_point& b) const noexcept
-                { return Detail::no_boundary(flag) || Detail::no_boundary(b.flag) || value == b.value ? flag < b.flag : value < b.value; }
+            Detail::BoundaryType flag;
+            boundary_point() = default;
+            boundary_point(T v, Detail::BoundaryType f): value(v), flag(f) {}
+            bool operator==(const boundary_point& b) const noexcept {
+                return flag == b.flag && (Detail::no_boundary(flag) || value == b.value);
+            }
+            bool operator<(const boundary_point& b) const noexcept {
+                if (Detail::no_boundary(flag) || Detail::no_boundary(b.flag) || value == b.value)
+                    return flag < b.flag;
+                else
+                    return value < b.value;
+            }
         };
         using boundary_points = std::pair<boundary_point, boundary_point>;
         T min_ = T();
@@ -157,12 +167,12 @@ namespace RS::Intervals {
         template <typename T>
         typename IntervalTypeBase<T>::boundary_points IntervalTypeBase<T>::find_interval_bounds() const noexcept {
             boundary_point lbp, rbp;
-            if (left_ == IntervalBound::open)          lbp = {Detail::BoundaryType::value_plus_epsilon, min_};
-            else if (left_ == IntervalBound::closed)   lbp = {Detail::BoundaryType::exact_value, min_};
-            else                                       lbp = {Detail::BoundaryType::minus_infinity, {}};
-            if (right_ == IntervalBound::open)         rbp = {Detail::BoundaryType::value_minus_epsilon, max_};
-            else if (right_ == IntervalBound::closed)  rbp = {Detail::BoundaryType::exact_value, max_};
-            else                                       rbp = {Detail::BoundaryType::plus_infinity, {}};
+            if (left_ == IntervalBound::open)          lbp = {min_, Detail::BoundaryType::value_plus_epsilon};
+            else if (left_ == IntervalBound::closed)   lbp = {min_, Detail::BoundaryType::exact_value};
+            else                                       lbp = {{}, Detail::BoundaryType::minus_infinity};
+            if (right_ == IntervalBound::open)         rbp = {max_, Detail::BoundaryType::value_minus_epsilon};
+            else if (right_ == IntervalBound::closed)  rbp = {max_, Detail::BoundaryType::exact_value};
+            else                                       rbp = {{}, Detail::BoundaryType::plus_infinity};
             return {lbp, rbp};
         }
 
