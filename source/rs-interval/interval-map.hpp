@@ -17,17 +17,23 @@ namespace RS::Intervals {
     template <typename K, typename T>
     class IntervalMap:
     public Detail::LessThanComparable<IntervalMap<K, T>> {
+
     public:
+
         using key_type = K;
         using mapped_type = T;
         using interval_type = Interval<K>;
         using iterator = typename std::map<Interval<K>, T>::const_iterator;
         using value_type = typename std::map<Interval<K>, T>::value_type;
+
         static constexpr auto category = interval_category<K>;
+
         IntervalMap() = default;
         explicit IntervalMap(const T& defval): map_(), def_(defval) {}
         IntervalMap(std::initializer_list<value_type> list) { for (auto& v: list) insert(v); }
+
         const T& operator[](const K& key) const;
+
         auto begin() const noexcept { return map_.begin(); }
         auto end() const noexcept { return map_.end(); }
         bool empty() const noexcept { return map_.empty(); }
@@ -47,10 +53,14 @@ namespace RS::Intervals {
         std::string str() const { return str({}, {}); }
         std::string str(const std::string& kmode, const std::string& vmode) const;
         void swap(IntervalMap& map) noexcept { map_.swap(map.map_); std::swap(def_, map.def_); }
+
     private:
+
         std::map<Interval<K>, T> map_;
         T def_ = T();
+
         std::pair<iterator, bool> do_find(const K& key) const;
+
     };
 
         template <typename K, typename T>

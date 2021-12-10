@@ -17,21 +17,27 @@ namespace RS::Intervals {
     template <typename T>
     class IntervalSet:
     public Detail::LessThanComparable<IntervalSet<T>> {
+
     public:
+
         using iterator = typename std::set<Interval<T>>::const_iterator;
         using interval_type = Interval<T>;
         using value_type = T;
+
         static constexpr auto category = interval_category<T>;
+
         IntervalSet() = default;
         IntervalSet(const T& t): set_{{t}} {}
         IntervalSet(const interval_type& in): set_{in} {}
         IntervalSet(std::initializer_list<interval_type> list): set_(list) {}
+
         bool operator()(const T& t) const { return contains(t); }
         IntervalSet operator~() const { return inverse(); }
         IntervalSet& operator&=(const IntervalSet<T>& b) { *this = set_intersection(b); return *this; }
         IntervalSet& operator|=(const IntervalSet<T>& b) { *this = set_union(b); return *this; }
         IntervalSet& operator-=(const IntervalSet<T>& b) { *this = set_difference(b); return *this; }
         IntervalSet& operator^=(const IntervalSet<T>& b) { *this = set_symmetric_difference(b); return *this; }
+
         auto begin() const noexcept { return set_.begin(); }
         auto end() const noexcept { return set_.end(); }
         bool empty() const noexcept { return set_.empty(); }
@@ -48,8 +54,11 @@ namespace RS::Intervals {
         size_t hash() const noexcept;
         std::string str(const std::string& mode = {}) const;
         void swap(IntervalSet& set) noexcept { set_.swap(set.set_); }
+
     private:
+
         std::set<Interval<T>> set_;
+
     };
 
         template <typename T>

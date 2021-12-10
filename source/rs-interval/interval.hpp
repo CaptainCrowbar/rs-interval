@@ -68,7 +68,9 @@ namespace RS::Intervals {
 
     template <typename T>
     class IntervalTypeBase {
+
     public:
+
         const T& min() const noexcept { return min_; }
         const T& max() const noexcept { return max_; }
         IntervalBound left() const noexcept { return left_; }
@@ -86,7 +88,9 @@ namespace RS::Intervals {
         bool is_right_open() const noexcept { return right_ == IntervalBound::open; }
         size_t hash() const noexcept;
         IntervalMatch match(const T& t) const;
+
     protected:
+
         struct boundary_point:
         public Detail::LessThanComparable<boundary_point> {
             T value;
@@ -103,15 +107,20 @@ namespace RS::Intervals {
                     return value < b.value;
             }
         };
+
         using boundary_points = std::pair<boundary_point, boundary_point>;
+
         T min_ = T();
         T max_ = T();
         IntervalBound left_ = IntervalBound::empty;
         IntervalBound right_ = IntervalBound::empty;
+
         void adjust_bounds();
         void do_swap(IntervalTypeBase& in) noexcept;
         boundary_points find_interval_bounds() const noexcept;
+
         static bool adjacent_intervals(const boundary_point& left, const boundary_point& right) noexcept;
+
     };
 
         template <typename T>
@@ -203,13 +212,18 @@ namespace RS::Intervals {
     template <typename T>
     class IntervalCategoryBase<T, IntervalCategory::stepwise>:
     public IntervalTypeBase<T> {
+
     private:
+
         static constexpr bool has_t_arithmetic = Detail::has_plus_operator<T> && Detail::has_minus_operator<T>;
         static constexpr bool has_int_arithmetic = Detail::has_plus_operator<T, int> && Detail::has_minus_operator<T, int>;
         static constexpr bool has_random_access = has_t_arithmetic || has_int_arithmetic;
         static constexpr bool prefer_ptrdiff_arithmetic = has_int_arithmetic && sizeof(T) > sizeof(int);
+
         using delta_type = std::conditional_t<has_t_arithmetic, T, std::conditional_t<prefer_ptrdiff_arithmetic, ptrdiff_t, int>>;
+
     public:
+
         class iterator:
         public Detail::LessThanComparable<iterator> {
         public:
@@ -237,11 +251,15 @@ namespace RS::Intervals {
         private:
             T value_;
         };
+
         iterator begin() const { return this->empty() ? iterator() : iterator(this->min_); }
         iterator end() const { return this->empty() ? iterator() : std::next(iterator(this->max_)); }
         size_t size() const;
+
     protected:
+
         void adjust_bounds();
+
     };
 
         template <typename T>
@@ -275,13 +293,18 @@ namespace RS::Intervals {
     template <typename T>
     class IntervalCategoryBase<T, IntervalCategory::integral>:
     public IntervalTypeBase<T> {
+
     private:
+
         static constexpr bool has_t_arithmetic = Detail::has_plus_operator<T> && Detail::has_minus_operator<T>;
         static constexpr bool has_int_arithmetic = Detail::has_plus_operator<T, int> && Detail::has_minus_operator<T, int>;
         static constexpr bool has_random_access = has_t_arithmetic || has_int_arithmetic;
         static constexpr bool prefer_ptrdiff_arithmetic = has_int_arithmetic && sizeof(T) > sizeof(int);
+
         using delta_type = std::conditional_t<has_t_arithmetic, T, std::conditional_t<prefer_ptrdiff_arithmetic, ptrdiff_t, int>>;
+
     public:
+
         class iterator:
         public Detail::LessThanComparable<iterator> {
         public:
@@ -309,11 +332,15 @@ namespace RS::Intervals {
         private:
             T value_;
         };
+
         iterator begin() const { return this->empty() ? iterator() : iterator(this->min_); }
         iterator end() const { return this->empty() ? iterator() : std::next(iterator(this->max_)); }
         size_t size() const;
+
     protected:
+
         void adjust_bounds();
+
     };
 
         template <typename T>
@@ -355,7 +382,9 @@ namespace RS::Intervals {
 
     template <typename IntervalType, typename T, IntervalCategory Cat = interval_category<T>>
     class IntervalArithmeticBase {
+
     public:
+
         IntervalType operator+() const { auto& a = static_cast<const IntervalType&>(*this); return a; }
         IntervalType operator-() const { auto& a = static_cast<const IntervalType&>(*this); return negative_interval(a); }
         IntervalType& operator+=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = add_intervals(a, b); return a; }
@@ -366,6 +395,7 @@ namespace RS::Intervals {
         IntervalType& operator*=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = multiply_intervals(a, b); return a; }
         IntervalType& operator/=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = divide_intervals(a, b); return a; }
         IntervalType& operator/=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = divide_intervals(a, b); return a; }
+
         friend IntervalType operator+(const IntervalType& a, const IntervalType& b) { return add_intervals(a, b); }
         friend IntervalType operator+(const IntervalType& a, const T& b) { return add_intervals(a, b); }
         friend IntervalType operator+(const T& a, const IntervalType& b) { return add_intervals(b, a); }
@@ -378,12 +408,15 @@ namespace RS::Intervals {
         friend IntervalType operator/(const IntervalType& a, const IntervalType& b) { return divide_intervals(a, b); }
         friend IntervalType operator/(const IntervalType& a, const T& b) { return divide_intervals(a, b); }
         friend IntervalType operator/(const T& a, const IntervalType& b) { return divide_intervals(a, b); }
+
     private:
+
         static IntervalType negative_interval(const IntervalType& a);
         static IntervalType add_intervals(const IntervalType& a, const IntervalType& b);
         static IntervalType subtract_intervals(const IntervalType& a, const IntervalType& b);
         static IntervalType multiply_intervals(const IntervalType& a, const IntervalType& b);
         static IntervalType divide_intervals(const IntervalType& a, const IntervalType& b);
+
     };
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
@@ -411,17 +444,29 @@ namespace RS::Intervals {
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
         IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
+
             if (a.empty() || b.empty()) {
+
                 // Both intervals are empty
+
                 return {};
+
             } else if ((a.is_single() && a.min() == T()) || (b.is_single() && b.min() == T())) {
+
                 // One of the intervals is singular zero
+
                 return T();
+
             } else if (a.is_universal() || b.is_universal()) {
+
                 // One of the intervals is universal
+
                 return IntervalType::all();
+
             } else if (a.is_finite() && b.is_finite()) {
+
                 // Both intervals are finite
+
                 std::array<std::pair<T, bool>, 4> points; // (value,closed)
                 points[0].first = a.min() * b.min();
                 points[1].first = a.min() * b.max();
@@ -435,6 +480,7 @@ namespace RS::Intervals {
                 T max_value = min_value;
                 T min_closed = points[0].second;
                 T max_closed = min_closed;
+
                 for (int i = 1; i < 4; ++i) {
                     if (points[i].first < min_value) {
                         min_value = points[i].first;
@@ -449,27 +495,46 @@ namespace RS::Intervals {
                         max_closed = max_closed || points[i].second;
                     }
                 }
+
                 auto lbound = min_closed ? IntervalBound::closed : IntervalBound::open;
                 auto rbound = max_closed ? IntervalBound::closed : IntervalBound::open;
+
                 return IntervalType(min_value, max_value, lbound, rbound);
+
             } else if (b.is_finite()) {
+
                 // LHS is infinite, RHS is finite
+
                 return multiply_intervals(b, a);
+
             } else if (b.is_right_bounded()) {
+
                 // RHS is unbounded below
+
                 return multiply_intervals(- a, - b);
+
             } else if (! a.is_left_bounded() && a.is_right_bounded()) {
+
                 // LHS is unbounded below
+
                 return - multiply_intervals(- a, b);
+
             } else if (a.is_finite()) {
+
                 // LHS is finite, RHS is unbounded above
                 // TODO
+
                 return {};
+
             } else {
+
                 // Both intervals are unbounded above
                 // TODO
+
                 return {};
+
             }
+
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
@@ -493,17 +558,23 @@ namespace RS::Intervals {
     public IntervalCategoryBase<T>,
     public IntervalArithmeticBase<Interval<T>, T>,
     public Detail::LessThanComparable<Interval<T>> {
+
     public:
+
         using value_type = T;
+
         static constexpr auto category = interval_category<T>;
+
         Interval() = default;
         Interval(const T& t): Interval(t, t, IntervalBound::closed, IntervalBound::closed) {}
         Interval(const T& t, IntervalBound l, IntervalBound r): Interval(t, t, l, r) {}
         Interval(const T& min, const T& max, IntervalBound lr = IntervalBound::closed): Interval(min, max, lr, lr) {}
         Interval(const T& min, const T& max, IntervalBound l, IntervalBound r);
         Interval(const T& min, const T& max, std::string_view mode);
+
         explicit operator bool() const noexcept { return ! this->empty(); }
         bool operator()(const T& t) const { return contains(t); }
+
         bool contains(const T& t) const { return this->match(t) == IntervalMatch::match; }
         IntervalSet<T> inverse() const;
         IntervalOrder order(const Interval& b) const;
@@ -518,7 +589,9 @@ namespace RS::Intervals {
         IntervalSet<T> set_symmetric_difference(const Interval& b) const;
         std::string str(const std::string& mode = {}) const;
         void swap(Interval& in) noexcept { this->do_swap(in); }
+
         static Interval all() noexcept { return Interval(T(), IntervalBound::unbound, IntervalBound::unbound); }
+
     };
 
         template <typename T>
