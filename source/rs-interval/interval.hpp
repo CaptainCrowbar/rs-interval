@@ -176,12 +176,12 @@ namespace RS::Intervals {
         template <typename T>
         typename IntervalTypeBase<T>::boundary_points IntervalTypeBase<T>::find_interval_bounds() const noexcept {
             boundary_point lbp, rbp;
-            if (left_ == IntervalBound::open)          lbp = {min_, Detail::BoundaryType::value_plus_epsilon};
+            if (left_ == IntervalBound::open)          lbp = {min_, Detail::BoundaryType::open_left};
             else if (left_ == IntervalBound::closed)   lbp = {min_, Detail::BoundaryType::exact_value};
-            else                                       lbp = {{}, Detail::BoundaryType::minus_infinity};
-            if (right_ == IntervalBound::open)         rbp = {max_, Detail::BoundaryType::value_minus_epsilon};
+            else                                       lbp = {{}, Detail::BoundaryType::unbounded_left};
+            if (right_ == IntervalBound::open)         rbp = {max_, Detail::BoundaryType::open_right};
             else if (right_ == IntervalBound::closed)  rbp = {max_, Detail::BoundaryType::exact_value};
-            else                                       rbp = {{}, Detail::BoundaryType::plus_infinity};
+            else                                       rbp = {{}, Detail::BoundaryType::unbounded_right};
             return {lbp, rbp};
         }
 
@@ -430,11 +430,11 @@ namespace RS::Intervals {
                 return {};
             if (a.is_universal() || b.is_universal())
                 return IntervalType::all();
-            IntervalBound l = std::max(a.left(), b.left());
-            IntervalBound r = std::max(a.right(), b.right());
-            T t = l == IntervalBound::unbound ? T() : a.min() + b.min();
-            T u = r == IntervalBound::unbound ? T() : a.max() + b.max();
-            return IntervalType(t, u, l, r);
+            T x = a.min() + b.min();
+            T y = a.max() + b.max();
+            IntervalBound lb = std::max(a.left(), b.left());
+            IntervalBound rb = std::max(a.right(), b.right());
+            return IntervalType(x, y, lb, rb);
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
