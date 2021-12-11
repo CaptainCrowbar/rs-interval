@@ -176,12 +176,12 @@ namespace RS::Intervals {
         template <typename T>
         typename IntervalTypeBase<T>::boundary_points IntervalTypeBase<T>::find_interval_bounds() const noexcept {
             boundary_point lbp, rbp;
-            if (left_ == IntervalBound::open)          lbp = {min_, Detail::BoundaryType::open_left};
+            if (left_ == IntervalBound::open)          lbp = {min_, Detail::BoundaryType::value_plus_epsilon};
             else if (left_ == IntervalBound::closed)   lbp = {min_, Detail::BoundaryType::exact_value};
-            else                                       lbp = {{}, Detail::BoundaryType::unbounded_left};
-            if (right_ == IntervalBound::open)         rbp = {max_, Detail::BoundaryType::open_right};
+            else                                       lbp = {{}, Detail::BoundaryType::minus_infinity};
+            if (right_ == IntervalBound::open)         rbp = {max_, Detail::BoundaryType::value_minus_epsilon};
             else if (right_ == IntervalBound::closed)  rbp = {max_, Detail::BoundaryType::exact_value};
-            else                                       rbp = {{}, Detail::BoundaryType::unbounded_right};
+            else                                       rbp = {{}, Detail::BoundaryType::plus_infinity};
             return {lbp, rbp};
         }
 

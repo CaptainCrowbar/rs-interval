@@ -161,15 +161,15 @@ namespace RS::Intervals {
         }
 
         RS_INTERVAL_ENUM_CLASS(BoundaryType, int, 0,
-            unbounded_left,
-            open_right,
+            minus_infinity,
+            value_minus_epsilon,
             exact_value,
-            open_left,
-            unbounded_right
+            value_plus_epsilon,
+            plus_infinity
         )
 
         constexpr bool no_boundary(BoundaryType b) noexcept {
-            return b == BoundaryType::unbounded_left || b == BoundaryType::unbounded_right;
+            return b == BoundaryType::minus_infinity || b == BoundaryType::plus_infinity;
         }
 
     }
