@@ -45,11 +45,11 @@
     }; \
     inline std::string to_string(EnumType t) { \
         static const auto names = ::RS::Intervals::Detail::split_string(# first_name "," # __VA_ARGS__, " ,"); \
-        IntType index = IntType(t) - IntType(first_value); \
-        if (index >= 0 && index < IntType(names.size())) \
+        IntType index = static_cast<IntType>(t) - static_cast<IntType>(first_value); \
+        if (index >= 0 && index < static_cast<IntType>(names.size())) \
             return names[size_t(index)]; \
         else \
-            return std::to_string(IntType(t)); \
+            return std::to_string(static_cast<IntType>(t)); \
     } \
     inline std::ostream& operator<<(std::ostream& out, EnumType t) { \
         return out << to_string(t); \
@@ -167,7 +167,7 @@ namespace RS::Intervals {
 
     }
 
-    RS_INTERVAL_ENUM_CLASS(IntervalBound, int, 0,
+    RS_INTERVAL_ENUM_CLASS(IntervalBound, unsigned char, 0,
         empty,   // The interval is empty
         closed,  // The interval includes the boundary value
         open,    // The interval does not include the boundary value
