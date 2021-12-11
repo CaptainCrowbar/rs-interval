@@ -16,7 +16,7 @@ namespace RS::Intervals {
 
     template <typename T>
     class IntervalSet:
-    public Detail::LessThanComparable<IntervalSet<T>> {
+    public Detail::TotalOrder<IntervalSet<T>> {
 
     public:
 

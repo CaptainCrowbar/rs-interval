@@ -96,7 +96,7 @@ namespace RS::Intervals {
             && has_less_or_equal_operator<T> && has_greater_or_equal_operator<T>);
 
         template <typename T>
-        struct LessThanComparable {
+        struct TotalOrder {
             bool operator!=(const T& rhs) const { return ! (static_cast<const T&>(*this) == rhs); }
             bool operator>(const T& rhs) const { return rhs < static_cast<const T&>(*this); }
             bool operator<=(const T& rhs) const { return ! (rhs < static_cast<const T&>(*this)); }
@@ -147,6 +147,11 @@ namespace RS::Intervals {
 
         template <typename T> constexpr bool is_maplike = is_range<T> && is_pairlike<typename RangeValueType<T>::type>;
 
+        template <typename T>
+        inline int compare_3way(const T& a, const T& b) noexcept {
+            return a == b ? 0 : a < b ? -1 : 1;
+        }
+
         inline std::vector<std::string> split_string(const std::string& str, const std::string& chars = ascii_whitespace) {
             std::vector<std::string> vec;
             size_t i = 0, j = 0;
@@ -160,21 +165,7 @@ namespace RS::Intervals {
             return vec;
         }
 
-        RS_INTERVAL_ENUM_CLASS(BoundaryType, int, 0,
-            minus_infinity,
-            value_minus_epsilon,
-            exact_value,
-            value_plus_epsilon,
-            plus_infinity
-        )
-
-        constexpr bool no_boundary(BoundaryType b) noexcept {
-            return b == BoundaryType::minus_infinity || b == BoundaryType::plus_infinity;
-        }
-
     }
-
-    // Supporting types
 
     RS_INTERVAL_ENUM_CLASS(IntervalBound, int, 0,
         empty,   // The interval is empty
@@ -240,5 +231,63 @@ namespace RS::Intervals {
     };
 
     template <typename T> constexpr auto interval_category = IntervalTraits<T>::category;
+
+    namespace Detail {
+
+        template <typename T>
+        struct Boundary:
+        public TotalOrder<Boundary<T>> {
+            T value;
+            IntervalBound bound;
+            bool upper;
+            Boundary() = default;
+            Boundary(T v, IntervalBound b, bool u): value(v), bound(b), upper(u) {}
+            bool operator==(const Boundary& r) const noexcept { return compare(*this, r) == 0; }
+            bool operator<(const Boundary& r) const noexcept { return compare(*this, r) == -1; }
+            static bool adjacent(const Boundary& l, const Boundary& r) noexcept;
+            static int compare(const Boundary& l, const Boundary& r) noexcept;
+        };
+
+            template <typename T>
+            bool Boundary<T>::adjacent(const Boundary& l, const Boundary& r) noexcept {
+                using IB = IntervalBound;
+                using IC = IntervalCategory;
+                if (l.bound == IB::empty || l.bound == IB::unbound || r.bound == IB::empty || r.bound == IB::unbound)
+                    return false;
+                if (l.bound != r.bound && l.value == r.value)
+                    return true;
+                if constexpr (interval_category<T> == IC::stepwise || interval_category<T> == IC::integral) {
+                    if (l.bound == IB::closed && r.bound == IB::closed && l.value < r.value) {
+                        T t = l.value;
+                        return ++t == r.value;
+                    }
+                }
+                return false;
+            }
+
+            template <typename T>
+            int Boundary<T>::compare(const Boundary& l, const Boundary& r) noexcept {
+                using IB = IntervalBound;
+                if (l.bound > r.bound) // case 1
+                    return - compare(r, l);
+                else if (l.bound == IB::empty && r.bound == IB::empty) // case 2
+                    return 0;
+                else if (l.bound == IB::empty) // case 3
+                    return l.upper ? 1 : -1;
+                else if (l.bound == IB::unbound && r.bound == IB::unbound) // case 4
+                    return compare_3way(l.upper, r.upper);
+                else if (r.bound == IB::unbound) // case 5
+                    return r.upper ? -1 : 1;
+                else if (l.bound == IB::closed && r.bound == IB::closed) // case 6
+                    return compare_3way(l.value, r.value);
+                else if (l.bound == IB::open && r.bound == IB::open && l.upper == r.upper) // case 7
+                    return compare_3way(l.value, r.value);
+                else if (r.upper) // case 8
+                    return l.value < r.value ? -1 : 1;
+                else // case 9
+                    return l.value <= r.value ? -1 : 1;
+            }
+
+    }
 
 }

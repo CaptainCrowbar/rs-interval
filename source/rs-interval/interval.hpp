@@ -13,6 +13,7 @@
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
+#include <iostream> // TEST
 
 namespace RS::Intervals {
 
@@ -91,25 +92,6 @@ namespace RS::Intervals {
 
     protected:
 
-        struct boundary_point:
-        public Detail::LessThanComparable<boundary_point> {
-            T value;
-            Detail::BoundaryType flag;
-            boundary_point() = default;
-            boundary_point(T v, Detail::BoundaryType f): value(v), flag(f) {}
-            bool operator==(const boundary_point& b) const noexcept {
-                return flag == b.flag && (Detail::no_boundary(flag) || value == b.value);
-            }
-            bool operator<(const boundary_point& b) const noexcept {
-                if (Detail::no_boundary(flag) || Detail::no_boundary(b.flag) || value == b.value)
-                    return flag < b.flag;
-                else
-                    return value < b.value;
-            }
-        };
-
-        using boundary_points = std::pair<boundary_point, boundary_point>;
-
         T min_ = T();
         T max_ = T();
         IntervalBound left_ = IntervalBound::empty;
@@ -117,9 +99,6 @@ namespace RS::Intervals {
 
         void adjust_bounds();
         void do_swap(IntervalTypeBase& in) noexcept;
-        boundary_points find_interval_bounds() const noexcept;
-
-        static bool adjacent_intervals(const boundary_point& left, const boundary_point& right) noexcept;
 
     };
 
@@ -173,33 +152,6 @@ namespace RS::Intervals {
             swap(right_, in.right_);
         }
 
-        template <typename T>
-        typename IntervalTypeBase<T>::boundary_points IntervalTypeBase<T>::find_interval_bounds() const noexcept {
-            boundary_point lbp, rbp;
-            if (left_ == IntervalBound::open)          lbp = {min_, Detail::BoundaryType::value_plus_epsilon};
-            else if (left_ == IntervalBound::closed)   lbp = {min_, Detail::BoundaryType::exact_value};
-            else                                       lbp = {{}, Detail::BoundaryType::minus_infinity};
-            if (right_ == IntervalBound::open)         rbp = {max_, Detail::BoundaryType::value_minus_epsilon};
-            else if (right_ == IntervalBound::closed)  rbp = {max_, Detail::BoundaryType::exact_value};
-            else                                       rbp = {{}, Detail::BoundaryType::plus_infinity};
-            return {lbp, rbp};
-        }
-
-        template <typename T>
-        bool IntervalTypeBase<T>::adjacent_intervals(const boundary_point& left, const boundary_point& right) noexcept {
-            if (Detail::no_boundary(left.flag) || Detail::no_boundary(right.flag))
-                return false;
-            if (int(right.flag) - int(left.flag) == 1 && left.value == right.value)
-                return true;
-            if constexpr (interval_category<T> == IntervalCategory::stepwise || interval_category<T> == IntervalCategory::integral) {
-                if (left.flag == Detail::BoundaryType::exact_value && right.flag == Detail::BoundaryType::exact_value && left.value < right.value) {
-                    T t = left.value;
-                    return ++t == right.value;
-                }
-            }
-            return false;
-        }
-
     // Base class for intervals in the same category
 
     template <typename T, IntervalCategory Cat = interval_category<T>>
@@ -225,7 +177,7 @@ namespace RS::Intervals {
     public:
 
         class iterator:
-        public Detail::LessThanComparable<iterator> {
+        public Detail::TotalOrder<iterator> {
         public:
             using difference_type = delta_type;
             using iterator_category = std::conditional_t<has_random_access, std::random_access_iterator_tag, std::bidirectional_iterator_tag>;
@@ -306,7 +258,7 @@ namespace RS::Intervals {
     public:
 
         class iterator:
-        public Detail::LessThanComparable<iterator> {
+        public Detail::TotalOrder<iterator> {
         public:
             using difference_type = delta_type;
             using iterator_category = std::conditional_t<has_random_access, std::random_access_iterator_tag, std::bidirectional_iterator_tag>;
@@ -557,7 +509,7 @@ namespace RS::Intervals {
     class Interval:
     public IntervalCategoryBase<T>,
     public IntervalArithmeticBase<Interval<T>, T>,
-    public Detail::LessThanComparable<Interval<T>> {
+    public Detail::TotalOrder<Interval<T>> {
 
     public:
 
@@ -627,30 +579,49 @@ namespace RS::Intervals {
 
         template <typename T>
         IntervalOrder Interval<T>::order(const Interval& b) const {
+            using BT = Detail::Boundary<T>;
             auto& a = *this;
-            if (a.empty() && b.empty())  return IntervalOrder::equal;
-            if (a.empty())               return IntervalOrder::b_only;
-            if (b.empty())               return IntervalOrder::a_only;
-            auto [al, ar] = a.find_interval_bounds();
-            auto [bl, br] = b.find_interval_bounds();
+            if (a.empty() && b.empty())
+                return IntervalOrder::equal;
+            else if (a.empty())
+                return IntervalOrder::b_only;
+            else if (b.empty())
+                return IntervalOrder::a_only;
+            BT al(a.min_, a.left_, false);
+            BT ar(a.max_, a.right_, true);
+            BT bl(b.min_, b.left_, false);
+            BT br(b.max_, b.right_, true);
             if (ar < bl) {
-                if (this->adjacent_intervals(ar, bl))  return IntervalOrder::a_touches_b;
-                else                                   return IntervalOrder::a_below_b;
+                if (BT::adjacent(ar, bl))
+                    return IntervalOrder::a_touches_b;
+                else
+                    return IntervalOrder::a_below_b;
             } else if (br < al) {
-                if (this->adjacent_intervals(br, al))  return IntervalOrder::b_touches_a;
-                else                                   return IntervalOrder::b_below_a;
+                if (BT::adjacent(br, al))
+                    return IntervalOrder::b_touches_a;
+                else
+                    return IntervalOrder::b_below_a;
             } else if (al < bl) {
-                if (ar < br)       return IntervalOrder::a_overlaps_b;
-                else if (br < ar)  return IntervalOrder::a_encloses_b;
-                else               return IntervalOrder::a_extends_below_b;
+                if (ar < br)
+                    return IntervalOrder::a_overlaps_b;
+                else if (br < ar)
+                    return IntervalOrder::a_encloses_b;
+                else
+                    return IntervalOrder::a_extends_below_b;
             } else if (bl < al) {
-                if (ar < br)       return IntervalOrder::b_encloses_a;
-                else if (br < ar)  return IntervalOrder::b_overlaps_a;
-                else               return IntervalOrder::b_extends_below_a;
+                if (ar < br)
+                    return IntervalOrder::b_encloses_a;
+                else if (br < ar)
+                    return IntervalOrder::b_overlaps_a;
+                else
+                    return IntervalOrder::b_extends_below_a;
             } else {
-                if (ar < br)       return IntervalOrder::b_extends_above_a;
-                else if (br < ar)  return IntervalOrder::a_extends_above_b;
-                else               return IntervalOrder::equal;
+                if (ar < br)
+                    return IntervalOrder::b_extends_above_a;
+                else if (br < ar)
+                    return IntervalOrder::a_extends_above_b;
+                else
+                    return IntervalOrder::equal;
             }
         }
 

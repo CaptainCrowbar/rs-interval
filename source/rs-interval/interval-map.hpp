@@ -16,7 +16,7 @@ namespace RS::Intervals {
 
     template <typename K, typename T>
     class IntervalMap:
-    public Detail::LessThanComparable<IntervalMap<K, T>> {
+    public Detail::TotalOrder<IntervalMap<K, T>> {
 
     public:
 
