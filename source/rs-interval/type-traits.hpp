@@ -94,11 +94,19 @@ namespace RS::Intervals {
             && has_less_or_equal_operator<T> && has_greater_or_equal_operator<T>);
 
         template <typename T>
+        struct Arithmetic {
+            friend T& operator+=(T& lhs, const T& rhs) { lhs = lhs + rhs; return lhs; }
+            friend T& operator-=(T& lhs, const T& rhs) { lhs = lhs - rhs; return lhs; }
+            friend T& operator*=(T& lhs, const T& rhs) { lhs = lhs * rhs; return lhs; }
+            friend T& operator/=(T& lhs, const T& rhs) { lhs = lhs / rhs; return lhs; }
+        };
+
+        template <typename T>
         struct TotalOrder {
-            bool operator!=(const T& rhs) const { return ! (static_cast<const T&>(*this) == rhs); }
-            bool operator>(const T& rhs) const { return rhs < static_cast<const T&>(*this); }
-            bool operator<=(const T& rhs) const { return ! (rhs < static_cast<const T&>(*this)); }
-            bool operator>=(const T& rhs) const { return ! (static_cast<const T&>(*this) < rhs); }
+            friend bool operator!=(const T& lhs, const T& rhs) { return ! (lhs == rhs); }
+            friend bool operator>(const T& lhs, const T& rhs) { return rhs < lhs; }
+            friend bool operator<=(const T& lhs, const T& rhs) { return ! (rhs < lhs); }
+            friend bool operator>=(const T& lhs, const T& rhs) { return ! (lhs < rhs); }
         };
 
         template <typename T>
@@ -195,6 +203,7 @@ namespace RS::Intervals {
 
         template <typename T>
         struct Boundary:
+        public Arithmetic<Boundary<T>>,
         public TotalOrder<Boundary<T>> {
             T value;
             IntervalBound bound;
