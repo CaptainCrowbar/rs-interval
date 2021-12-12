@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
 
     // interval-boundary-addition-test.cpp
     UNIT_TEST(rs_interval_boundary_addition)
+    UNIT_TEST(rs_interval_boundary_subtraction)
 
     // interval-boundary-multiplication-test.cpp
     UNIT_TEST(rs_interval_boundary_multiplication)

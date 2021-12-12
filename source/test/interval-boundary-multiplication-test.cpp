@@ -11,6 +11,16 @@ namespace RS::Intervals::Detail {
 
     // Temporary work
 
+    // enum class IntervalBound
+    //     empty
+    //     closed
+    //     open
+    //     unbound
+    // struct Boundary
+    //     T value
+    //     IntervalBound bound
+    //     bool upper
+
     template <typename T>
     Boundary<T> operator*(const Boundary<T>& l, const Boundary<T>& r) {
         // TODO

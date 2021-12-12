@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rs-interval/format.hpp"
+#include <algorithm>
 #include <limits>
 #include <ostream>
 #include <string>
@@ -187,6 +188,11 @@ namespace RS::Intervals {
 
     namespace Detail {
 
+        constexpr bool is_bounded(IntervalBound b) noexcept {
+            using IB = IntervalBound;
+            return b == IB::closed || b == IB::open;
+        }
+
         template <typename T>
         struct Boundary:
         public TotalOrder<Boundary<T>> {
@@ -198,16 +204,13 @@ namespace RS::Intervals {
             std::string str() const;
             static bool adjacent(const Boundary& l, const Boundary& r) noexcept;
             static int compare(const Boundary& l, const Boundary& r) noexcept;
-            friend bool operator==(const Boundary& l, const Boundary& r) noexcept { return compare(l, r) == 0; }
-            friend bool operator<(const Boundary& l, const Boundary& r) noexcept { return compare(l, r) == -1; }
         };
 
             template <typename T>
             std::string Boundary<T>::str() const {
-                using IB = IntervalBound;
                 std::string s = upper ? "right" : "left";
                 s += " " + to_string(bound);
-                if (bound == IB::closed || bound == IB::open)
+                if (is_bounded(bound))
                     s += " " + format_object(value);
                 return s;
             }
@@ -216,7 +219,7 @@ namespace RS::Intervals {
             bool Boundary<T>::adjacent(const Boundary& l, const Boundary& r) noexcept {
                 using IB = IntervalBound;
                 using IC = IntervalCategory;
-                if (l.bound == IB::empty || l.bound == IB::unbound || r.bound == IB::empty || r.bound == IB::unbound)
+                if (! is_bounded(l.bound) || ! is_bounded(r.bound))
                     return false;
                 if (l.bound != r.bound && l.value == r.value)
                     return true;
@@ -250,6 +253,42 @@ namespace RS::Intervals {
                     return l.value < r.value ? -1 : 1;
                 else // case 9
                     return l.value <= r.value ? -1 : 1;
+            }
+
+            template <typename T>
+            Boundary<T> operator-(const Boundary<T>& b) {
+                if (is_bounded(b.bound))
+                    return {- b.value, b.bound, ! b.upper};
+                else
+                    return {{}, b.bound, ! b.upper};
+            }
+
+            template <typename T>
+            Boundary<T> operator+(const Boundary<T>& l, const Boundary<T>& r) {
+                // We will only be adding like to like (lower or upper bounds),
+                // so we can assume l.upper==r.upper.
+                using IB = IntervalBound;
+                if (l.bound == IB::empty || r.bound == IB::empty)
+                    return {{}, IB::empty, l.upper};
+                else if (l.bound == IB::unbound || r.bound == IB::unbound)
+                    return {{}, IB::unbound, l.upper};
+                else
+                    return {l.value + r.value, std::max(l.bound, r.bound), l.upper};
+            }
+
+            template <typename T>
+            Boundary<T> operator-(const Boundary<T>& l, const Boundary<T>& r) {
+                return l + - r;
+            }
+
+            template <typename T>
+            bool operator==(const Boundary<T>& l, const Boundary<T>& r) noexcept {
+                return Boundary<T>::compare(l, r) == 0;
+            }
+
+            template <typename T>
+            bool operator<(const Boundary<T>& l, const Boundary<T>& r) noexcept {
+                return Boundary<T>::compare(l, r) == -1;
             }
 
     }
