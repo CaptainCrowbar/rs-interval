@@ -20,8 +20,11 @@ namespace RS::Intervals {
     // Forward declarations
 
     template <typename T> class Interval;
-    template <typename T> class IntervalSet;
+    template <typename IntervalType, typename T, IntervalCategory Cat> class IntervalArithmeticBase;
+    template <typename T, IntervalCategory Cat> class IntervalCategoryBase;
     template <typename K, typename T> class IntervalMap;
+    template <typename T> class IntervalSet;
+    template <typename T> class IntervalTypeBase;
 
     // Implementation details
 
@@ -61,6 +64,21 @@ namespace RS::Intervals {
             if (it == map.end())
                 throw std::invalid_argument("Invalid interval mode: " + std::string(mode));
             return it->second;
+        }
+
+        template <typename T>
+        Boundary<T> left_of(const IntervalTypeBase<T>& i) {
+            return {i.min(), i.left(), false};
+        }
+
+        template <typename T>
+        Boundary<T> right_of(const IntervalTypeBase<T>& i) {
+            return {i.max(), i.right(), true};
+        }
+
+        template <typename T>
+        Interval<T> from_bounds(const Boundary<T>& l, const Boundary<T>& r) {
+            return {l.value, r.value, l.bound, r.bound};
         }
 
     }
@@ -378,15 +396,10 @@ namespace RS::Intervals {
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
         IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::add_intervals(const IntervalType& a, const IntervalType& b) {
-            if (a.empty() || b.empty())
-                return {};
-            if (a.is_universal() || b.is_universal())
-                return IntervalType::all();
-            T x = a.min() + b.min();
-            T y = a.max() + b.max();
-            IntervalBound lb = std::max(a.left(), b.left());
-            IntervalBound rb = std::max(a.right(), b.right());
-            return IntervalType(x, y, lb, rb);
+            using BT = Detail::Boundary<T>;
+            BT l = left_of(a)+ left_of(b);
+            BT r = right_of(a)+ right_of(b);
+            return from_bounds(l, r);
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
@@ -579,18 +592,23 @@ namespace RS::Intervals {
 
         template <typename T>
         IntervalOrder Interval<T>::order(const Interval& b) const {
+
             using BT = Detail::Boundary<T>;
+
             auto& a = *this;
+
             if (a.empty() && b.empty())
                 return IntervalOrder::equal;
             else if (a.empty())
                 return IntervalOrder::b_only;
             else if (b.empty())
                 return IntervalOrder::a_only;
-            BT al(a.min_, a.left_, false);
-            BT ar(a.max_, a.right_, true);
-            BT bl(b.min_, b.left_, false);
-            BT br(b.max_, b.right_, true);
+
+            BT al = left_of(a);
+            BT ar = right_of(a);
+            BT bl = left_of(b);
+            BT br = right_of(b);
+
             if (ar < bl) {
                 if (BT::adjacent(ar, bl))
                     return IntervalOrder::a_touches_b;
@@ -623,13 +641,17 @@ namespace RS::Intervals {
                 else
                     return IntervalOrder::equal;
             }
+
         }
 
         template <typename T>
         int Interval<T>::compare(const Interval& b) const noexcept {
+
             auto& a = *this;
+
             if (a.empty() || b.empty())
                 return int(b.empty()) - int(a.empty());
+
             if (a.is_left_bounded() && b.is_left_bounded()) {
                 if (a.min() > b.min())
                     return 1;
@@ -640,6 +662,7 @@ namespace RS::Intervals {
             } else if (a.is_left_bounded() || b.is_left_bounded()) {
                 return a.is_left_bounded() ? 1 : -1;
             }
+
             if (a.is_right_bounded() && b.is_right_bounded()) {
                 if (a.max() < b.max())
                     return -1;
@@ -650,7 +673,9 @@ namespace RS::Intervals {
             } else if (a.is_right_bounded() || b.is_right_bounded()) {
                 return a.is_right_bounded() ? -1 : 1;
             }
+
             return 0;
+
         }
 
         template <typename T>
