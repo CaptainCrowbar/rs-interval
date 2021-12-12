@@ -17,7 +17,9 @@ add_executable(${unittest}
     test/type-traits-test.cpp
     test/format-integer-test.cpp
     test/format-floating-point-test.cpp
-    test/interval-boundary-compare-test.cpp
+    test/interval-boundary-comparison-test.cpp
+    test/interval-boundary-addition-test.cpp
+    test/interval-boundary-multiplication-test.cpp
     test/ordered-basic-test.cpp
     test/ordered-set-test.cpp
     test/ordered-map-test.cpp

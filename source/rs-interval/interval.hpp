@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rs-interval/format.hpp"
+#include "rs-interval/type-traits.hpp"
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -13,7 +14,6 @@
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
-#include <iostream> // TEST
 
 namespace RS::Intervals {
 

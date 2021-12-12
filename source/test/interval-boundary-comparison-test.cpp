@@ -1,13 +1,30 @@
 #include "rs-interval.hpp"
 #include "test/unit-test.hpp"
+#include <string>
 
 using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
 
-void test_rs_interval_boundary_compare() {
+using B = Boundary<int>;
+using IB = IntervalBound;
 
-    using B = Boundary<int>;
-    using IB = IntervalBound;
+void test_rs_interval_boundary_formatting() {
+
+    B b;
+    std::string s;
+
+    TRY((b = {42, IB::empty, false}));    TRY(s = b.str());  TEST_EQUAL(s, "left empty");
+    TRY((b = {42, IB::empty, true}));     TRY(s = b.str());  TEST_EQUAL(s, "right empty");
+    TRY((b = {42, IB::closed, false}));   TRY(s = b.str());  TEST_EQUAL(s, "left closed 42");
+    TRY((b = {42, IB::closed, true}));    TRY(s = b.str());  TEST_EQUAL(s, "right closed 42");
+    TRY((b = {42, IB::open, false}));     TRY(s = b.str());  TEST_EQUAL(s, "left open 42");
+    TRY((b = {42, IB::open, true}));      TRY(s = b.str());  TEST_EQUAL(s, "right open 42");
+    TRY((b = {42, IB::unbound, false}));  TRY(s = b.str());  TEST_EQUAL(s, "left unbound");
+    TRY((b = {42, IB::unbound, true}));   TRY(s = b.str());  TEST_EQUAL(s, "right unbound");
+
+}
+
+void test_rs_interval_boundary_comparison() {
 
     B el1(1, IB::empty, false);    B el2(2, IB::empty, false);
     B eu1(1, IB::empty, true);     B eu2(2, IB::empty, true);

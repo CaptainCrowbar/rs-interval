@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iterator>
+#include "rs-interval/format.hpp"
 #include <limits>
 #include <ostream>
 #include <string>
@@ -61,9 +61,6 @@
 
 namespace RS::Intervals {
 
-    constexpr const char* ascii_whitespace = "\t\n\f\r ";
-    constexpr size_t npos = std::string::npos;
-
     namespace Detail {
 
         RS_INTERVAL_DETECT_PREFIX_OPERATOR(increment, ++)
@@ -103,61 +100,17 @@ namespace RS::Intervals {
             bool operator>=(const T& rhs) const { return ! (static_cast<const T&>(*this) < rhs); }
         };
 
-        template <typename T, typename = void> struct HasStrMethod: std::false_type {};
-        template <typename T> struct HasStrMethod<T,
-            std::void_t<decltype(std::declval<std::string&>() = std::declval<const T&>().str())>>: std::true_type {};
-        template <typename T> constexpr bool has_str_method = HasStrMethod<T>::value;
-
-        template <typename T, typename = void> struct HasAdlToStringFunction: std::false_type {};
-        template <typename T> struct HasAdlToStringFunction<T,
-            std::void_t<decltype(std::declval<std::string&>() = to_string(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T> constexpr bool has_adl_to_string_function = HasAdlToStringFunction<T>::value;
-
-        template <typename T, typename = void> struct HasStdToStringFunction: std::false_type {};
-        template <typename T> struct HasStdToStringFunction<T,
-            std::void_t<decltype(std::declval<std::string&>() = std::to_string(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T> constexpr bool has_std_to_string_function = HasStdToStringFunction<T>::value;
-
-        template <typename T, typename = void> struct HasAdlBeginFunction: std::false_type {};
-        template <typename T> struct HasAdlBeginFunction<T, std::void_t<decltype(begin(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T, typename = void> struct HasAdlEndFunction: std::false_type {};
-        template <typename T> struct HasAdlEndFunction<T, std::void_t<decltype(end(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T, typename = void> struct HasStdBeginFunction: std::false_type {};
-        template <typename T> struct HasStdBeginFunction<T, std::void_t<decltype(std::begin(std::declval<const T&>()))>>: std::true_type {};
-        template <typename T, typename = void> struct HasStdEndFunction: std::false_type {};
-        template <typename T> struct HasStdEndFunction<T, std::void_t<decltype(std::end(std::declval<const T&>()))>>: std::true_type {};
-
-        template <typename T> constexpr bool is_range = (HasAdlBeginFunction<T>::value && HasAdlEndFunction<T>::value)
-            || (HasStdBeginFunction<T>::value && HasStdEndFunction<T>::value);
-
-        template <typename T, bool UseAdl = HasAdlBeginFunction<T>::value, bool UseStd = HasStdBeginFunction<T>::value> struct RangeValueType
-            { using type = void; };
-        template <typename T, bool UseStd> struct RangeValueType<T, true, UseStd>
-            { using type = std::decay_t<decltype(*begin(std::declval<T>()))>; };
-        template <typename T> struct RangeValueType<T, false, true>
-            { using type = std::decay_t<decltype(*std::begin(std::declval<T>()))>; };
-
-        template <typename T, typename = void> struct HasFirstMember: std::false_type {};
-        template <typename T> struct HasFirstMember<T,
-            std::void_t<decltype(std::declval<T>().first)>>: std::true_type {};
-        template <typename T, typename = void> struct HasSecondMember: std::false_type {};
-        template <typename T> struct HasSecondMember<T,
-            std::void_t<decltype(std::declval<T>().second)>>: std::true_type {};
-        template <typename T> constexpr bool is_pairlike = HasFirstMember<T>::value && HasSecondMember<T>::value;
-
-        template <typename T> constexpr bool is_maplike = is_range<T> && is_pairlike<typename RangeValueType<T>::type>;
-
         template <typename T>
         inline int compare_3way(const T& a, const T& b) noexcept {
             return a == b ? 0 : a < b ? -1 : 1;
         }
 
-        inline std::vector<std::string> split_string(const std::string& str, const std::string& chars = ascii_whitespace) {
+        inline std::vector<std::string> split_string(const std::string& str, const std::string& chars = "\t\n\f\r ") {
             std::vector<std::string> vec;
             size_t i = 0, j = 0;
             while (j < str.size()) {
                 i = str.find_first_not_of(chars, j);
-                if (i == npos)
+                if (i == std::string::npos)
                     break;
                 j = str.find_first_of(chars, i);
                 vec.push_back(str.substr(i, j - i));
@@ -242,11 +195,22 @@ namespace RS::Intervals {
             bool upper;
             Boundary() = default;
             Boundary(T v, IntervalBound b, bool u): value(v), bound(b), upper(u) {}
-            bool operator==(const Boundary& r) const noexcept { return compare(*this, r) == 0; }
-            bool operator<(const Boundary& r) const noexcept { return compare(*this, r) == -1; }
+            std::string str() const;
             static bool adjacent(const Boundary& l, const Boundary& r) noexcept;
             static int compare(const Boundary& l, const Boundary& r) noexcept;
+            friend bool operator==(const Boundary& l, const Boundary& r) noexcept { return compare(l, r) == 0; }
+            friend bool operator<(const Boundary& l, const Boundary& r) noexcept { return compare(l, r) == -1; }
         };
+
+            template <typename T>
+            std::string Boundary<T>::str() const {
+                using IB = IntervalBound;
+                std::string s = upper ? "right" : "left";
+                s += " " + to_string(bound);
+                if (bound == IB::closed || bound == IB::open)
+                    s += " " + format_object(value);
+                return s;
+            }
 
             template <typename T>
             bool Boundary<T>::adjacent(const Boundary& l, const Boundary& r) noexcept {

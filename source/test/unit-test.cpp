@@ -19,8 +19,15 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_interval_format_floating_point_with_fixed_point)
     UNIT_TEST(rs_interval_format_floating_point_with_general_format)
 
-    // interval-boundary-compare-test.cpp
-    UNIT_TEST(rs_interval_boundary_compare)
+    // interval-boundary-comparison-test.cpp
+    UNIT_TEST(rs_interval_boundary_formatting)
+    UNIT_TEST(rs_interval_boundary_comparison)
+
+    // interval-boundary-addition-test.cpp
+    UNIT_TEST(rs_interval_boundary_addition)
+
+    // interval-boundary-multiplication-test.cpp
+    UNIT_TEST(rs_interval_boundary_multiplication)
 
     // ordered-basic-test.cpp
     UNIT_TEST(rs_ordered_interval_basic_properties)

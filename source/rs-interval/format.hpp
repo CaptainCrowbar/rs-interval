@@ -1,14 +1,16 @@
 #pragma once
 
-#include "rs-interval/type-traits.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream> // TEST
+#include <iterator>
 #include <limits>
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 namespace RS::Intervals {
 
@@ -39,6 +41,50 @@ namespace RS::Intervals {
 
     namespace Detail {
 
+        template <typename T, typename = void> struct HasStrMethod: std::false_type {};
+        template <typename T> struct HasStrMethod<T,
+            std::void_t<decltype(std::declval<std::string&>() = std::declval<const T&>().str())>>: std::true_type {};
+        template <typename T> constexpr bool has_str_method = HasStrMethod<T>::value;
+
+        template <typename T, typename = void> struct HasAdlToStringFunction: std::false_type {};
+        template <typename T> struct HasAdlToStringFunction<T,
+            std::void_t<decltype(std::declval<std::string&>() = to_string(std::declval<const T&>()))>>: std::true_type {};
+        template <typename T> constexpr bool has_adl_to_string_function = HasAdlToStringFunction<T>::value;
+
+        template <typename T, typename = void> struct HasStdToStringFunction: std::false_type {};
+        template <typename T> struct HasStdToStringFunction<T,
+            std::void_t<decltype(std::declval<std::string&>() = std::to_string(std::declval<const T&>()))>>: std::true_type {};
+        template <typename T> constexpr bool has_std_to_string_function = HasStdToStringFunction<T>::value;
+
+        template <typename T, typename = void> struct HasAdlBeginFunction: std::false_type {};
+        template <typename T> struct HasAdlBeginFunction<T, std::void_t<decltype(begin(std::declval<const T&>()))>>: std::true_type {};
+        template <typename T, typename = void> struct HasAdlEndFunction: std::false_type {};
+        template <typename T> struct HasAdlEndFunction<T, std::void_t<decltype(end(std::declval<const T&>()))>>: std::true_type {};
+        template <typename T, typename = void> struct HasStdBeginFunction: std::false_type {};
+        template <typename T> struct HasStdBeginFunction<T, std::void_t<decltype(std::begin(std::declval<const T&>()))>>: std::true_type {};
+        template <typename T, typename = void> struct HasStdEndFunction: std::false_type {};
+        template <typename T> struct HasStdEndFunction<T, std::void_t<decltype(std::end(std::declval<const T&>()))>>: std::true_type {};
+
+        template <typename T> constexpr bool is_range = (HasAdlBeginFunction<T>::value && HasAdlEndFunction<T>::value)
+            || (HasStdBeginFunction<T>::value && HasStdEndFunction<T>::value);
+
+        template <typename T, bool UseAdl = HasAdlBeginFunction<T>::value, bool UseStd = HasStdBeginFunction<T>::value> struct RangeValueType
+            { using type = void; };
+        template <typename T, bool UseStd> struct RangeValueType<T, true, UseStd>
+            { using type = std::decay_t<decltype(*begin(std::declval<T>()))>; };
+        template <typename T> struct RangeValueType<T, false, true>
+            { using type = std::decay_t<decltype(*std::begin(std::declval<T>()))>; };
+
+        template <typename T, typename = void> struct HasFirstMember: std::false_type {};
+        template <typename T> struct HasFirstMember<T,
+            std::void_t<decltype(std::declval<T>().first)>>: std::true_type {};
+        template <typename T, typename = void> struct HasSecondMember: std::false_type {};
+        template <typename T> struct HasSecondMember<T,
+            std::void_t<decltype(std::declval<T>().second)>>: std::true_type {};
+        template <typename T> constexpr bool is_pairlike = HasFirstMember<T>::value && HasSecondMember<T>::value;
+
+        template <typename T> constexpr bool is_maplike = is_range<T> && is_pairlike<typename RangeValueType<T>::type>;
+
         inline int str_to_int(const std::string& str) {
             return int(std::strtol(str.data(), nullptr, 10));
         }
@@ -58,7 +104,7 @@ namespace RS::Intervals {
 
         inline std::string trim_exponent(const std::string& str, bool xsign) {
             size_t begin_cut = str.find_first_of("Ee");
-            if (begin_cut == npos)
+            if (begin_cut == std::string::npos)
                 return str;
             ++begin_cut;
             bool neg = str[begin_cut] == '-';
@@ -80,10 +126,10 @@ namespace RS::Intervals {
 
         inline std::string trim_zeros(const std::string& str) {
             size_t dec_point = str.find('.');
-            if (dec_point == npos)
+            if (dec_point == std::string::npos)
                 return str;
             size_t end_sig = str.find_first_not_of("0123456789", dec_point + 1);
-            if (end_sig == npos)
+            if (end_sig == std::string::npos)
                 end_sig = str.size();
             size_t last_digit = end_sig - 1;
             while (str[last_digit] == '0')
@@ -154,11 +200,11 @@ namespace RS::Intervals {
 
         char mode = spec[0];
         bool opt_ucase = mode <= 'Z';
-        bool opt_sign = spec.find('s') != npos;
-        bool opt_xsign = spec.find('S') != npos;
-        bool opt_ztrim = spec.find('z') != npos;
+        bool opt_sign = spec.find('s') != std::string::npos;
+        bool opt_xsign = spec.find('S') != std::string::npos;
+        bool opt_ztrim = spec.find('z') != std::string::npos;
         size_t pos = spec.find_first_of("0123456789");
-        int prec = pos == npos ? 6 : Detail::str_to_int(spec.substr(pos));
+        int prec = pos == std::string::npos ? 6 : Detail::str_to_int(spec.substr(pos));
         std::string result;
 
         switch (mode) {
@@ -191,10 +237,10 @@ namespace RS::Intervals {
         if (mode >= 'd' && mode <= 'f')
             return format_float(floating_type(x), spec);
 
-        bool opt_sign = spec.find('s') != npos;
+        bool opt_sign = spec.find('s') != std::string::npos;
         T base = mode == 'X' || mode == 'x' ? 16 : 10;
         size_t pos = spec.find_first_of("0123456789");
-        int prec = pos == npos ? 1 : Detail::str_to_int(spec.substr(pos));
+        int prec = pos == std::string::npos ? 1 : Detail::str_to_int(spec.substr(pos));
         std::string result;
         bool neg = false;
         if constexpr (is_signed) {
