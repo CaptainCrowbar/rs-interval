@@ -397,8 +397,8 @@ namespace RS::Intervals {
         template <typename IntervalType, typename T, IntervalCategory Cat>
         IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::add_intervals(const IntervalType& a, const IntervalType& b) {
             using BT = Detail::Boundary<T>;
-            BT l = left_of(a)+ left_of(b);
-            BT r = right_of(a)+ right_of(b);
+            BT l = left_of(a) + left_of(b);
+            BT r = right_of(a) + right_of(b);
             return from_bounds(l, r);
         }
 
@@ -410,95 +410,39 @@ namespace RS::Intervals {
         template <typename IntervalType, typename T, IntervalCategory Cat>
         IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
 
-            if (a.empty() || b.empty()) {
+            // TODO
 
-                // Both intervals are empty
+            using BT = Detail::Boundary<T>;
 
-                return {};
+            std::cout << "==> " << a << " " << b << "\n";
 
-            } else if ((a.is_single() && a.min() == T()) || (b.is_single() && b.min() == T())) {
+            BT la = left_of(a);
+            BT ra = right_of(a);
+            BT lb = left_of(b);
+            BT rb = right_of(b);
 
-                // One of the intervals is singular zero
+            std::cout << "... la=" << la.str() << ", ra=" << ra.str() << ", lb=" << lb.str() << ", rb=" << rb.str() << "\n";
 
-                return T();
+            std::array<BT, 4> bs;
+            bs[0] = la * lb;
+            bs[1] = la * rb;
+            bs[2] = ra * lb;
+            bs[3] = ra * rb;
 
-            } else if (a.is_universal() || b.is_universal()) {
+            std::cout << "...";
+            for (auto& b: bs) std::cout << " " << b.str() << ";";
+            std::cout << "\n";
 
-                // One of the intervals is universal
+            BT l = *std::min_element(bs.begin(), bs.end());
+            BT r = *std::max_element(bs.begin(), bs.end());
 
-                return IntervalType::all();
+            std::cout << "... l=" << l.str() << ", r=" << r.str() << "\n";
 
-            } else if (a.is_finite() && b.is_finite()) {
+            auto result = from_bounds(l, r);
 
-                // Both intervals are finite
+            std::cout << "... " << result << "\n";
 
-                std::array<std::pair<T, bool>, 4> points; // (value,closed)
-                points[0].first = a.min() * b.min();
-                points[1].first = a.min() * b.max();
-                points[2].first = a.max() * b.min();
-                points[3].first = a.max() * b.max();
-                points[0].second = a.is_left_closed() && b.is_left_closed();
-                points[1].second = a.is_left_closed() && b.is_right_closed();
-                points[2].second = a.is_right_closed() && b.is_left_closed();
-                points[3].second = a.is_right_closed() && b.is_right_closed();
-                T min_value = points[0].first;
-                T max_value = min_value;
-                T min_closed = points[0].second;
-                T max_closed = min_closed;
-
-                for (int i = 1; i < 4; ++i) {
-                    if (points[i].first < min_value) {
-                        min_value = points[i].first;
-                        min_closed = points[i].second;
-                    } else if (points[i].first == min_value) {
-                        min_closed = min_closed || points[i].second;
-                    }
-                    if (points[i].first > max_value) {
-                        max_value = points[i].first;
-                        max_closed = points[i].second;
-                    } else if (points[i].first == max_value) {
-                        max_closed = max_closed || points[i].second;
-                    }
-                }
-
-                auto lbound = min_closed ? IntervalBound::closed : IntervalBound::open;
-                auto rbound = max_closed ? IntervalBound::closed : IntervalBound::open;
-
-                return IntervalType(min_value, max_value, lbound, rbound);
-
-            } else if (b.is_finite()) {
-
-                // LHS is infinite, RHS is finite
-
-                return multiply_intervals(b, a);
-
-            } else if (b.is_right_bounded()) {
-
-                // RHS is unbounded below
-
-                return multiply_intervals(- a, - b);
-
-            } else if (! a.is_left_bounded() && a.is_right_bounded()) {
-
-                // LHS is unbounded below
-
-                return - multiply_intervals(- a, b);
-
-            } else if (a.is_finite()) {
-
-                // LHS is finite, RHS is unbounded above
-                // TODO
-
-                return {};
-
-            } else {
-
-                // Both intervals are unbounded above
-                // TODO
-
-                return {};
-
-            }
+            return result;
 
         }
 
