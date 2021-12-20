@@ -1,4 +1,4 @@
-#include "test/unit-test.hpp"
+#include "rs-unit-test.hpp"
 
 int main(int argc, char** argv) {
 
@@ -101,6 +101,8 @@ int main(int argc, char** argv) {
 
     // continuous-arithmetic-test.cpp
     UNIT_TEST(rs_continuous_interval_arithmetic)
+
+    // unit-test.cpp
 
     return RS::UnitTest::end_tests();
 

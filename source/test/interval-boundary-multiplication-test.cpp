@@ -1,5 +1,5 @@
 #include "rs-interval.hpp"
-#include "test/unit-test.hpp"
+#include "rs-unit-test.hpp"
 
 using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;

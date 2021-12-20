@@ -1,6 +1,6 @@
 #include "rs-interval.hpp"
 #include "test/stepwise.hpp"
-#include "test/unit-test.hpp"
+#include "rs-unit-test.hpp"
 #include <iostream>
 #include <random>
 #include <string>

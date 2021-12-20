@@ -2,24 +2,35 @@
 
 set -euo pipefail
 
-dir="${PWD##*/}"
-dir="${dir%%-*}"
-if [ "$dir" == build ]; then cd ..; fi
-
-head=$(find source -name unit-test.hpp)
-if ! [ "$head" ]; then
-    echo "*** unit-test.hpp not found"
-    exit 1
+if [[ "${PWD##*/}" =~ build ]]; then
+    cd ..
 fi
 
-main=$(find source -name unit-test.cpp)
+main=$(find . -name unit-test.cpp)
+
 if ! [ "$main" ]; then
-    echo "*** unit-test.cpp not found"
-    exit 1
-fi
-temp="${main%.cpp}.temp.cpp"
 
-cmake=$(find source -name CMakeLists.txt)
+    srcdir=.
+
+    for s in source src; do
+        if [ -d "$s" ]; then
+            srcdir="$s"
+            break
+        fi
+    done
+
+    if [ -d "$srcdir/test" ]; then
+        srcdir="$srcdir/test"
+    fi
+
+    main="$srcdir/unit-test.cpp"
+
+fi
+
+testdir="${main%/*}"
+temp="${main%.cpp}.temp.cpp"
+cmake=$(find . -name CMakeLists.txt)
+
 if ! [ "$cmake" ]; then
     echo "*** CMakeLists.txt not found"
     exit 1
@@ -30,7 +41,7 @@ testfiles=$(grep -E '[-]test\.cpp$' "$cmake" \
     | grep -Fv "$main")
 
 cat > $temp << EOF
-#include "${head#source/}"
+#include "rs-unit-test.hpp"
 
 int main(int argc, char** argv) {
 

@@ -2,6 +2,8 @@
 
 By Ross Smith
 
+_[GitHub repository](https://github.com/CaptainCrowbar/rs-interval)_
+
 ```c++
 #include "rs-intervals/interval.hpp"
 namespace RS::Intervals;
@@ -11,6 +13,20 @@ namespace RS::Intervals;
 
 * TOC
 {:toc}
+
+## Version Information
+
+```c++
+std::array<int, 3> version() noexcept;
+```
+
+Returns an array containing the major, minor, and patch version numbers.
+
+```c++
+std::string version_string();
+```
+
+Returns the version numbers as a string (e.g. `"1.23.456"`).
 
 ## Supporting types
 
