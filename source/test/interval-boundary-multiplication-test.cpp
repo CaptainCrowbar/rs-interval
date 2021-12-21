@@ -9,250 +9,228 @@ using BT = BoundaryType;
 
 namespace RS::Intervals::Detail {
 
+    // RS_FORMAT_DEFINE_ENUM_CLASS(BoundaryType, int, -3,
+    //     empty,
+    //     minus_infinity,
+    //     just_below,
+    //     closed,
+    //     just_above,
+    //     plus_infinity
+    // )
+
     template <typename T>
     Boundary<T> Boundary<T>::operator*(const Boundary& b) const {
-        // TODO
-        (void)b;
-        return {};
+
+        using BT = BoundaryType;
+
+        static const Boundary zero(T(), BT::closed);
+
+        const Boundary& a = *this;
+
+        // (1) If either argument is empty, the result is empty
+        if (a.type == BT::empty || b.type == BT::empty)
+            return {};
+
+        // (2) Symmetric cases
+        if (a < zero && b < zero)
+            return (- a) * (- b);
+        if (a < zero)
+            return - (-a) * b;
+        if (b < zero)
+            return - a * (-b);
+        if (a < b)
+            return b * a;
+
+        // (3) If the RHS is a closed zero, the result is a closed zero (LHS zero is already covered)
+        if (b == zero)
+            return zero;
+
+        // (4) if the RHS is zero plus epsilon, the result is zero + epsilon
+        if (b == Boundary(T(), BT::just_above))
+            return b;
+
+        // (5) If the LHS is positive infinity, the result is positive infinity
+        if (a == Boundary(T(), BT::plus_infinity))
+            return a;
+
+        // All cases that include an infinity have now been covered
+
+        T product = a.value * b.value;
+
+        // (6) If both arguments are closed, the result is closed
+        if (a.type == BT::closed && b.type == BT::closed)
+            return {product, BT::closed};
+
+        // (7) If one argument has an epsilon but the other does not, the result has the same epsilon
+        if (std::abs(a.type) == 1 && b.type == BT::closed)
+            return {product, a.type};
+        if (std::abs(b.type) == 1 && a.type == BT::closed)
+            return {product, b.type};
+
+        // (8) If both sides have the same epsilon, the result has the same epsilon
+        if (a.type == b.type)
+            return {product, a.type};
+
+        // (9) The remaining case is where the arguments have epsilons of opposite signs
+        int sign = -1;
+        if (a.value != b.value) {
+            sign = int(a.type);
+            if (a.value < b.value)
+                sign = - sign;
+        }
+        return {product, BT(sign)};
+
     }
 
-//         // Temporary work
 
-//         // enum class IntervalBound
-//         //     empty
-//         //     closed
-//         //     open
-//         //     unbound
-//         // struct Boundary
-//         //     T value
-//         //     IntervalBound bound
-//         //     bool upper
 
-//         template <typename T>
-//         Boundary<T> operator*(const Boundary<T>& l, const Boundary<T>& r) {
-//             // The upper flag in the result is not important
-//             using IB = IntervalBound;
-//             bool u = l.upper && r.upper;
-//             if (l.bound == IB::empty || r.bound == IB::empty) // case 1
-//                 return {{}, IB::empty, u};
-//             bool lzero = (l.bound == IB::closed || l.bound == IB::open) && l.value == T();
-//             bool rzero = (r.bound == IB::closed || l.bound == IB::open) && r.value == T();
-//             if (lzero && rzero) // case 2a
-//                 return {{}, std::max(l.bound, r.bound), u};
-//             else if (lzero) // case 2b
-//                 return {{}, l.bound, u};
-//             else if (rzero) // case 2c
-//                 return {{}, r.bound, u};
-//             else if (l.bound == IB::unbound || r.bound == IB::unbound) // case 3
-//                 return {{}, IB::unbound, u};
-//             else // case 4
-//                 return {l.value * r.value, std::max(l.bound, r.bound), u};
-//         }
+    //  case 9   087  +x-eps  *  +y+eps  ->  +xy-x*eps+y*eps-eps^2
+    //  case 9   107  +x+eps  *  +y-eps  ->  +xy+x*eps-y*eps-eps^2
+    //  case 8   085  +x-eps  *  +y-eps  ->  +xy-eps
+    //  case 8   109  +x+eps  *  +y+eps  ->  +xy+eps
+    //  case 7a  086  +x-eps  *  +y      ->  +xy-eps
+    //  case 7a  108  +x+eps  *  +y      ->  +xy+eps
+    //  case 7b  096  +x      *  +y-eps  ->  +xy-eps
+    //  case 7b  098  +x      *  +y+eps  ->  +xy+eps
+    //  case 6   097  +x      *  +y      ->  +xy
+    //  case 5   118  +inf    *  +y-eps  ->  +inf
+    //  case 5   119  +inf    *  +y      ->  +inf
+    //  case 5   120  +inf    *  +y+eps  ->  +inf
+    //  case 5   121  +inf    *  +inf    ->  +inf
+    //  case 4   073  0+eps   *  0+eps   ->  0+eps
+    //  case 4   084  +x-eps  *  0+eps   ->  0+eps
+    //  case 4   095  +x      *  0+eps   ->  0+eps
+    //  case 4   106  +x+eps  *  0+eps   ->  0+eps
+    //  case 4   117  +inf    *  0+eps   ->  0+eps
+    //  case 2a  001  -inf    *  -inf    ->  +inf
+    //  case 2a  002  -inf    *  -y-eps  ->  +inf
+    //  case 2a  003  -inf    *  -y      ->  +inf
+    //  case 2a  004  -inf    *  -y+eps  ->  +inf
+    //  case 2a  012  -x-eps  *  -inf    ->  +inf
+    //  case 2a  013  -x-eps  *  -y-eps  ->  +xy+eps
+    //  case 2a  014  -x-eps  *  -y      ->  +xy+eps
+    //  case 2a  015  -x-eps  *  -y+eps  ->  +xy-eps
+    //  case 2a  023  -x      *  -inf    ->  +inf
+    //  case 2a  024  -x      *  -y-eps  ->  +xy+eps
+    //  case 2a  025  -x      *  -y      ->  +xy
+    //  case 2a  026  -x      *  -y+eps  ->  +xy-eps
+    //  case 2a  034  -x+eps  *  -inf    ->  +inf
+    //  case 2a  035  -x+eps  *  -y-eps  ->  +xy-eps
+    //  case 2a  036  -x+eps  *  -y      ->  +xy-eps
+    //  case 2a  037  -x+eps  *  -y+eps  ->  +xy-eps
+    //  case 2b  005  -inf    *  0-eps   ->  0+eps
+    //  case 2b  006  -inf    *  0       ->  0
+    //  case 2b  007  -inf    *  0+eps   ->  0-eps
+    //  case 2b  008  -inf    *  +y-eps  ->  -inf
+    //  case 2b  009  -inf    *  +y      ->  -inf
+    //  case 2b  010  -inf    *  +y+eps  ->  -inf
+    //  case 2b  011  -inf    *  +inf    ->  -inf
+    //  case 2b  016  -x-eps  *  0-eps   ->  0+eps
+    //  case 2b  017  -x-eps  *  0       ->  0
+    //  case 2b  018  -x-eps  *  0+eps   ->  0-eps
+    //  case 2b  019  -x-eps  *  +y-eps  ->  -xy+eps
+    //  case 2b  020  -x-eps  *  +y      ->  -xy-eps
+    //  case 2b  021  -x-eps  *  +y+eps  ->  -xy-eps
+    //  case 2b  022  -x-eps  *  +inf    ->  -inf
+    //  case 2b  027  -x      *  0-eps   ->  0+eps
+    //  case 2b  028  -x      *  0       ->  0
+    //  case 2b  029  -x      *  0+eps   ->  0-eps
+    //  case 2b  030  -x      *  +y-eps  ->  -xy+eps
+    //  case 2b  031  -x      *  +y      ->  -xy
+    //  case 2b  032  -x      *  +y+eps  ->  -xy-eps
+    //  case 2b  033  -x      *  +inf    ->  -inf
+    //  case 2b  038  -x+eps  *  0-eps   ->  0+eps
+    //  case 2b  039  -x+eps  *  0       ->  0
+    //  case 2b  040  -x+eps  *  0+eps   ->  0-eps
+    //  case 2b  041  -x+eps  *  +y-eps  ->  -xy+eps
+    //  case 2b  042  -x+eps  *  +y      ->  -xy+eps
+    //  case 2b  043  -x+eps  *  +y+eps  ->  -xy+eps
+    //  case 2b  044  -x+eps  *  +inf    ->  -inf
+    //  case 2b  049  0-eps   *  0-eps   ->  0+eps
+    //  case 2b  050  0-eps   *  0       ->  0
+    //  case 2b  051  0-eps   *  0+eps   ->  0-eps
+    //  case 2b  052  0-eps   *  +y-eps  ->  0-eps
+    //  case 2b  053  0-eps   *  +y      ->  0-eps
+    //  case 2b  054  0-eps   *  +y+eps  ->  0-eps
+    //  case 2b  055  0-eps   *  +inf    ->  0-eps
+    //  case 2c  045  0-eps   *  -inf    ->  0+eps
+    //  case 2c  046  0-eps   *  -y-eps  ->  0+eps
+    //  case 2c  047  0-eps   *  -y      ->  0+eps
+    //  case 2c  048  0-eps   *  -y+eps  ->  0+eps
+    //  case 2c  056  0       *  -inf    ->  0
+    //  case 2c  057  0       *  -y-eps  ->  0
+    //  case 2c  058  0       *  -y      ->  0
+    //  case 2c  059  0       *  -y+eps  ->  0
+    //  case 2c  060  0       *  0-eps   ->  0
+    //  case 2c  067  0+eps   *  -inf    ->  0-eps
+    //  case 2c  068  0+eps   *  -y-eps  ->  0-eps
+    //  case 2c  069  0+eps   *  -y      ->  0-eps
+    //  case 2c  070  0+eps   *  -y+eps  ->  0-eps
+    //  case 2c  071  0+eps   *  0-eps   ->  0-eps
+    //  case 2c  078  +x-eps  *  -inf    ->  -inf
+    //  case 2c  079  +x-eps  *  -y-eps  ->  -xy+eps
+    //  case 2c  080  +x-eps  *  -y      ->  -xy+eps
+    //  case 2c  081  +x-eps  *  -y+eps  ->  -xy+eps
+    //  case 2c  082  +x-eps  *  0-eps   ->  0-eps
+    //  case 2c  089  +x      *  -inf    ->  -inf
+    //  case 2c  090  +x      *  -y-eps  ->  -xy-eps
+    //  case 2c  091  +x      *  -y      ->  -xy
+    //  case 2c  092  +x      *  -y+eps  ->  -xy+eps
+    //  case 2c  093  +x      *  0-eps   ->  0-eps
+    //  case 2c  100  +x+eps  *  -inf    ->  -inf
+    //  case 2c  101  +x+eps  *  -y-eps  ->  -xy-eps
+    //  case 2c  102  +x+eps  *  -y      ->  -xy-eps
+    //  case 2c  103  +x+eps  *  -y+eps  ->  -xy+eps
+    //  case 2c  104  +x+eps  *  0-eps   ->  0-eps
+    //  case 2c  111  +inf    *  -inf    ->  -inf
+    //  case 2c  112  +inf    *  -y-eps  ->  -inf
+    //  case 2c  113  +inf    *  -y      ->  -inf
+    //  case 2c  114  +inf    *  -y+eps  ->  -inf
+    //  case 2c  115  +inf    *  0-eps   ->  0-eps
+    //  case 2d  062  0       *  0+eps   ->  0
+    //  case 2d  063  0       *  +y-eps  ->  0
+    //  case 2d  064  0       *  +y      ->  0
+    //  case 2d  065  0       *  +y+eps  ->  0
+    //  case 2d  066  0       *  +inf    ->  0
+    //  case 2d  074  0+eps   *  +y-eps  ->  0+eps
+    //  case 2d  075  0+eps   *  +y      ->  0+eps
+    //  case 2d  076  0+eps   *  +y+eps  ->  0+eps
+    //  case 2d  077  0+eps   *  +inf    ->  0+eps
+    //  case 2d  088  +x-eps  *  +inf    ->  +inf
+    //  case 2d  099  +x      *  +inf    ->  +inf
+    //  case 2d  110  +x+eps  *  +inf    ->  +inf
+    //  case 3   061  0       *  0       ->  0
+    //  case 3   072  0+eps   *  0       ->  0
+    //  case 3   083  +x-eps  *  0       ->  0
+    //  case 3   094  +x      *  0       ->  0
+    //  case 3   105  +x+eps  *  0       ->  0
+    //  case 3   116  +inf    *  0       ->  0
+
+
 
 }
 
-// void test_rs_interval_boundary_multiplication() {
+void test_rs_interval_boundary_multiplication() {
 
-//     B el0(0, IB::empty, false);    B el2(2, IB::empty, false);    B el_3(-3, IB::empty, false);
-//     B eu0(0, IB::empty, true);     B eu2(2, IB::empty, true);     B eu_3(-3, IB::empty, true);
-//     B cl0(0, IB::closed, false);   B cl2(2, IB::closed, false);   B cl_3(-3, IB::closed, false);
-//     B cu0(0, IB::closed, true);    B cu2(2, IB::closed, true);    B cu_3(-3, IB::closed, true);
-//     B ol0(0, IB::open, false);     B ol2(2, IB::open, false);     B ol_3(-3, IB::open, false);
-//     B ou0(0, IB::open, true);      B ou2(2, IB::open, true);      B ou_3(-3, IB::open, true);
-//     B ul0(0, IB::unbound, false);  B ul2(2, IB::unbound, false);  B ul_3(-3, IB::unbound, false);
-//     B uu0(0, IB::unbound, true);   B uu2(2, IB::unbound, true);   B uu_3(-3, IB::unbound, true);
+    B em0(0, BT::empty);
+    B mi0(0, BT::minus_infinity);
+    B pi0(0, BT::plus_infinity);
+    B jb2(2, BT::just_below);
+    B cl2(2, BT::closed);
+    B ja2(2, BT::just_above);
+    B jb4(4, BT::just_below);
+    B cl4(4, BT::closed);
+    B ja4(4, BT::just_above);
+    B jb9(9, BT::just_below);
+    B cl9(9, BT::closed);
+    B ja9(9, BT::just_above);
+    B jb_3(-3, BT::just_below);
+    B cl_3(-3, BT::closed);
+    B ja_3(-3, BT::just_above);
+    B jb_6(-6, BT::just_below);
+    B cl_6(-6, BT::closed);
+    B ja_6(-6, BT::just_above);
 
-//     /* C1   lb=0=empty    rb=0=empty    !lu  !ru  v=0*0   */  TEST_EQUAL((el0 * el2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    !lu  !ru  v=0*0   */  TEST_EQUAL((el2 * el2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    !lu  !ru  v=0*0   */  TEST_EQUAL((el_3 * el2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    !lu  ru   v=0*0   */  TEST_EQUAL((el0 * eu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    !lu  ru   v=0*0   */  TEST_EQUAL((el2 * eu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    !lu  ru   v=0*0   */  TEST_EQUAL((el_3 * eu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    lu   !ru  v=0*0   */  TEST_EQUAL((eu0 * el2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    lu   !ru  v=0*0   */  TEST_EQUAL((eu2 * el2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    lu   !ru  v=0*0   */  TEST_EQUAL((eu_3 * el2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=0=empty    lu   ru   v=0*0   */  TEST_EQUAL((eu0 * eu2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=0=empty    lu   ru   v=0*0   */  TEST_EQUAL((eu2 * eu2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=0=empty    lu   ru   v=0*0   */  TEST_EQUAL((eu_3 * eu2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=1=closed   !lu  !ru  v=0*2   */  TEST_EQUAL((el0 * cl2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   !lu  !ru  v=0*2   */  TEST_EQUAL((el2 * cl2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   !lu  !ru  v=0*2   */  TEST_EQUAL((el_3 * cl2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   !lu  ru   v=0*2   */  TEST_EQUAL((el0 * cu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   !lu  ru   v=0*2   */  TEST_EQUAL((el2 * cu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   !lu  ru   v=0*2   */  TEST_EQUAL((el_3 * cu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   lu   !ru  v=0*2   */  TEST_EQUAL((eu0 * cl2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   lu   !ru  v=0*2   */  TEST_EQUAL((eu2 * cl2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   lu   !ru  v=0*2   */  TEST_EQUAL((eu_3 * cl2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=1=closed   lu   ru   v=0*2   */  TEST_EQUAL((eu0 * cu2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=1=closed   lu   ru   v=0*2   */  TEST_EQUAL((eu2 * cu2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=1=closed   lu   ru   v=0*2   */  TEST_EQUAL((eu_3 * cu2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=2=open     !lu  !ru  v=0*2   */  TEST_EQUAL((el0 * ol2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     !lu  !ru  v=0*2   */  TEST_EQUAL((el2 * ol2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     !lu  !ru  v=0*2   */  TEST_EQUAL((el_3 * ol2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     !lu  ru   v=0*2   */  TEST_EQUAL((el0 * ou2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     !lu  ru   v=0*2   */  TEST_EQUAL((el2 * ou2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     !lu  ru   v=0*2   */  TEST_EQUAL((el_3 * ou2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     lu   !ru  v=0*2   */  TEST_EQUAL((eu0 * ol2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     lu   !ru  v=0*2   */  TEST_EQUAL((eu2 * ol2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     lu   !ru  v=0*2   */  TEST_EQUAL((eu_3 * ol2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=2=open     lu   ru   v=0*2   */  TEST_EQUAL((eu0 * ou2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=2=open     lu   ru   v=0*2   */  TEST_EQUAL((eu2 * ou2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=2=open     lu   ru   v=0*2   */  TEST_EQUAL((eu_3 * ou2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=3=unbound  !lu  !ru  v=0*0   */  TEST_EQUAL((el0 * ul2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  !lu  !ru  v=0*0   */  TEST_EQUAL((el2 * ul2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  !lu  !ru  v=0*0   */  TEST_EQUAL((el_3 * ul2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  !lu  ru   v=0*0   */  TEST_EQUAL((el0 * uu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  !lu  ru   v=0*0   */  TEST_EQUAL((el2 * uu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  !lu  ru   v=0*0   */  TEST_EQUAL((el_3 * uu2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  lu   !ru  v=0*0   */  TEST_EQUAL((eu0 * ul2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  lu   !ru  v=0*0   */  TEST_EQUAL((eu2 * ul2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  lu   !ru  v=0*0   */  TEST_EQUAL((eu_3 * ul2).str(), "left empty");
-//     /* C1   lb=0=empty    rb=3=unbound  lu   ru   v=0*0   */  TEST_EQUAL((eu0 * uu2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=3=unbound  lu   ru   v=0*0   */  TEST_EQUAL((eu2 * uu2).str(), "right empty");
-//     /* C1   lb=0=empty    rb=3=unbound  lu   ru   v=0*0   */  TEST_EQUAL((eu_3 * uu2).str(), "right empty");
-//     /* C1   lb=1=closed   rb=0=empty    !lu  !ru  v=-3*0  */  TEST_EQUAL((cl_3 * el2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    !lu  !ru  v=0*0   */  TEST_EQUAL((cl0 * el2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    !lu  !ru  v=2*0   */  TEST_EQUAL((cl2 * el2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    !lu  ru   v=-3*0  */  TEST_EQUAL((cl_3 * eu2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    !lu  ru   v=0*0   */  TEST_EQUAL((cl0 * eu2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    !lu  ru   v=2*0   */  TEST_EQUAL((cl2 * eu2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    lu   !ru  v=-3*0  */  TEST_EQUAL((cu_3 * el2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    lu   !ru  v=0*0   */  TEST_EQUAL((cu0 * el2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    lu   !ru  v=2*0   */  TEST_EQUAL((cu2 * el2).str(), "left empty");
-//     /* C1   lb=1=closed   rb=0=empty    lu   ru   v=-3*0  */  TEST_EQUAL((cu_3 * eu2).str(), "right empty");
-//     /* C1   lb=1=closed   rb=0=empty    lu   ru   v=0*0   */  TEST_EQUAL((cu0 * eu2).str(), "right empty");
-//     /* C1   lb=1=closed   rb=0=empty    lu   ru   v=2*0   */  TEST_EQUAL((cu2 * eu2).str(), "right empty");
-//     /* C1   lb=2=open     rb=0=empty    !lu  !ru  v=-3*0  */  TEST_EQUAL((ol_3 * el2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    !lu  !ru  v=0*0   */  TEST_EQUAL((ol0 * el2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    !lu  !ru  v=2*0   */  TEST_EQUAL((ol2 * el2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    !lu  ru   v=-3*0  */  TEST_EQUAL((ol_3 * eu2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    !lu  ru   v=0*0   */  TEST_EQUAL((ol0 * eu2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    !lu  ru   v=2*0   */  TEST_EQUAL((ol2 * eu2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    lu   !ru  v=-3*0  */  TEST_EQUAL((ou_3 * el2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    lu   !ru  v=0*0   */  TEST_EQUAL((ou0 * el2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    lu   !ru  v=2*0   */  TEST_EQUAL((ou2 * el2).str(), "left empty");
-//     /* C1   lb=2=open     rb=0=empty    lu   ru   v=-3*0  */  TEST_EQUAL((ou_3 * eu2).str(), "right empty");
-//     /* C1   lb=2=open     rb=0=empty    lu   ru   v=0*0   */  TEST_EQUAL((ou0 * eu2).str(), "right empty");
-//     /* C1   lb=2=open     rb=0=empty    lu   ru   v=2*0   */  TEST_EQUAL((ou2 * eu2).str(), "right empty");
-//     /* C1   lb=3=unbound  rb=0=empty    !lu  !ru  v=0*0   */  TEST_EQUAL((ul0 * el2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    !lu  !ru  v=0*0   */  TEST_EQUAL((ul2 * el2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    !lu  !ru  v=0*0   */  TEST_EQUAL((ul_3 * el2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    !lu  ru   v=0*0   */  TEST_EQUAL((ul0 * eu2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    !lu  ru   v=0*0   */  TEST_EQUAL((ul2 * eu2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    !lu  ru   v=0*0   */  TEST_EQUAL((ul_3 * eu2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    lu   !ru  v=0*0   */  TEST_EQUAL((uu0 * el2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    lu   !ru  v=0*0   */  TEST_EQUAL((uu2 * el2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    lu   !ru  v=0*0   */  TEST_EQUAL((uu_3 * el2).str(), "left empty");
-//     /* C1   lb=3=unbound  rb=0=empty    lu   ru   v=0*0   */  TEST_EQUAL((uu0 * eu2).str(), "right empty");
-//     /* C1   lb=3=unbound  rb=0=empty    lu   ru   v=0*0   */  TEST_EQUAL((uu2 * eu2).str(), "right empty");
-//     /* C1   lb=3=unbound  rb=0=empty    lu   ru   v=0*0   */  TEST_EQUAL((uu_3 * eu2).str(), "right empty");
-//     /* C2b  lb=1=closed   rb=1=closed   !lu  !ru  v=0*2   */  TEST_EQUAL((cl0 * cl2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=1=closed   !lu  ru   v=0*2   */  TEST_EQUAL((cl0 * cu2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=1=closed   lu   !ru  v=0*2   */  TEST_EQUAL((cu0 * cl2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=1=closed   lu   ru   v=0*2   */  TEST_EQUAL((cu0 * cu2).str(), "right closed 0");
-//     /* C2b  lb=1=closed   rb=2=open     !lu  !ru  v=0*2   */  TEST_EQUAL((cl0 * ol2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=2=open     !lu  ru   v=0*2   */  TEST_EQUAL((cl0 * ou2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=2=open     lu   !ru  v=0*2   */  TEST_EQUAL((cu0 * ol2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=2=open     lu   ru   v=0*2   */  TEST_EQUAL((cu0 * ou2).str(), "right closed 0");
-//     /* C2b  lb=1=closed   rb=3=unbound  !lu  !ru  v=0*0   */  TEST_EQUAL((cl0 * ul2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=3=unbound  !lu  ru   v=0*0   */  TEST_EQUAL((cl0 * uu2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=3=unbound  lu   !ru  v=0*0   */  TEST_EQUAL((cu0 * ul2).str(), "left closed 0");
-//     /* C2b  lb=1=closed   rb=3=unbound  lu   ru   v=0*0   */  TEST_EQUAL((cu0 * uu2).str(), "right closed 0");
-//     /* C2b  lb=2=open     rb=1=closed   !lu  !ru  v=0*2   */  TEST_EQUAL((ol0 * cl2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=1=closed   !lu  ru   v=0*2   */  TEST_EQUAL((ol0 * cu2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=1=closed   lu   !ru  v=0*2   */  TEST_EQUAL((ou0 * cl2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=1=closed   lu   ru   v=0*2   */  TEST_EQUAL((ou0 * cu2).str(), "right open 0");
-//     /* C2b  lb=2=open     rb=2=open     !lu  !ru  v=0*2   */  TEST_EQUAL((ol0 * ol2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=2=open     !lu  ru   v=0*2   */  TEST_EQUAL((ol0 * ou2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=2=open     lu   !ru  v=0*2   */  TEST_EQUAL((ou0 * ol2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=2=open     lu   ru   v=0*2   */  TEST_EQUAL((ou0 * ou2).str(), "right open 0");
-//     /* C2b  lb=2=open     rb=3=unbound  !lu  !ru  v=0*0   */  TEST_EQUAL((ol0 * ul2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=3=unbound  !lu  ru   v=0*0   */  TEST_EQUAL((ol0 * uu2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=3=unbound  lu   !ru  v=0*0   */  TEST_EQUAL((ou0 * ul2).str(), "left open 0");
-//     /* C2b  lb=2=open     rb=3=unbound  lu   ru   v=0*0   */  TEST_EQUAL((ou0 * uu2).str(), "right open 0");
-//     /* C3   lb=1=closed   rb=3=unbound  !lu  !ru  v=-3*0  */  TEST_EQUAL((cl_3 * ul2).str(), "left unbound");
-//     /* C3   lb=1=closed   rb=3=unbound  !lu  !ru  v=2*0   */  TEST_EQUAL((cl2 * ul2).str(), "left unbound");
-//     /* C3   lb=1=closed   rb=3=unbound  !lu  ru   v=-3*0  */  TEST_EQUAL((cl_3 * uu2).str(), "left unbound");
-//     /* C3   lb=1=closed   rb=3=unbound  !lu  ru   v=2*0   */  TEST_EQUAL((cl2 * uu2).str(), "left unbound");
-//     /* C3   lb=1=closed   rb=3=unbound  lu   !ru  v=-3*0  */  TEST_EQUAL((cu_3 * ul2).str(), "left unbound");
-//     /* C3   lb=1=closed   rb=3=unbound  lu   !ru  v=2*0   */  TEST_EQUAL((cu2 * ul2).str(), "left unbound");
-//     /* C3   lb=1=closed   rb=3=unbound  lu   ru   v=-3*0  */  TEST_EQUAL((cu_3 * uu2).str(), "right unbound");
-//     /* C3   lb=1=closed   rb=3=unbound  lu   ru   v=2*0   */  TEST_EQUAL((cu2 * uu2).str(), "right unbound");
-//     /* C3   lb=2=open     rb=3=unbound  !lu  !ru  v=-3*0  */  TEST_EQUAL((ol_3 * ul2).str(), "left unbound");
-//     /* C3   lb=2=open     rb=3=unbound  !lu  !ru  v=2*0   */  TEST_EQUAL((ol2 * ul2).str(), "left unbound");
-//     /* C3   lb=2=open     rb=3=unbound  !lu  ru   v=-3*0  */  TEST_EQUAL((ol_3 * uu2).str(), "left unbound");
-//     /* C3   lb=2=open     rb=3=unbound  !lu  ru   v=2*0   */  TEST_EQUAL((ol2 * uu2).str(), "left unbound");
-//     /* C3   lb=2=open     rb=3=unbound  lu   !ru  v=-3*0  */  TEST_EQUAL((ou_3 * ul2).str(), "left unbound");
-//     /* C3   lb=2=open     rb=3=unbound  lu   !ru  v=2*0   */  TEST_EQUAL((ou2 * ul2).str(), "left unbound");
-//     /* C3   lb=2=open     rb=3=unbound  lu   ru   v=-3*0  */  TEST_EQUAL((ou_3 * uu2).str(), "right unbound");
-//     /* C3   lb=2=open     rb=3=unbound  lu   ru   v=2*0   */  TEST_EQUAL((ou2 * uu2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   !lu  !ru  v=0*2   */  TEST_EQUAL((ul0 * cl2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   !lu  !ru  v=0*2   */  TEST_EQUAL((ul2 * cl2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   !lu  !ru  v=0*2   */  TEST_EQUAL((ul_3 * cl2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   !lu  ru   v=0*2   */  TEST_EQUAL((ul0 * cu2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   !lu  ru   v=0*2   */  TEST_EQUAL((ul2 * cu2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   !lu  ru   v=0*2   */  TEST_EQUAL((ul_3 * cu2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   lu   !ru  v=0*2   */  TEST_EQUAL((uu0 * cl2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   lu   !ru  v=0*2   */  TEST_EQUAL((uu2 * cl2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   lu   !ru  v=0*2   */  TEST_EQUAL((uu_3 * cl2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   lu   ru   v=0*2   */  TEST_EQUAL((uu0 * cu2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   lu   ru   v=0*2   */  TEST_EQUAL((uu2 * cu2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=1=closed   lu   ru   v=0*2   */  TEST_EQUAL((uu_3 * cu2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=2=open     !lu  !ru  v=0*2   */  TEST_EQUAL((ul0 * ol2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     !lu  !ru  v=0*2   */  TEST_EQUAL((ul2 * ol2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     !lu  !ru  v=0*2   */  TEST_EQUAL((ul_3 * ol2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     !lu  ru   v=0*2   */  TEST_EQUAL((ul0 * ou2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     !lu  ru   v=0*2   */  TEST_EQUAL((ul2 * ou2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     !lu  ru   v=0*2   */  TEST_EQUAL((ul_3 * ou2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     lu   !ru  v=0*2   */  TEST_EQUAL((uu0 * ol2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     lu   !ru  v=0*2   */  TEST_EQUAL((uu2 * ol2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     lu   !ru  v=0*2   */  TEST_EQUAL((uu_3 * ol2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=2=open     lu   ru   v=0*2   */  TEST_EQUAL((uu0 * ou2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=2=open     lu   ru   v=0*2   */  TEST_EQUAL((uu2 * ou2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=2=open     lu   ru   v=0*2   */  TEST_EQUAL((uu_3 * ou2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  !lu  !ru  v=0*0   */  TEST_EQUAL((ul0 * ul2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  !lu  !ru  v=0*0   */  TEST_EQUAL((ul2 * ul2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  !lu  !ru  v=0*0   */  TEST_EQUAL((ul_3 * ul2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  !lu  ru   v=0*0   */  TEST_EQUAL((ul0 * uu2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  !lu  ru   v=0*0   */  TEST_EQUAL((ul2 * uu2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  !lu  ru   v=0*0   */  TEST_EQUAL((ul_3 * uu2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  lu   !ru  v=0*0   */  TEST_EQUAL((uu0 * ul2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  lu   !ru  v=0*0   */  TEST_EQUAL((uu2 * ul2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  lu   !ru  v=0*0   */  TEST_EQUAL((uu_3 * ul2).str(), "left unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  lu   ru   v=0*0   */  TEST_EQUAL((uu0 * uu2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  lu   ru   v=0*0   */  TEST_EQUAL((uu2 * uu2).str(), "right unbound");
-//     /* C3   lb=3=unbound  rb=3=unbound  lu   ru   v=0*0   */  TEST_EQUAL((uu_3 * uu2).str(), "right unbound");
-//     /* C4   lb=1=closed   rb=1=closed   !lu  !ru  v=-3*2  */  TEST_EQUAL((cl_3 * cl2).str(), "left closed -6");
-//     /* C4   lb=1=closed   rb=1=closed   !lu  !ru  v=2*2   */  TEST_EQUAL((cl2 * cl2).str(), "left closed 4");
-//     /* C4   lb=1=closed   rb=1=closed   !lu  ru   v=-3*2  */  TEST_EQUAL((cl_3 * cu2).str(), "left closed -6");
-//     /* C4   lb=1=closed   rb=1=closed   !lu  ru   v=2*2   */  TEST_EQUAL((cl2 * cu2).str(), "left closed 4");
-//     /* C4   lb=1=closed   rb=1=closed   lu   !ru  v=-3*2  */  TEST_EQUAL((cu_3 * cl2).str(), "left closed -6");
-//     /* C4   lb=1=closed   rb=1=closed   lu   !ru  v=2*2   */  TEST_EQUAL((cu2 * cl2).str(), "left closed 4");
-//     /* C4   lb=1=closed   rb=1=closed   lu   ru   v=-3*2  */  TEST_EQUAL((cu_3 * cu2).str(), "right closed -6");
-//     /* C4   lb=1=closed   rb=1=closed   lu   ru   v=2*2   */  TEST_EQUAL((cu2 * cu2).str(), "right closed 4");
-//     /* C4   lb=1=closed   rb=2=open     !lu  !ru  v=-3*2  */  TEST_EQUAL((cl_3 * ol2).str(), "left open -6");
-//     /* C4   lb=1=closed   rb=2=open     !lu  !ru  v=2*2   */  TEST_EQUAL((cl2 * ol2).str(), "left open 4");
-//     /* C4   lb=1=closed   rb=2=open     !lu  ru   v=-3*2  */  TEST_EQUAL((cl_3 * ou2).str(), "left open -6");
-//     /* C4   lb=1=closed   rb=2=open     !lu  ru   v=2*2   */  TEST_EQUAL((cl2 * ou2).str(), "left open 4");
-//     /* C4   lb=1=closed   rb=2=open     lu   !ru  v=-3*2  */  TEST_EQUAL((cu_3 * ol2).str(), "left open -6");
-//     /* C4   lb=1=closed   rb=2=open     lu   !ru  v=2*2   */  TEST_EQUAL((cu2 * ol2).str(), "left open 4");
-//     /* C4   lb=1=closed   rb=2=open     lu   ru   v=-3*2  */  TEST_EQUAL((cu_3 * ou2).str(), "right open -6");
-//     /* C4   lb=1=closed   rb=2=open     lu   ru   v=2*2   */  TEST_EQUAL((cu2 * ou2).str(), "right open 4");
-//     /* C4   lb=2=open     rb=1=closed   !lu  !ru  v=-3*2  */  TEST_EQUAL((ol_3 * cl2).str(), "left open -6");
-//     /* C4   lb=2=open     rb=1=closed   !lu  !ru  v=2*2   */  TEST_EQUAL((ol2 * cl2).str(), "left open 4");
-//     /* C4   lb=2=open     rb=1=closed   !lu  ru   v=-3*2  */  TEST_EQUAL((ol_3 * cu2).str(), "left open -6");
-//     /* C4   lb=2=open     rb=1=closed   !lu  ru   v=2*2   */  TEST_EQUAL((ol2 * cu2).str(), "left open 4");
-//     /* C4   lb=2=open     rb=1=closed   lu   !ru  v=-3*2  */  TEST_EQUAL((ou_3 * cl2).str(), "left open -6");
-//     /* C4   lb=2=open     rb=1=closed   lu   !ru  v=2*2   */  TEST_EQUAL((ou2 * cl2).str(), "left open 4");
-//     /* C4   lb=2=open     rb=1=closed   lu   ru   v=-3*2  */  TEST_EQUAL((ou_3 * cu2).str(), "right open -6");
-//     /* C4   lb=2=open     rb=1=closed   lu   ru   v=2*2   */  TEST_EQUAL((ou2 * cu2).str(), "right open 4");
-//     /* C4   lb=2=open     rb=2=open     !lu  !ru  v=-3*2  */  TEST_EQUAL((ol_3 * ol2).str(), "left open -6");
-//     /* C4   lb=2=open     rb=2=open     !lu  !ru  v=2*2   */  TEST_EQUAL((ol2 * ol2).str(), "left open 4");
-//     /* C4   lb=2=open     rb=2=open     !lu  ru   v=-3*2  */  TEST_EQUAL((ol_3 * ou2).str(), "left open -6");
-//     /* C4   lb=2=open     rb=2=open     !lu  ru   v=2*2   */  TEST_EQUAL((ol2 * ou2).str(), "left open 4");
-//     /* C4   lb=2=open     rb=2=open     lu   !ru  v=-3*2  */  TEST_EQUAL((ou_3 * ol2).str(), "left open -6");
-//     /* C4   lb=2=open     rb=2=open     lu   !ru  v=2*2   */  TEST_EQUAL((ou2 * ol2).str(), "left open 4");
-//     /* C4   lb=2=open     rb=2=open     lu   ru   v=-3*2  */  TEST_EQUAL((ou_3 * ou2).str(), "right open -6");
-//     /* C4   lb=2=open     rb=2=open     lu   ru   v=2*2   */  TEST_EQUAL((ou2 * ou2).str(), "right open 4");
+    // TODO
 
-// }
+}

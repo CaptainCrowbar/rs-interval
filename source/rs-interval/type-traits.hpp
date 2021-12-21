@@ -257,9 +257,19 @@ namespace RS::Intervals {
             template <typename T>
             std::string Boundary<T>::str() const {
                 using namespace RS::Format;
-                auto s = to_string(type);
-                if (has_value())
-                    s += " " + format_object(value);
+                using BT = BoundaryType;
+                switch (type) {
+                    case BT::empty:           return "{}";
+                    case BT::minus_infinity:  return "-inf";
+                    case BT::plus_infinity:   return "+inf";
+                    default:                  break;
+                }
+                auto s = RS::Format::format_object(value);
+                switch (type) {
+                    case BT::just_below:  s += "-eps"; break;
+                    case BT::just_above:  s += "+eps"; break;
+                    default:              break;
+                }
                 return s;
             }
 

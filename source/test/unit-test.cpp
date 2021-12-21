@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_interval_boundary_subtraction)
 
     // interval-boundary-multiplication-test.cpp
+    UNIT_TEST(rs_interval_boundary_multiplication)
 
     // ordered-basic-test.cpp
     UNIT_TEST(rs_ordered_interval_basic_properties)

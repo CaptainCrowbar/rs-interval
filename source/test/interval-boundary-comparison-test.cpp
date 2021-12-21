@@ -12,12 +12,12 @@ void test_rs_interval_boundary_formatting() {
 
     B b;
 
-    TRY((b = {42, BT::empty}));           TEST_EQUAL(b.str(), "empty");
-    TRY((b = {42, BT::minus_infinity}));  TEST_EQUAL(b.str(), "minus_infinity");
-    TRY((b = {42, BT::just_below}));      TEST_EQUAL(b.str(), "just_below 42");
-    TRY((b = {42, BT::closed}));          TEST_EQUAL(b.str(), "closed 42");
-    TRY((b = {42, BT::just_above}));      TEST_EQUAL(b.str(), "just_above 42");
-    TRY((b = {42, BT::plus_infinity}));   TEST_EQUAL(b.str(), "plus_infinity");
+    TRY((b = {42, BT::empty}));           TEST_EQUAL(b.str(), "{}");
+    TRY((b = {42, BT::minus_infinity}));  TEST_EQUAL(b.str(), "-inf");
+    TRY((b = {42, BT::just_below}));      TEST_EQUAL(b.str(), "42-eps");
+    TRY((b = {42, BT::closed}));          TEST_EQUAL(b.str(), "42");
+    TRY((b = {42, BT::just_above}));      TEST_EQUAL(b.str(), "42+eps");
+    TRY((b = {42, BT::plus_infinity}));   TEST_EQUAL(b.str(), "+inf");
 
 }
 
