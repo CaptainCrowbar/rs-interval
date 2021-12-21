@@ -9,14 +9,15 @@ int main(int argc, char** argv) {
 
     // interval-boundary-comparison-test.cpp
     UNIT_TEST(rs_interval_boundary_formatting)
+    UNIT_TEST(rs_interval_boundary_adjacency)
     UNIT_TEST(rs_interval_boundary_comparison)
 
     // interval-boundary-addition-test.cpp
+    UNIT_TEST(rs_interval_boundary_inversion)
     UNIT_TEST(rs_interval_boundary_addition)
     UNIT_TEST(rs_interval_boundary_subtraction)
 
     // interval-boundary-multiplication-test.cpp
-    UNIT_TEST(rs_interval_boundary_multiplication)
 
     // ordered-basic-test.cpp
     UNIT_TEST(rs_ordered_interval_basic_properties)

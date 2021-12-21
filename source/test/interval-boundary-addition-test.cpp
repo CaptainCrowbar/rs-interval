@@ -4,97 +4,121 @@
 using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
 
-using B = Boundary<int>;
-using IB = IntervalBound;
+using B = Boundary<double>;
+using BT = BoundaryType;
+
+void test_rs_interval_boundary_inversion() {
+
+    B em0(0, BT::empty);
+    B mi0(0, BT::minus_infinity);
+    B pi0(0, BT::plus_infinity);
+    B jb2(2, BT::just_below);
+    B cl2(2, BT::closed);
+    B ja2(2, BT::just_above);
+    B jb_2(-2, BT::just_below);
+    B cl_2(-2, BT::closed);
+    B ja_2(-2, BT::just_above);
+
+    TEST_EQUAL(- em0, em0);
+    TEST_EQUAL(- mi0, pi0);
+    TEST_EQUAL(- pi0, mi0);
+    TEST_EQUAL(- jb2, ja_2);
+    TEST_EQUAL(- cl2, cl_2);
+    TEST_EQUAL(- ja2, jb_2);
+    TEST_EQUAL(- jb_2, ja2);
+    TEST_EQUAL(- cl_2, cl2);
+    TEST_EQUAL(- ja_2, jb2);
+
+}
 
 void test_rs_interval_boundary_addition() {
 
-    B el1(1, IB::empty, false);    B el2(2, IB::empty, false);
-    B eu1(1, IB::empty, true);     B eu2(2, IB::empty, true);
-    B cl1(1, IB::closed, false);   B cl2(2, IB::closed, false);
-    B cu1(1, IB::closed, true);    B cu2(2, IB::closed, true);
-    B ol1(1, IB::open, false);     B ol2(2, IB::open, false);
-    B ou1(1, IB::open, true);      B ou2(2, IB::open, true);
-    B ul1(1, IB::unbound, false);  B ul2(2, IB::unbound, false);
-    B uu1(1, IB::unbound, true);   B uu2(2, IB::unbound, true);
+    B em0(0, BT::empty);
+    B mi0(0, BT::minus_infinity);
+    B pi0(0, BT::plus_infinity);
+    B jb1(1, BT::just_below);
+    B cl1(1, BT::closed);
+    B ja1(1, BT::just_above);
+    B jb2(2, BT::just_below);
+    B cl2(2, BT::closed);
+    B ja2(2, BT::just_above);
+    B jb3(3, BT::just_below);
+    B cl3(3, BT::closed);
+    B ja3(3, BT::just_above);
 
-    /* lb=0=empty    rb=0=empty    !lu  !ru  */  TEST_EQUAL((el1 + el2).str(), "left empty");
-    /* lb=0=empty    rb=0=empty    lu   ru   */  TEST_EQUAL((eu1 + eu2).str(), "right empty");
-    /* lb=0=empty    rb=1=closed   !lu  !ru  */  TEST_EQUAL((el1 + cl2).str(), "left empty");
-    /* lb=0=empty    rb=1=closed   lu   ru   */  TEST_EQUAL((eu1 + cu2).str(), "right empty");
-    /* lb=0=empty    rb=2=open     !lu  !ru  */  TEST_EQUAL((el1 + ol2).str(), "left empty");
-    /* lb=0=empty    rb=2=open     lu   ru   */  TEST_EQUAL((eu1 + ou2).str(), "right empty");
-    /* lb=0=empty    rb=3=unbound  !lu  !ru  */  TEST_EQUAL((el1 + ul2).str(), "left empty");
-    /* lb=0=empty    rb=3=unbound  lu   ru   */  TEST_EQUAL((eu1 + uu2).str(), "right empty");
-    /* lb=1=closed   rb=0=empty    !lu  !ru  */  TEST_EQUAL((cl1 + el2).str(), "left empty");
-    /* lb=1=closed   rb=0=empty    lu   ru   */  TEST_EQUAL((cu1 + eu2).str(), "right empty");
-    /* lb=1=closed   rb=1=closed   !lu  !ru  */  TEST_EQUAL((cl1 + cl2).str(), "left closed 3");
-    /* lb=1=closed   rb=1=closed   lu   ru   */  TEST_EQUAL((cu1 + cu2).str(), "right closed 3");
-    /* lb=1=closed   rb=2=open     !lu  !ru  */  TEST_EQUAL((cl1 + ol2).str(), "left open 3");
-    /* lb=1=closed   rb=2=open     lu   ru   */  TEST_EQUAL((cu1 + ou2).str(), "right open 3");
-    /* lb=1=closed   rb=3=unbound  !lu  !ru  */  TEST_EQUAL((cl1 + ul2).str(), "left unbound");
-    /* lb=1=closed   rb=3=unbound  lu   ru   */  TEST_EQUAL((cu1 + uu2).str(), "right unbound");
-    /* lb=2=open     rb=0=empty    !lu  !ru  */  TEST_EQUAL((ol1 + el2).str(), "left empty");
-    /* lb=2=open     rb=0=empty    lu   ru   */  TEST_EQUAL((ou1 + eu2).str(), "right empty");
-    /* lb=2=open     rb=1=closed   !lu  !ru  */  TEST_EQUAL((ol1 + cl2).str(), "left open 3");
-    /* lb=2=open     rb=1=closed   lu   ru   */  TEST_EQUAL((ou1 + cu2).str(), "right open 3");
-    /* lb=2=open     rb=2=open     !lu  !ru  */  TEST_EQUAL((ol1 + ol2).str(), "left open 3");
-    /* lb=2=open     rb=2=open     lu   ru   */  TEST_EQUAL((ou1 + ou2).str(), "right open 3");
-    /* lb=2=open     rb=3=unbound  !lu  !ru  */  TEST_EQUAL((ol1 + ul2).str(), "left unbound");
-    /* lb=2=open     rb=3=unbound  lu   ru   */  TEST_EQUAL((ou1 + uu2).str(), "right unbound");
-    /* lb=3=unbound  rb=0=empty    !lu  !ru  */  TEST_EQUAL((ul1 + el2).str(), "left empty");
-    /* lb=3=unbound  rb=0=empty    lu   ru   */  TEST_EQUAL((uu1 + eu2).str(), "right empty");
-    /* lb=3=unbound  rb=1=closed   !lu  !ru  */  TEST_EQUAL((ul1 + cl2).str(), "left unbound");
-    /* lb=3=unbound  rb=1=closed   lu   ru   */  TEST_EQUAL((uu1 + cu2).str(), "right unbound");
-    /* lb=3=unbound  rb=2=open     !lu  !ru  */  TEST_EQUAL((ul1 + ol2).str(), "left unbound");
-    /* lb=3=unbound  rb=2=open     lu   ru   */  TEST_EQUAL((uu1 + ou2).str(), "right unbound");
-    /* lb=3=unbound  rb=3=unbound  !lu  !ru  */  TEST_EQUAL((ul1 + ul2).str(), "left unbound");
-    /* lb=3=unbound  rb=3=unbound  lu   ru   */  TEST_EQUAL((uu1 + uu2).str(), "right unbound");
+    TEST_EQUAL(em0 + em0, em0);
+    TEST_EQUAL(em0 + mi0, em0);
+    TEST_EQUAL(em0 + pi0, em0);
+    TEST_EQUAL(em0 + jb2, em0);
+    TEST_EQUAL(em0 + cl2, em0);
+    TEST_EQUAL(em0 + ja2, em0);
+    TEST_EQUAL(mi0 + em0, em0);
+    TEST_EQUAL(mi0 + mi0, mi0);
+    TEST_EQUAL(mi0 + cl2, mi0);
+    TEST_EQUAL(mi0 + ja2, mi0);
+    TEST_EQUAL(pi0 + em0, em0);
+    TEST_EQUAL(pi0 + pi0, pi0);
+    TEST_EQUAL(pi0 + jb2, pi0);
+    TEST_EQUAL(pi0 + cl2, pi0);
+    TEST_EQUAL(jb1 + em0, em0);
+    TEST_EQUAL(jb1 + pi0, pi0);
+    TEST_EQUAL(jb1 + jb2, jb3);
+    TEST_EQUAL(jb1 + cl2, jb3);
+    TEST_EQUAL(cl1 + em0, em0);
+    TEST_EQUAL(cl1 + mi0, mi0);
+    TEST_EQUAL(cl1 + pi0, pi0);
+    TEST_EQUAL(cl1 + jb2, jb3);
+    TEST_EQUAL(cl1 + cl2, cl3);
+    TEST_EQUAL(cl1 + ja2, ja3);
+    TEST_EQUAL(ja1 + em0, em0);
+    TEST_EQUAL(ja1 + mi0, mi0);
+    TEST_EQUAL(ja1 + cl2, ja3);
+    TEST_EQUAL(ja1 + ja2, ja3);
 
 }
 
 void test_rs_interval_boundary_subtraction() {
 
-    B el1(1, IB::empty, false);    B el2(2, IB::empty, false);
-    B eu1(1, IB::empty, true);     B eu2(2, IB::empty, true);
-    B cl1(1, IB::closed, false);   B cl2(2, IB::closed, false);
-    B cu1(1, IB::closed, true);    B cu2(2, IB::closed, true);
-    B ol1(1, IB::open, false);     B ol2(2, IB::open, false);
-    B ou1(1, IB::open, true);      B ou2(2, IB::open, true);
-    B ul1(1, IB::unbound, false);  B ul2(2, IB::unbound, false);
-    B uu1(1, IB::unbound, true);   B uu2(2, IB::unbound, true);
+    B em0(0, BT::empty);
+    B mi0(0, BT::minus_infinity);
+    B pi0(0, BT::plus_infinity);
+    B jb1(1, BT::just_below);
+    B cl1(1, BT::closed);
+    B ja1(1, BT::just_above);
+    B jb2(2, BT::just_below);
+    B cl2(2, BT::closed);
+    B ja2(2, BT::just_above);
+    B jb3(3, BT::just_below);
+    B cl3(3, BT::closed);
+    B ja3(3, BT::just_above);
 
-    /* lb=0=empty    rb=0=empty    !lu  ru   */  TEST_EQUAL((el1 - el2).str(), "left empty");
-    /* lb=0=empty    rb=0=empty    lu   !ru  */  TEST_EQUAL((eu1 - eu2).str(), "right empty");
-    /* lb=0=empty    rb=1=closed   !lu  ru   */  TEST_EQUAL((el1 - cl2).str(), "left empty");
-    /* lb=0=empty    rb=1=closed   lu   !ru  */  TEST_EQUAL((eu1 - cu2).str(), "right empty");
-    /* lb=0=empty    rb=2=open     !lu  ru   */  TEST_EQUAL((el1 - ol2).str(), "left empty");
-    /* lb=0=empty    rb=2=open     lu   !ru  */  TEST_EQUAL((eu1 - ou2).str(), "right empty");
-    /* lb=0=empty    rb=3=unbound  !lu  ru   */  TEST_EQUAL((el1 - ul2).str(), "left empty");
-    /* lb=0=empty    rb=3=unbound  lu   !ru  */  TEST_EQUAL((eu1 - uu2).str(), "right empty");
-    /* lb=1=closed   rb=0=empty    !lu  ru   */  TEST_EQUAL((cl1 - el2).str(), "left empty");
-    /* lb=1=closed   rb=0=empty    lu   !ru  */  TEST_EQUAL((cu1 - eu2).str(), "right empty");
-    /* lb=1=closed   rb=1=closed   !lu  ru   */  TEST_EQUAL((cl1 - cl2).str(), "left closed -1");
-    /* lb=1=closed   rb=1=closed   lu   !ru  */  TEST_EQUAL((cu1 - cu2).str(), "right closed -1");
-    /* lb=1=closed   rb=2=open     !lu  ru   */  TEST_EQUAL((cl1 - ol2).str(), "left open -1");
-    /* lb=1=closed   rb=2=open     lu   !ru  */  TEST_EQUAL((cu1 - ou2).str(), "right open -1");
-    /* lb=1=closed   rb=3=unbound  !lu  ru   */  TEST_EQUAL((cl1 - ul2).str(), "left unbound");
-    /* lb=1=closed   rb=3=unbound  lu   !ru  */  TEST_EQUAL((cu1 - uu2).str(), "right unbound");
-    /* lb=2=open     rb=0=empty    !lu  ru   */  TEST_EQUAL((ol1 - el2).str(), "left empty");
-    /* lb=2=open     rb=0=empty    lu   !ru  */  TEST_EQUAL((ou1 - eu2).str(), "right empty");
-    /* lb=2=open     rb=1=closed   !lu  ru   */  TEST_EQUAL((ol1 - cl2).str(), "left open -1");
-    /* lb=2=open     rb=1=closed   lu   !ru  */  TEST_EQUAL((ou1 - cu2).str(), "right open -1");
-    /* lb=2=open     rb=2=open     !lu  ru   */  TEST_EQUAL((ol1 - ol2).str(), "left open -1");
-    /* lb=2=open     rb=2=open     lu   !ru  */  TEST_EQUAL((ou1 - ou2).str(), "right open -1");
-    /* lb=2=open     rb=3=unbound  !lu  ru   */  TEST_EQUAL((ol1 - ul2).str(), "left unbound");
-    /* lb=2=open     rb=3=unbound  lu   !ru  */  TEST_EQUAL((ou1 - uu2).str(), "right unbound");
-    /* lb=3=unbound  rb=0=empty    !lu  ru   */  TEST_EQUAL((ul1 - el2).str(), "left empty");
-    /* lb=3=unbound  rb=0=empty    lu   !ru  */  TEST_EQUAL((uu1 - eu2).str(), "right empty");
-    /* lb=3=unbound  rb=1=closed   !lu  ru   */  TEST_EQUAL((ul1 - cl2).str(), "left unbound");
-    /* lb=3=unbound  rb=1=closed   lu   !ru  */  TEST_EQUAL((uu1 - cu2).str(), "right unbound");
-    /* lb=3=unbound  rb=2=open     !lu  ru   */  TEST_EQUAL((ul1 - ol2).str(), "left unbound");
-    /* lb=3=unbound  rb=2=open     lu   !ru  */  TEST_EQUAL((uu1 - ou2).str(), "right unbound");
-    /* lb=3=unbound  rb=3=unbound  !lu  ru   */  TEST_EQUAL((ul1 - ul2).str(), "left unbound");
-    /* lb=3=unbound  rb=3=unbound  lu   !ru  */  TEST_EQUAL((uu1 - uu2).str(), "right unbound");
+    TEST_EQUAL(em0 - em0, em0);
+    TEST_EQUAL(em0 - mi0, em0);
+    TEST_EQUAL(em0 - pi0, em0);
+    TEST_EQUAL(em0 - jb2, em0);
+    TEST_EQUAL(em0 - cl2, em0);
+    TEST_EQUAL(em0 - ja2, em0);
+    TEST_EQUAL(mi0 - em0, em0);
+    TEST_EQUAL(mi0 - pi0, mi0);
+    TEST_EQUAL(mi0 - jb2, mi0);
+    TEST_EQUAL(mi0 - cl2, mi0);
+    TEST_EQUAL(pi0 - em0, em0);
+    TEST_EQUAL(pi0 - mi0, pi0);
+    TEST_EQUAL(pi0 - cl2, pi0);
+    TEST_EQUAL(pi0 - ja2, pi0);
+    TEST_EQUAL(jb3 - em0, em0);
+    TEST_EQUAL(jb3 - mi0, pi0);
+    TEST_EQUAL(jb3 - cl2, jb1);
+    TEST_EQUAL(jb3 - ja2, jb1);
+    TEST_EQUAL(cl3 - em0, em0);
+    TEST_EQUAL(cl3 - mi0, pi0);
+    TEST_EQUAL(cl3 - pi0, mi0);
+    TEST_EQUAL(cl3 - jb2, ja1);
+    TEST_EQUAL(cl3 - cl2, cl1);
+    TEST_EQUAL(cl3 - ja2, jb1);
+    TEST_EQUAL(ja3 - em0, em0);
+    TEST_EQUAL(ja3 - pi0, mi0);
+    TEST_EQUAL(ja3 - jb2, ja1);
+    TEST_EQUAL(ja3 - cl2, ja1);
 
 }

@@ -72,17 +72,48 @@ namespace RS::Intervals {
 
         template <typename T>
         Boundary<T> left_of(const IntervalTypeBase<T>& i) {
-            return {i.min(), i.left(), false};
+            using BT = BoundaryType;
+            if (i.empty())
+                return {{}, BT::empty};
+            else if (i.is_left_closed())
+                return {i.min(), BT::closed};
+            else if (i.is_left_open())
+                return {i.min(), BT::just_above};
+            else
+                return {{}, BT::minus_infinity};
         }
 
         template <typename T>
         Boundary<T> right_of(const IntervalTypeBase<T>& i) {
-            return {i.max(), i.right(), true};
+            using BT = BoundaryType;
+            if (i.empty())
+                return {{}, BT::empty};
+            else if (i.is_right_closed())
+                return {i.max(), BT::closed};
+            else if (i.is_right_open())
+                return {i.max(), BT::just_below};
+            else
+                return {{}, BT::plus_infinity};
         }
 
         template <typename T>
         Interval<T> from_bounds(const Boundary<T>& l, const Boundary<T>& r) {
-            return {l.value, r.value, l.bound, r.bound};
+            using BT = BoundaryType;
+            using IB = IntervalBound;
+            IB lbound, rbound;
+            switch (l.type) {
+                case BT::empty:           lbound = IB::empty; break;
+                case BT::just_above:      lbound = IB::open; break;
+                case BT::minus_infinity:  lbound = IB::unbound; break;
+                default:                  lbound = IB::closed; break;
+            }
+            switch (r.type) {
+                case BT::empty:          rbound = IB::empty; break;
+                case BT::just_below:     rbound = IB::open; break;
+                case BT::plus_infinity:  rbound = IB::unbound; break;
+                default:                 rbound = IB::closed; break;
+            }
+            return {l.value, r.value, lbound, rbound};
         }
 
     }
@@ -400,9 +431,8 @@ namespace RS::Intervals {
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
         IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::add_intervals(const IntervalType& a, const IntervalType& b) {
-            using BT = Detail::Boundary<T>;
-            BT l = left_of(a) + left_of(b);
-            BT r = right_of(a) + right_of(b);
+            auto l = left_of(a) + left_of(b);
+            auto r = right_of(a) + right_of(b);
             return from_bounds(l, r);
         }
 
@@ -411,52 +441,52 @@ namespace RS::Intervals {
             return add_intervals(a, negative_interval(b));
         }
 
-        template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
+        // template <typename IntervalType, typename T, IntervalCategory Cat>
+        // IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
 
-            // TODO
+        //     // TODO
 
-            using BT = Detail::Boundary<T>;
+        //     using BT = Detail::Boundary<T>;
 
-            std::cout << "==> " << a << " " << b << "\n";
+        //     std::cout << "==> " << a << " " << b << "\n";
 
-            BT la = left_of(a);
-            BT ra = right_of(a);
-            BT lb = left_of(b);
-            BT rb = right_of(b);
+        //     BT la = left_of(a);
+        //     BT ra = right_of(a);
+        //     BT lb = left_of(b);
+        //     BT rb = right_of(b);
 
-            std::cout << "... la=" << la.str() << ", ra=" << ra.str() << ", lb=" << lb.str() << ", rb=" << rb.str() << "\n";
+        //     std::cout << "... la=" << la.str() << ", ra=" << ra.str() << ", lb=" << lb.str() << ", rb=" << rb.str() << "\n";
 
-            std::array<BT, 4> bs;
-            bs[0] = la * lb;
-            bs[1] = la * rb;
-            bs[2] = ra * lb;
-            bs[3] = ra * rb;
+        //     std::array<BT, 4> bs;
+        //     bs[0] = la * lb;
+        //     bs[1] = la * rb;
+        //     bs[2] = ra * lb;
+        //     bs[3] = ra * rb;
 
-            std::cout << "...";
-            for (auto& b: bs) std::cout << " " << b.str() << ";";
-            std::cout << "\n";
+        //     std::cout << "...";
+        //     for (auto& b: bs) std::cout << " " << b.str() << ";";
+        //     std::cout << "\n";
 
-            BT l = *std::min_element(bs.begin(), bs.end());
-            BT r = *std::max_element(bs.begin(), bs.end());
+        //     BT l = *std::min_element(bs.begin(), bs.end());
+        //     BT r = *std::max_element(bs.begin(), bs.end());
 
-            std::cout << "... l=" << l.str() << ", r=" << r.str() << "\n";
+        //     std::cout << "... l=" << l.str() << ", r=" << r.str() << "\n";
 
-            auto result = from_bounds(l, r);
+        //     auto result = from_bounds(l, r);
 
-            std::cout << "... " << result << "\n";
+        //     std::cout << "... " << result << "\n";
 
-            return result;
+        //     return result;
 
-        }
+        // }
 
-        template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::divide_intervals(const IntervalType& a, const IntervalType& b) {
-            // TODO
-            (void)a;
-            (void)b;
-            return {};
-        }
+        // template <typename IntervalType, typename T, IntervalCategory Cat>
+        // IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::divide_intervals(const IntervalType& a, const IntervalType& b) {
+        //     // TODO
+        //     (void)a;
+        //     (void)b;
+        //     return {};
+        // }
 
     template <typename IntervalType, typename T>
     class IntervalArithmeticBase<IntervalType, T, IntervalCategory::ordered> {};
@@ -558,12 +588,12 @@ namespace RS::Intervals {
             BT br = right_of(b);
 
             if (ar < bl) {
-                if (BT::adjacent(ar, bl))
+                if (ar.adjacent(bl))
                     return IntervalOrder::a_touches_b;
                 else
                     return IntervalOrder::a_below_b;
             } else if (br < al) {
-                if (BT::adjacent(br, al))
+                if (br.adjacent(al))
                     return IntervalOrder::b_touches_a;
                 else
                     return IntervalOrder::b_below_a;

@@ -3,6 +3,7 @@
 #include "rs-format/enum.hpp"
 #include "rs-format/format.hpp"
 #include <algorithm>
+#include <cstdlib>
 #include <limits>
 #include <ostream>
 #include <string>
@@ -179,109 +180,127 @@ namespace RS::Intervals {
 
     namespace Detail {
 
-        constexpr bool is_bounded(IntervalBound b) noexcept {
-            using IB = IntervalBound;
-            return b == IB::closed || b == IB::open;
-        }
+        RS_FORMAT_DEFINE_ENUM_CLASS(BoundaryType, int, -3,
+            empty,
+            minus_infinity,
+            just_below,
+            closed,
+            just_above,
+            plus_infinity
+        )
 
         template <typename T>
         struct Boundary:
         public Arithmetic<Boundary<T>>,
         public TotalOrder<Boundary<T>> {
-            T value;
-            IntervalBound bound;
-            bool upper;
+            T value = T();
+            BoundaryType type = BoundaryType::empty;
             Boundary() = default;
-            Boundary(T v, IntervalBound b, bool u): value(v), bound(b), upper(u) {}
+            Boundary(T v, BoundaryType t);
+            bool adjacent(const Boundary& b) const noexcept;
+            int compare(const Boundary& b) const noexcept;
+            bool has_value() const noexcept;
             std::string str() const;
-            static bool adjacent(const Boundary& l, const Boundary& r) noexcept;
-            static int compare(const Boundary& l, const Boundary& r) noexcept;
+            Boundary operator-() const;
+            Boundary operator+(const Boundary& b) const;
+            Boundary operator-(const Boundary& b) const { return *this + - b; }
+            Boundary operator*(const Boundary& b) const;
+            bool operator==(const Boundary& b) const noexcept { return compare(b) == 0; }
+            bool operator<(const Boundary& b) const noexcept { return compare(b) < 0; }
         };
 
             template <typename T>
-            std::string Boundary<T>::str() const {
-                using namespace RS::Format;
-                std::string s = upper ? "right" : "left";
-                s += " " + to_string(bound);
-                if (is_bounded(bound))
-                    s += " " + format_object(value);
-                return s;
+            Boundary<T>::Boundary(T v, BoundaryType t):
+            value(), type(t) {
+                if (has_value())
+                    value = v;
             }
 
             template <typename T>
-            bool Boundary<T>::adjacent(const Boundary& l, const Boundary& r) noexcept {
-                using IB = IntervalBound;
+            bool Boundary<T>::adjacent(const Boundary& b) const noexcept {
+                using BT = BoundaryType;
                 using IC = IntervalCategory;
-                if (! is_bounded(l.bound) || ! is_bounded(r.bound))
+                if (! has_value() || ! b.has_value())
                     return false;
-                if (l.bound != r.bound && l.value == r.value)
-                    return true;
+                if (type != BT::closed && b.type != BT::closed)
+                    return false;
+                if (value == b.value)
+                    return std::abs(int(type) - int(b.type)) == 1;
                 if constexpr (interval_category<T> == IC::stepwise || interval_category<T> == IC::integral) {
-                    if (l.bound == IB::closed && r.bound == IB::closed && l.value < r.value) {
-                        T t = l.value;
-                        return ++t == r.value;
+                    if (type == BT::closed && b.type == BT::closed) {
+                        if (value < b.value) {
+                            T t = value;
+                            return ++t == b.value;
+                        } else if (b.value < value) {
+                            T t = b.value;
+                            return ++t == value;
+                        }
                     }
                 }
                 return false;
             }
 
             template <typename T>
-            int Boundary<T>::compare(const Boundary& l, const Boundary& r) noexcept {
-                using IB = IntervalBound;
-                if (l.bound > r.bound) // case 1
-                    return - compare(r, l);
-                else if (l.bound == IB::empty && r.bound == IB::empty) // case 2
-                    return 0;
-                else if (l.bound == IB::empty) // case 3
-                    return l.upper ? 1 : -1;
-                else if (l.bound == IB::unbound && r.bound == IB::unbound) // case 4
-                    return compare_3way(l.upper, r.upper);
-                else if (r.bound == IB::unbound) // case 5
-                    return r.upper ? -1 : 1;
-                else if (l.bound == IB::closed && r.bound == IB::closed) // case 6
-                    return compare_3way(l.value, r.value);
-                else if (l.bound == IB::open && r.bound == IB::open && l.upper == r.upper) // case 7
-                    return compare_3way(l.value, r.value);
-                else if (r.upper) // case 8
-                    return l.value < r.value ? -1 : 1;
-                else // case 9
-                    return l.value <= r.value ? -1 : 1;
-            }
-
-            template <typename T>
-            Boundary<T> operator-(const Boundary<T>& b) {
-                if (is_bounded(b.bound))
-                    return {- b.value, b.bound, ! b.upper};
+            int Boundary<T>::compare(const Boundary& b) const noexcept {
+                if (has_value() && b.has_value() && value != b.value)
+                    return value < b.value ? -1 : 1;
                 else
-                    return {{}, b.bound, ! b.upper};
+                    return type < b.type ? -1 : type > b.type ? 1 : 0;
             }
 
             template <typename T>
-            Boundary<T> operator+(const Boundary<T>& l, const Boundary<T>& r) {
-                // We will only be adding like to like (lower or upper bounds),
-                // so we can assume l.upper==r.upper.
-                using IB = IntervalBound;
-                if (l.bound == IB::empty || r.bound == IB::empty)
-                    return {{}, IB::empty, l.upper};
-                else if (l.bound == IB::unbound || r.bound == IB::unbound)
-                    return {{}, IB::unbound, l.upper};
+            bool Boundary<T>::has_value() const noexcept {
+                using BT = BoundaryType;
+                return type >= BT::just_below && type <= BT::just_above;
+            }
+
+            template <typename T>
+            std::string Boundary<T>::str() const {
+                using namespace RS::Format;
+                auto s = to_string(type);
+                if (has_value())
+                    s += " " + format_object(value);
+                return s;
+            }
+
+            template <typename T>
+            Boundary<T> Boundary<T>::operator-() const {
+                using BT = BoundaryType;
+                if (type == BT::empty)
+                    return {};
                 else
-                    return {l.value + r.value, std::max(l.bound, r.bound), l.upper};
+                    return {- value, BT(- int(type))};
             }
 
             template <typename T>
-            Boundary<T> operator-(const Boundary<T>& l, const Boundary<T>& r) {
-                return l + - r;
+            Boundary<T> Boundary<T>::operator+(const Boundary& b) const {
+                // We will only be adding like to like (lower or upper
+                // bounds), so the combinations just_below+just_above and
+                // minus_infinity+plus_infinity will never happen.
+                using BT = BoundaryType;
+                if (type == BT::empty || b.type == BT::empty)
+                    return {};
+                else if (! has_value())
+                    return *this;
+                else if (! b.has_value())
+                    return b;
+                T sum = value + b.value;
+                if (type == BT::closed)
+                    return {sum, b.type};
+                else if (b.type == BT::closed)
+                    return {sum, type};
+                else
+                    return {sum, type};
             }
 
-            template <typename T>
-            bool operator==(const Boundary<T>& l, const Boundary<T>& r) noexcept {
-                return Boundary<T>::compare(l, r) == 0;
-            }
+            // TODO
+            // template <typename T>
+            // Boundary<T> Boundary<T>::operator*(const Boundary& b) const {
+            // }
 
             template <typename T>
-            bool operator<(const Boundary<T>& l, const Boundary<T>& r) noexcept {
-                return Boundary<T>::compare(l, r) == -1;
+            std::ostream& operator<<(std::ostream& out, const Boundary<T>& b) {
+                return out << b.str();
             }
 
     }
