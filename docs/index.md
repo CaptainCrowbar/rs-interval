@@ -73,25 +73,23 @@ types, a type must at the very least be default constructible, copyable, and
 totally ordered (defining all six comparison operators). Additional type
 properties enable additional interval properties.
 
-IntervalCategory  | Value  | Description                          | Example
-----------------  | -----  | -----------                          | -------
-`none`            | 0      | Not usable in an interval            | `bool`
-`ordered`         | 1      | Ordered but not an arithmetic type   | `std::string`
-`stepwise`        | 2      | Incrementable and decrementable      | `int*`
-`integral`        | 3      | Integer arithmetic operations        | `int`
-`continuous`      | 4      | Models a continuous arithmetic type  | `float`
+| IntervalCategory  | Description                          | Example        |
+| ----------------  | -----------                          | -------        |
+| `none`            | Not usable in an interval            | `bool`         |
+| `ordered`         | Ordered but not an arithmetic type   | `std::string`  |
+| `stepwise`        | Incrementable and decrementable      | `int*`         |
+| `integral`        | Integer arithmetic operations        | `int`          |
+| `continuous`      | Models a continuous arithmetic type  | `float`        |
 
 The `IntervalTraits` or `interval_category` templates determine the category
 of a given type, according to the following algorithm:
 
-[TODO]
-
 * _if `T` is `bool` or `T` is not default constructible, copyable, and totally ordered_
     * _category is `none`_
-* _else if `is_integral_v<T>` is true, or `numeric_limits<T>` is defined and `is_integer` is true_
-    * _category is `integral`_
 * _else if `is_floating_point_v<T>` is true, or `numeric_limits<T>` is defined and `is_integer` is false_
     * _category is `continuous`_
+* _else if `is_integral_v<T>` is true, or `numeric_limits<T>` is defined and `is_integer` is true_
+    * _category is `integral`_
 * _else if `T` has unary `++ --` and binary `+ - * /`_
     * _category is `integral`_
 * _else if `T` has `+ - * /` operators but not `++ --`_
@@ -137,23 +135,23 @@ In the "picture" layouts here:
 * `*` = included in both intervals
 * `.` = gap between the two intervals
 
-IntervalOrder        | Value  | Picture      | Description
--------------        | -----  | -------      | -----------
-`b_only`             | -7     | `BBB`        | `A` is empty, `B` is not
-`a_below_b`          | -6     | `AAA...BBB`  | Upper bound of `A` is less than lower bound of `B`, with a gap
-`a_touches_b`        | -5     | `AAABBB`     | Upper bound of `A` is less than lower bound of `B`, with no gap
-`a_overlaps_b`       | -4     | `AAA***BBB`  | Upper bound of `A` overlaps lower bound of `B`
-`a_extends_below_b`  | -3     | `AAA***`     | `B` is a subset of `A`, with the same upper bound
-`a_encloses_b`       | -2     | `AAA***AAA`  | `B` is a subset of `A`, matching neither bound
-`b_extends_above_a`  | -1     | `***BBB`     | `A` is a subset of `B`, with the same lower bound
-`equal`              | 0      | `***`        | `A` and `B` are the same (this includes the case where both are empty)
-`a_extends_above_b`  | 1      | `***AAA`     | `B` is a subset of `A`, with the same lower bound
-`b_encloses_a`       | 2      | `BBB***BBB`  | `A` is a subset of `B`, matching neither bound
-`b_extends_below_a`  | 3      | `BBB***`     | `A` is a subset of `B`, with the same upper bound
-`b_overlaps_a`       | 4      | `BBB***AAA`  | Upper bound of `B` overlaps lower bound of `A`
-`b_touches_a`        | 5      | `BBBAAA`     | Upper bound of `B` is less than lower bound of `A`, with no gap
-`b_below_a`          | 6      | `BBB...AAA`  | Upper bound of `B` is less than lower bound of `A`, with a gap
-`a_only`             | 7      | `AAA`        | `B` is empty, `A` is not
+| IntervalOrder        | Value  | Picture      | Description                                                             |
+| -------------        | -----  | -------      | -----------                                                             |
+| `b_only`             | -7     | `BBB`        | `A` is empty, `B` is not                                                |
+| `a_below_b`          | -6     | `AAA...BBB`  | Upper bound of `A` is less than lower bound of `B`, with a gap          |
+| `a_touches_b`        | -5     | `AAABBB`     | Upper bound of `A` is less than lower bound of `B`, with no gap         |
+| `a_overlaps_b`       | -4     | `AAA***BBB`  | Upper bound of `A` overlaps lower bound of `B`                          |
+| `a_extends_below_b`  | -3     | `AAA***`     | `B` is a subset of `A`, with the same upper bound                       |
+| `a_encloses_b`       | -2     | `AAA***AAA`  | `B` is a subset of `A`, matching neither bound                          |
+| `b_extends_above_a`  | -1     | `***BBB`     | `A` is a subset of `B`, with the same lower bound                       |
+| `equal`              | 0      | `***`        | `A` and `B` are the same (this includes the case where both are empty)  |
+| `a_extends_above_b`  | 1      | `***AAA`     | `B` is a subset of `A`, with the same lower bound                       |
+| `b_encloses_a`       | 2      | `BBB***BBB`  | `A` is a subset of `B`, matching neither bound                          |
+| `b_extends_below_a`  | 3      | `BBB***`     | `A` is a subset of `B`, with the same upper bound                       |
+| `b_overlaps_a`       | 4      | `BBB***AAA`  | Upper bound of `B` overlaps lower bound of `A`                          |
+| `b_touches_a`        | 5      | `BBBAAA`     | Upper bound of `B` is less than lower bound of `A`, with no gap         |
+| `b_below_a`          | 6      | `BBB...AAA`  | Upper bound of `B` is less than lower bound of `A`, with a gap          |
+| `a_only`             | 7      | `AAA`        | `B` is empty, `A` is not                                                |
 
 ## Interval class
 
@@ -226,17 +224,17 @@ not.
 The sixth constructor also takes explicit boundary value and boundary type
 arguments, but the boundary types are specified using a string as shorthand:
 
-Mode    | Left bound  | Right bound  | Description
-----    | ----------  | -----------  | -----------
-`"()"`  | `open`      | `open`       | Open interval
-`"(]"`  | `open`      | `closed`     | Half-open interval, closed on the right
-`"[)"`  | `closed`    | `open`       | Half-open interval, closed on the left
-`"[]"`  | `closed`    | `closed`     | Closed interval
-`"<"`   | `unbound`   | `open`       | Open interval, bounded above (first argument is ignored)
-`"<="`  | `unbound`   | `closed`     | Closed interval, bounded above (first argument is ignored)
-`">"`   | `open`      | `unbound`    | Open interval, bounded below (second argument is ignored)
-`">="`  | `closed`    | `unbound`    | Closed interval, bounded below (second argument is ignored)
-`"*"`   | `unbound`   | `unbound`    | Universal interval (first two arguments are ignored)
+| Mode    | Left bound  | Right bound  | Description                                                  |
+| ----    | ----------  | -----------  | -----------                                                  |
+| `"()"`  | `open`      | `open`       | Open interval                                                |
+| `"(]"`  | `open`      | `closed`     | Half-open interval, closed on the right                      |
+| `"[)"`  | `closed`    | `open`       | Half-open interval, closed on the left                       |
+| `"[]"`  | `closed`    | `closed`     | Closed interval                                              |
+| `"<"`   | `unbound`   | `open`       | Open interval, bounded above (first argument is ignored)     |
+| `"<="`  | `unbound`   | `closed`     | Closed interval, bounded above (first argument is ignored)   |
+| `">"`   | `open`      | `unbound`    | Open interval, bounded below (second argument is ignored)    |
+| `">="`  | `closed`    | `unbound`    | Closed interval, bounded below (second argument is ignored)  |
+| `"*"`   | `unbound`   | `unbound`    | Universal interval (first two arguments are ignored)         |
 
 This constructor will throw `std::invalid_argument` if the mode string is not
 one of these.
@@ -287,19 +285,19 @@ bool Interval::is_right_open() const noexcept;
 
 Interval properties.
 
-Property              | Description
---------              | -----------
-`empty()`             | True if the interval is empty
-`is_single()`         | True if the interval contains exactly one value
-`is_finite()`         | True if the interval is non-empty and bounded on both sides
-`is_infinite()`       | True if the interval is non-empty and unbound on at least one side
-`is_universal()`      | True if the interval contains all values of the underlying type
-`is_left_bounded()`   | True if the interval is non-empty and bounded below
-`is_left_closed()`    | True if the interval is left-bounded and includes its lower bound
-`is_left_open()`      | True if the interval is left-bounded and does not include its lower bound
-`is_right_bounded()`  | True if the interval is non-empty and bounded above
-`is_right_closed()`   | True if the interval is right-bounded and includes its upper bound
-`is_right_open()`     | True if the interval is right-bounded and does not include its upper bound
+| Property              | Description                                                                 |
+| --------              | -----------                                                                 |
+| `empty()`             | True if the interval is empty                                               |
+| `is_single()`         | True if the interval contains exactly one value                             |
+| `is_finite()`         | True if the interval is non-empty and bounded on both sides                 |
+| `is_infinite()`       | True if the interval is non-empty and unbound on at least one side          |
+| `is_universal()`      | True if the interval contains all values of the underlying type             |
+| `is_left_bounded()`   | True if the interval is non-empty and bounded below                         |
+| `is_left_closed()`    | True if the interval is left-bounded and includes its lower bound           |
+| `is_left_open()`      | True if the interval is left-bounded and does not include its lower bound   |
+| `is_right_bounded()`  | True if the interval is non-empty and bounded above                         |
+| `is_right_closed()`   | True if the interval is right-bounded and includes its upper bound          |
+| `is_right_open()`     | True if the interval is right-bounded and does not include its upper bound  |
 
 ```c++
 Interval::iterator Interval::begin() const;
@@ -401,19 +399,19 @@ std::ostream& operator<<(std::ostream& out, const Interval& in);
 Format an interval as a string. The table below shows how intervals are
 formatted (`A` and `B` represent formatted values of `T`).
 
-Format   | Description
-------   | -----------
-`{}`     | Empty interval
-`*`      | Universal interval (contains every value)
-`A`      | Single value
-`(A,B)`  | Open interval
-`(A,B]`  | Half-open interval, closed on the right
-`[A,B)`  | Half-open interval, closed on the left
-`[A,B]`  | Closed interval
-`<A`     | Open interval, bounded above
-`<=A`    | Closed interval, bounded above
-`>A`     | Open interval, bounded below
-`>=A`    | Closed interval, bounded below
+| Format   | Description                                |
+| ------   | -----------                                |
+| `{}`     | Empty interval                             |
+| `*`      | Universal interval (contains every value)  |
+| `A`      | Single value                               |
+| `(A,B)`  | Open interval                              |
+| `(A,B]`  | Half-open interval, closed on the right    |
+| `[A,B)`  | Half-open interval, closed on the left     |
+| `[A,B]`  | Closed interval                            |
+| `<A`     | Open interval, bounded above               |
+| `<=A`    | Closed interval, bounded above             |
+| `>A`     | Open interval, bounded below               |
+| `>=A`    | Closed interval, bounded below             |
 
 ```c++
 size_t Interval::hash() const noexcept;

@@ -68,7 +68,7 @@ namespace RS::Intervals {
             (has_plus_operator<T> && has_minus_operator<T>
             && has_multiply_operator<T> && has_divide_operator<T>);
 
-        template <typename T> constexpr bool has_comparison_operators =
+        template <typename T> constexpr bool is_totally_ordered =
             (has_equality_operator<T> && has_inequality_operator<T>
             && has_less_than_operator<T> && has_greater_than_operator<T>
             && has_less_or_equal_operator<T> && has_greater_or_equal_operator<T>);
@@ -156,13 +156,16 @@ namespace RS::Intervals {
     struct IntervalTraits {
         using type = std::remove_cv_t<T>;
         static constexpr IntervalCategory category =
-            ! std::is_default_constructible_v<type> || ! std::is_copy_constructible_v<type> || ! std::is_copy_assignable_v<type>
-                    || ! Detail::has_comparison_operators<type> || std::is_same_v<type, bool> ?
+            std::is_same_v<type, bool> || ! std::is_default_constructible_v<type>
+                    || ! std::is_copy_constructible_v<type> || ! std::is_copy_assignable_v<type>
+                    || ! Detail::is_totally_ordered<type> ?
                 IntervalCategory::none :
-            std::is_integral_v<T> || (std::numeric_limits<type>::is_specialized && std::numeric_limits<type>::is_integer) ?
-                IntervalCategory::integral :
-            std::is_floating_point_v<T> || (std::numeric_limits<type>::is_specialized && ! std::numeric_limits<type>::is_integer) ?
+            std::is_floating_point_v<T>
+                    || (std::numeric_limits<type>::is_specialized && ! std::numeric_limits<type>::is_integer) ?
                 IntervalCategory::continuous :
+            std::is_integral_v<T>
+                    || (std::numeric_limits<type>::is_specialized && std::numeric_limits<type>::is_integer) ?
+                IntervalCategory::integral :
             Detail::has_basic_arithmetic_operators<type> && Detail::has_stepwise_operators<type> ?
                 IntervalCategory::integral :
             Detail::has_basic_arithmetic_operators<type> ?
