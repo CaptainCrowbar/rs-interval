@@ -9,6 +9,14 @@ _[GitHub repository](https://github.com/CaptainCrowbar/rs-interval)_
 namespace RS::Intervals;
 ```
 
+This is a headers-only library; there is nothing to build (unless you want to
+run the unit tests), and no binaries to install.
+
+This uses my [formatting](https://github.com/CaptainCrowbar/rs-format) and
+[unit test](https://github.com/CaptainCrowbar/rs-unit-test) libraries. Both of
+these are header-only libraries; the unit test library is not required if you
+only want to use this library without building its unit tests.
+
 ## Contents
 
 * TOC
