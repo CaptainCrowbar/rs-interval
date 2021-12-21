@@ -41,6 +41,7 @@ function(check_for_library required library header repo)
     endif()
 endfunction()
 
+check_for_library(yes rs-format rs-format.hpp https://github.com/CaptainCrowbar/rs-format)
 check_for_library(no rs-unit-test rs-unit-test.hpp https://github.com/CaptainCrowbar/rs-unit-test)
 
 set(library rs-interval)
@@ -50,8 +51,6 @@ find_package(Threads REQUIRED)
 
 add_executable(${unittest}
     test/type-traits-test.cpp
-    test/format-integer-test.cpp
-    test/format-floating-point-test.cpp
     test/interval-boundary-comparison-test.cpp
     test/interval-boundary-addition-test.cpp
     test/interval-boundary-multiplication-test.cpp

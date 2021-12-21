@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rs-interval/format.hpp"
 #include "rs-interval/type-traits.hpp"
+#include "rs-format/format.hpp"
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -16,6 +16,10 @@
 #include <utility>
 
 namespace RS::Intervals {
+
+    // Imports
+
+    using RS::Format::FormatSpec;
 
     // Forward declarations
 
@@ -496,7 +500,7 @@ namespace RS::Intervals {
         IntervalSet<T> set_union(const Interval& b) const;
         IntervalSet<T> set_difference(const Interval& b) const;
         IntervalSet<T> set_symmetric_difference(const Interval& b) const;
-        std::string str(const std::string& mode = {}) const;
+        std::string str(const FormatSpec& spec = {}) const;
         void swap(Interval& in) noexcept { this->do_swap(in); }
 
         static Interval all() noexcept { return Interval(T(), IntervalBound::unbound, IntervalBound::unbound); }
@@ -771,21 +775,21 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        std::string Interval<T>::str(const std::string& mode) const {
-            using namespace Detail;
+        std::string Interval<T>::str(const FormatSpec& spec) const {
+            using namespace RS::Format;
             if (this->empty())
                 return "{}";
             else if (this->is_universal())
                 return "*";
             else if (this->is_single())
-                return format_object(this->min(), mode);
+                return format_object(this->min(), spec);
             else if (! this->is_left_bounded())
-                return (this->is_right_closed() ? "<=" : "<") + format_object(this->max(), mode);
+                return (this->is_right_closed() ? "<=" : "<") + format_object(this->max(), spec);
             else if (! this->is_right_bounded())
-                return (this->is_left_closed() ? ">=" : ">") + format_object(this->min(), mode);
+                return (this->is_left_closed() ? ">=" : ">") + format_object(this->min(), spec);
             else
-                return (this->is_left_closed() ? '[' : '(') + format_object(this->min(), mode) + ','
-                    + format_object(this->max(), mode) + (this->is_right_closed() ? ']' : ')');
+                return (this->is_left_closed() ? '[' : '(') + format_object(this->min(), spec) + ','
+                    + format_object(this->max(), spec) + (this->is_right_closed() ? ']' : ')');
         }
 
     template <typename T> bool operator==(const Interval<T>& a, const Interval<T>& b) noexcept { return a.compare(b) == 0; }

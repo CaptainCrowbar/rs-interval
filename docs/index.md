@@ -31,6 +31,12 @@ Returns the version numbers as a string (e.g. `"1.23.456"`).
 ## Supporting types
 
 ```c++
+using RS::Format::FormatSpec;
+```
+
+Imported for convenience.
+
+```c++
 enum class IntervalBound;
     IntervalBound::empty = 0;    // interval is empty
     IntervalBound::closed = 1;   // interval includes the bound
@@ -380,7 +386,7 @@ consist of more than one interval, so most of these return an `IntervalSet`
 rather than an `Interval`.
 
 ```c++
-std::string Interval::str(char mode = 0, int prec = -1) const;
+std::string Interval::str(const FormatSpec& spec = {}) const;
 std::ostream& operator<<(std::ostream& out, const Interval& in);
 ```
 
@@ -400,26 +406,6 @@ Format   | Description
 `<=A`    | Closed interval, bounded above
 `>A`     | Open interval, bounded below
 `>=A`    | Closed interval, bounded below
-
-The `mode` and `prec` arguments will only be used if the value type is a
-floating point arithmetic type; `mode` must be one of `[EeFfGg]`, and `prec`
-has its usual meaning. Other types are formatted according to the following
-rules:
-
-* _if `T` is `char`_
-    * _format as a literal character_
-* _else if `T` is an integer arithmetic type_
-    * _format as a decimal integer_
-* _else if `T` is a floating point arithmetic type_
-    * _format as described above_
-* _else if `T` is implicitly or explicitly convertible to `std::string`_
-    * _convert directly to a string_
-* _else if a `to_string(T)` or `std::to_string(T)` function exists_
-    * _format by calling that function_
-* _else if `T` has an output operator_
-    * _format using `std::ostringstream`_
-* _else_
-    * _fail to compile_
 
 ```c++
 size_t Interval::hash() const noexcept;
@@ -608,7 +594,7 @@ IntervalSet operator^(const T& a, const IntervalSet& b);
 Set operations.
 
 ```c++
-std::string IntervalSet::str(char mode = 0, int prec = -1) const;
+std::string IntervalSet::str(const FormatSpec& spec = {}) const;
 std::ostream& operator<<(std::ostream& out, const IntervalSet& set);
 ```
 
@@ -769,16 +755,15 @@ this interval does not overlap any existing interval in the map.
 
 ```c++
 std::string IntervalMap::str() const;
-std::string IntervalMap::str(char kmode, int kprec,
-    char vmode, int vprec) const;
+std::string IntervalMap::str(const FormatSpec& kspec, const FormatSpec& vspec) const;
 std::ostream& operator<<(std::ostream& out, const IntervalMap& set);
 ```
 
-Format an interval set as a string. The format is `"{A:X,B:Y,C:Z,...}"`, where
+Format an interval map as a string. The format is `"{A:X,B:Y,C:Z,...}"`, where
 `A`, `B`, `C`, etc are intervals or values of `K` (formatted as described for
 `Interval::str()` above), and `X`, `Y`, `Z`, etc are values of `T`. The two
-sets of formatting parameters are used for the keys and values respectively.
-The default value is not reported.
+sets of formatting parameters (`kspec` and `vspec`) are used for the keys and
+values respectively. The default value is not reported.
 
 ```c++
 size_t IntervalMap::hash() const noexcept;

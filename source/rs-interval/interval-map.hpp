@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rs-interval/format.hpp"
 #include "rs-interval/interval.hpp"
+#include "rs-format/format.hpp"
 #include <algorithm>
 #include <initializer_list>
 #include <map>
@@ -51,7 +51,7 @@ namespace RS::Intervals {
         void erase(const interval_type& in);
         size_t hash() const noexcept;
         std::string str() const { return str({}, {}); }
-        std::string str(const std::string& kmode, const std::string& vmode) const;
+        std::string str(const FormatSpec& kspec, const FormatSpec& vspec) const;
         void swap(IntervalMap& map) noexcept { map_.swap(map.map_); std::swap(def_, map.def_); }
 
     private:
@@ -145,13 +145,17 @@ namespace RS::Intervals {
         }
 
         template <typename K, typename T>
-        std::string IntervalMap<K, T>::str(const std::string& kmode, const std::string& vmode) const {
-            using namespace Detail;
+        std::string IntervalMap<K, T>::str(const FormatSpec& kspec, const FormatSpec& vspec) const {
+            using namespace RS::Format;
             if (empty())
                 return "{}";
             std::string s = "{";
-            for (auto& [k,v]: *this)
-                s += format_object(k, kmode) + ':'+ format_object(v, vmode) + ',';
+            for (auto& [k,v]: *this) {
+                s += format_object(k, kspec);
+                s += ':';
+                s += format_object(v, vspec);
+                s += ',';
+            }
             s.back() = '}';
             return s;
         }

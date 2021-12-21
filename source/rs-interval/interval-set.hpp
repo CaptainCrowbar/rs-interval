@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rs-interval/format.hpp"
 #include "rs-interval/interval.hpp"
+#include "rs-format/format.hpp"
 #include <algorithm>
 #include <initializer_list>
 #include <iterator>
@@ -52,7 +52,7 @@ namespace RS::Intervals {
         IntervalSet set_difference(const IntervalSet& b) const;
         IntervalSet set_symmetric_difference(const IntervalSet& b) const;
         size_t hash() const noexcept;
-        std::string str(const std::string& mode = {}) const;
+        std::string str(const FormatSpec& spec = {}) const;
         void swap(IntervalSet& set) noexcept { set_.swap(set.set_); }
 
     private:
@@ -170,13 +170,15 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        std::string IntervalSet<T>::str(const std::string& mode) const {
-            using namespace Detail;
+        std::string IntervalSet<T>::str(const FormatSpec& spec) const {
+            using namespace RS::Format;
             if (empty())
                 return "{}";
             std::string s = "{";
-            for (auto& t: *this)
-                s += format_object(t, mode) + ',';
+            for (auto& t: *this) {
+                s += format_object(t, spec);
+                s += ',';
+            }
             s.back() = '}';
             return s;
         }

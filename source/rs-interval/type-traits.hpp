@@ -1,6 +1,7 @@
 #pragma once
 
-#include "rs-interval/format.hpp"
+#include "rs-format/enum.hpp"
+#include "rs-format/format.hpp"
 #include <algorithm>
 #include <limits>
 #include <ostream>
@@ -38,27 +39,6 @@
         std::true_type {}; \
     template <typename T, typename U = T> \
         constexpr bool has_ ## name ## _operator = HasBinaryOperator ## name<T, U>::value;
-
-#define RS_INTERVAL_ENUM_IMPL_(EnumType, enum_class, IntType, first_value, first_name, ...) \
-    enum enum_class EnumType: IntType { \
-        first_name = first_value, \
-        __VA_ARGS__ \
-    }; \
-    inline std::string to_string(EnumType t) { \
-        static const auto names = ::RS::Intervals::Detail::split_string(# first_name "," # __VA_ARGS__, " ,"); \
-        IntType index = static_cast<IntType>(t) - static_cast<IntType>(first_value); \
-        if (index >= 0 && index < static_cast<IntType>(names.size())) \
-            return names[size_t(index)]; \
-        else \
-            return std::to_string(static_cast<IntType>(t)); \
-    } \
-    inline std::ostream& operator<<(std::ostream& out, EnumType t) { \
-        return out << to_string(t); \
-    }
-#define RS_INTERVAL_ENUM(EnumType, IntType, first_value, first_name, ...) \
-    RS_INTERVAL_ENUM_IMPL_(EnumType,, IntType, first_value, first_name, __VA_ARGS__)
-#define RS_INTERVAL_ENUM_CLASS(EnumType, IntType, first_value, first_name, ...) \
-    RS_INTERVAL_ENUM_IMPL_(EnumType, class, IntType, first_value, first_name, __VA_ARGS__)
 
 namespace RS::Intervals {
 
@@ -129,7 +109,7 @@ namespace RS::Intervals {
 
     }
 
-    RS_INTERVAL_ENUM_CLASS(IntervalBound, unsigned char, 0,
+    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalBound, unsigned char, 0,
         empty,   // The interval is empty
         closed,  // The interval includes the boundary value
         open,    // The interval does not include the boundary value
@@ -138,7 +118,7 @@ namespace RS::Intervals {
 
     constexpr IntervalBound operator~(IntervalBound b) noexcept { return IntervalBound(3 - int(b)); }
 
-    RS_INTERVAL_ENUM_CLASS(IntervalCategory, int, 0,
+    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalCategory, int, 0,
         none,       // Not usable in an interval
         ordered,    // Ordered but not an arithmetic type (e.g. string)
         stepwise,   // Incrementable and decrementable (e.g. pointer)
@@ -146,14 +126,14 @@ namespace RS::Intervals {
         continuous  // Models a continuous arithmetic type (e.g. floating point)
     )
 
-    RS_INTERVAL_ENUM_CLASS(IntervalMatch, int, -1,
+    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalMatch, int, -1,
         low,    // The value is less than the interval's lower bound
         match,  // The value is an element of the interval
         high,   // The value is greater than the interval's upper bound
         empty   // The interval is empty
     )
 
-    RS_INTERVAL_ENUM_CLASS(IntervalOrder, int, -7,
+    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalOrder, int, -7,
         // Name             Index  Picture    Description
         b_only,             // -7  BBB        A is empty, B is not
         a_below_b,          // -6  AAA...BBB  Upper bound of A is less than lower bound of B, with a gap
@@ -217,6 +197,7 @@ namespace RS::Intervals {
 
             template <typename T>
             std::string Boundary<T>::str() const {
+                using namespace RS::Format;
                 std::string s = upper ? "right" : "left";
                 s += " " + to_string(bound);
                 if (is_bounded(bound))
