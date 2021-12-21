@@ -181,11 +181,11 @@ namespace RS::Intervals {
     namespace Detail {
 
         RS_FORMAT_DEFINE_ENUM_CLASS(BoundaryType, int, -3,
-            empty,
+            null,
             minus_infinity,
-            just_below,
-            closed,
-            just_above,
+            minus_epsilon,
+            exact,
+            plus_epsilon,
             plus_infinity
         )
 
@@ -194,7 +194,7 @@ namespace RS::Intervals {
         public Arithmetic<Boundary<T>>,
         public TotalOrder<Boundary<T>> {
             T value = T();
-            BoundaryType type = BoundaryType::empty;
+            BoundaryType type = BoundaryType::null;
             Boundary() = default;
             Boundary(T v, BoundaryType t);
             bool adjacent(const Boundary& b) const noexcept;
@@ -222,12 +222,12 @@ namespace RS::Intervals {
                 using IC = IntervalCategory;
                 if (! has_value() || ! b.has_value())
                     return false;
-                if (type != BT::closed && b.type != BT::closed)
+                if (type != BT::exact && b.type != BT::exact)
                     return false;
                 if (value == b.value)
                     return std::abs(int(type) - int(b.type)) == 1;
                 if constexpr (interval_category<T> == IC::stepwise || interval_category<T> == IC::integral) {
-                    if (type == BT::closed && b.type == BT::closed) {
+                    if (type == BT::exact && b.type == BT::exact) {
                         if (value < b.value) {
                             T t = value;
                             return ++t == b.value;
@@ -251,7 +251,7 @@ namespace RS::Intervals {
             template <typename T>
             bool Boundary<T>::has_value() const noexcept {
                 using BT = BoundaryType;
-                return type >= BT::just_below && type <= BT::just_above;
+                return type >= BT::minus_epsilon && type <= BT::plus_epsilon;
             }
 
             template <typename T>
@@ -259,16 +259,16 @@ namespace RS::Intervals {
                 using namespace RS::Format;
                 using BT = BoundaryType;
                 switch (type) {
-                    case BT::empty:           return "{}";
+                    case BT::null:            return "{}";
                     case BT::minus_infinity:  return "-inf";
                     case BT::plus_infinity:   return "+inf";
                     default:                  break;
                 }
                 auto s = RS::Format::format_object(value);
                 switch (type) {
-                    case BT::just_below:  s += "-eps"; break;
-                    case BT::just_above:  s += "+eps"; break;
-                    default:              break;
+                    case BT::minus_epsilon:  s += "-eps"; break;
+                    case BT::plus_epsilon:   s += "+eps"; break;
+                    default:                 break;
                 }
                 return s;
             }
@@ -276,7 +276,7 @@ namespace RS::Intervals {
             template <typename T>
             Boundary<T> Boundary<T>::operator-() const {
                 using BT = BoundaryType;
-                if (type == BT::empty)
+                if (type == BT::null)
                     return {};
                 else
                     return {- value, BT(- int(type))};
@@ -285,19 +285,19 @@ namespace RS::Intervals {
             template <typename T>
             Boundary<T> Boundary<T>::operator+(const Boundary& b) const {
                 // We will only be adding like to like (lower or upper
-                // bounds), so the combinations just_below+just_above and
+                // bounds), so the combinations minus_epsilon+plus_epsilon and
                 // minus_infinity+plus_infinity will never happen.
                 using BT = BoundaryType;
-                if (type == BT::empty || b.type == BT::empty)
+                if (type == BT::null || b.type == BT::null)
                     return {};
                 else if (! has_value())
                     return *this;
                 else if (! b.has_value())
                     return b;
                 T sum = value + b.value;
-                if (type == BT::closed)
+                if (type == BT::exact)
                     return {sum, b.type};
-                else if (b.type == BT::closed)
+                else if (b.type == BT::exact)
                     return {sum, type};
                 else
                     return {sum, type};

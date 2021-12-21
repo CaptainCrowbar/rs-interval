@@ -74,11 +74,11 @@ namespace RS::Intervals {
         Boundary<T> left_of(const IntervalTypeBase<T>& i) {
             using BT = BoundaryType;
             if (i.empty())
-                return {{}, BT::empty};
+                return {{}, BT::null};
             else if (i.is_left_closed())
-                return {i.min(), BT::closed};
+                return {i.min(), BT::exact};
             else if (i.is_left_open())
-                return {i.min(), BT::just_above};
+                return {i.min(), BT::plus_epsilon};
             else
                 return {{}, BT::minus_infinity};
         }
@@ -87,11 +87,11 @@ namespace RS::Intervals {
         Boundary<T> right_of(const IntervalTypeBase<T>& i) {
             using BT = BoundaryType;
             if (i.empty())
-                return {{}, BT::empty};
+                return {{}, BT::null};
             else if (i.is_right_closed())
-                return {i.max(), BT::closed};
+                return {i.max(), BT::exact};
             else if (i.is_right_open())
-                return {i.max(), BT::just_below};
+                return {i.max(), BT::minus_epsilon};
             else
                 return {{}, BT::plus_infinity};
         }
@@ -102,14 +102,14 @@ namespace RS::Intervals {
             using IB = IntervalBound;
             IB lbound, rbound;
             switch (l.type) {
-                case BT::empty:           lbound = IB::empty; break;
-                case BT::just_above:      lbound = IB::open; break;
+                case BT::null:            lbound = IB::empty; break;
+                case BT::plus_epsilon:    lbound = IB::open; break;
                 case BT::minus_infinity:  lbound = IB::unbound; break;
                 default:                  lbound = IB::closed; break;
             }
             switch (r.type) {
-                case BT::empty:          rbound = IB::empty; break;
-                case BT::just_below:     rbound = IB::open; break;
+                case BT::null:           rbound = IB::empty; break;
+                case BT::minus_epsilon:  rbound = IB::open; break;
                 case BT::plus_infinity:  rbound = IB::unbound; break;
                 default:                 rbound = IB::closed; break;
             }
@@ -826,10 +826,14 @@ namespace RS::Intervals {
     template <typename T> bool operator<(const Interval<T>& a, const Interval<T>& b) noexcept { return a.compare(b) < 0; }
     template <typename T> std::ostream& operator<<(std::ostream& out, const Interval<T>& in) { return out << in.str(); }
     template <typename T> Interval<T> make_interval(const T& t) { return Interval<T>(t); }
-    template <typename T> Interval<T> make_interval(const T& t, IntervalBound l, IntervalBound r) { return Interval<T>(t, l, r); }
-    template <typename T> Interval<T> make_interval(const T& min, const T& max, IntervalBound lr = IntervalBound::closed) { return Interval<T>(min, max, lr); }
-    template <typename T> Interval<T> make_interval(const T& min, const T& max, IntervalBound l, IntervalBound r) { return Interval<T>(min, max, l, r); }
-    template <typename T> Interval<T> make_interval(const T& min, const T& max, std::string_view mode) { return Interval<T>(min, max, mode); }
+    template <typename T> Interval<T> make_interval(const T& t, IntervalBound l, IntervalBound r)
+        { return Interval<T>(t, l, r); }
+    template <typename T> Interval<T> make_interval(const T& min, const T& max, IntervalBound lr = IntervalBound::closed)
+        { return Interval<T>(min, max, lr); }
+    template <typename T> Interval<T> make_interval(const T& min, const T& max, IntervalBound l, IntervalBound r)
+        { return Interval<T>(min, max, l, r); }
+    template <typename T> Interval<T> make_interval(const T& min, const T& max, std::string_view mode)
+        { return Interval<T>(min, max, mode); }
     template <typename T> void swap(Interval<T>& a, Interval<T>& b) { a.swap(b); }
 
     template <typename T>

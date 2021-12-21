@@ -9,26 +9,17 @@ using BT = BoundaryType;
 
 namespace RS::Intervals::Detail {
 
-    // RS_FORMAT_DEFINE_ENUM_CLASS(BoundaryType, int, -3,
-    //     empty,
-    //     minus_infinity,
-    //     just_below,
-    //     closed,
-    //     just_above,
-    //     plus_infinity
-    // )
-
     template <typename T>
     Boundary<T> Boundary<T>::operator*(const Boundary& b) const {
 
         using BT = BoundaryType;
 
-        static const Boundary zero(T(), BT::closed);
+        static const Boundary zero(T(), BT::exact);
 
         const Boundary& a = *this;
 
         // (1) If either argument is empty, the result is empty
-        if (a.type == BT::empty || b.type == BT::empty)
+        if (a.type == BT::null || b.type == BT::null)
             return {};
 
         // (2) Symmetric cases
@@ -46,7 +37,7 @@ namespace RS::Intervals::Detail {
             return zero;
 
         // (4) if the RHS is zero plus epsilon, the result is zero + epsilon
-        if (b == Boundary(T(), BT::just_above))
+        if (b == Boundary(T(), BT::plus_epsilon))
             return b;
 
         // (5) If the LHS is positive infinity, the result is positive infinity
@@ -58,13 +49,13 @@ namespace RS::Intervals::Detail {
         T product = a.value * b.value;
 
         // (6) If both arguments are closed, the result is closed
-        if (a.type == BT::closed && b.type == BT::closed)
-            return {product, BT::closed};
+        if (a.type == BT::exact && b.type == BT::exact)
+            return {product, BT::exact};
 
         // (7) If one argument has an epsilon but the other does not, the result has the same epsilon
-        if (std::abs(a.type) == 1 && b.type == BT::closed)
+        if (std::abs(a.type) == 1 && b.type == BT::exact)
             return {product, a.type};
-        if (std::abs(b.type) == 1 && a.type == BT::closed)
+        if (std::abs(b.type) == 1 && a.type == BT::exact)
             return {product, b.type};
 
         // (8) If both sides have the same epsilon, the result has the same epsilon
@@ -212,24 +203,24 @@ namespace RS::Intervals::Detail {
 
 void test_rs_interval_boundary_multiplication() {
 
-    B em0(0, BT::empty);
-    B mi0(0, BT::minus_infinity);
-    B pi0(0, BT::plus_infinity);
-    B jb2(2, BT::just_below);
-    B cl2(2, BT::closed);
-    B ja2(2, BT::just_above);
-    B jb4(4, BT::just_below);
-    B cl4(4, BT::closed);
-    B ja4(4, BT::just_above);
-    B jb9(9, BT::just_below);
-    B cl9(9, BT::closed);
-    B ja9(9, BT::just_above);
-    B jb_3(-3, BT::just_below);
-    B cl_3(-3, BT::closed);
-    B ja_3(-3, BT::just_above);
-    B jb_6(-6, BT::just_below);
-    B cl_6(-6, BT::closed);
-    B ja_6(-6, BT::just_above);
+    B null(0, BT::null);
+    B minf(0, BT::minus_infinity);
+    B pinf(0, BT::plus_infinity);
+    B me2(2, BT::minus_epsilon);
+    B ex2(2, BT::exact);
+    B pe2(2, BT::plus_epsilon);
+    B me4(4, BT::minus_epsilon);
+    B ex4(4, BT::exact);
+    B pe4(4, BT::plus_epsilon);
+    B me9(9, BT::minus_epsilon);
+    B ex9(9, BT::exact);
+    B pe9(9, BT::plus_epsilon);
+    B me_3(-3, BT::minus_epsilon);
+    B ex_3(-3, BT::exact);
+    B pe_3(-3, BT::plus_epsilon);
+    B me_6(-6, BT::minus_epsilon);
+    B ex_6(-6, BT::exact);
+    B pe_6(-6, BT::plus_epsilon);
 
     // TODO
 
