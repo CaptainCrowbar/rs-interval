@@ -2,7 +2,6 @@
 
 #include "rs-format/enum.hpp"
 #include "rs-format/format.hpp"
-#include <algorithm>
 #include <cstdlib>
 #include <limits>
 #include <ostream>

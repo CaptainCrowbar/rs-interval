@@ -1,5 +1,6 @@
 #include "rs-interval.hpp"
 #include "rs-unit-test.hpp"
+#include <cstdlib>
 
 using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
@@ -203,24 +204,24 @@ namespace RS::Intervals::Detail {
 
 void test_rs_interval_boundary_multiplication() {
 
-    B null(0, BT::null);
-    B minf(0, BT::minus_infinity);
-    B pinf(0, BT::plus_infinity);
-    B me2(2, BT::minus_epsilon);
-    B ex2(2, BT::exact);
-    B pe2(2, BT::plus_epsilon);
-    B me4(4, BT::minus_epsilon);
-    B ex4(4, BT::exact);
-    B pe4(4, BT::plus_epsilon);
-    B me9(9, BT::minus_epsilon);
-    B ex9(9, BT::exact);
-    B pe9(9, BT::plus_epsilon);
-    B me_3(-3, BT::minus_epsilon);
-    B ex_3(-3, BT::exact);
-    B pe_3(-3, BT::plus_epsilon);
-    B me_6(-6, BT::minus_epsilon);
-    B ex_6(-6, BT::exact);
-    B pe_6(-6, BT::plus_epsilon);
+    static const B null(0, BT::null);
+    static const B minf(0, BT::minus_infinity);
+    static const B pinf(0, BT::plus_infinity);
+    static const B me2(2, BT::minus_epsilon);
+    static const B ex2(2, BT::exact);
+    static const B pe2(2, BT::plus_epsilon);
+    static const B me4(4, BT::minus_epsilon);
+    static const B ex4(4, BT::exact);
+    static const B pe4(4, BT::plus_epsilon);
+    static const B me9(9, BT::minus_epsilon);
+    static const B ex9(9, BT::exact);
+    static const B pe9(9, BT::plus_epsilon);
+    static const B me_3(-3, BT::minus_epsilon);
+    static const B ex_3(-3, BT::exact);
+    static const B pe_3(-3, BT::plus_epsilon);
+    static const B me_6(-6, BT::minus_epsilon);
+    static const B ex_6(-6, BT::exact);
+    static const B pe_6(-6, BT::plus_epsilon);
 
     // TODO
 

@@ -1,6 +1,5 @@
 #include "rs-interval.hpp"
 #include "rs-unit-test.hpp"
-#include <string>
 
 using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
@@ -23,15 +22,15 @@ void test_rs_interval_boundary_formatting() {
 
 void test_rs_interval_boundary_adjacency() {
 
-    B null(0, BT::null);
-    B minf(0, BT::minus_infinity);
-    B pinf(0, BT::plus_infinity);
-    B me1(1, BT::minus_epsilon);
-    B ex1(1, BT::exact);
-    B pe1(1, BT::plus_epsilon);
-    B me2(2, BT::minus_epsilon);
-    B ex2(2, BT::exact);
-    B pe2(2, BT::plus_epsilon);
+    static const B null(0, BT::null);
+    static const B minf(0, BT::minus_infinity);
+    static const B pinf(0, BT::plus_infinity);
+    static const B me1(1, BT::minus_epsilon);
+    static const B ex1(1, BT::exact);
+    static const B pe1(1, BT::plus_epsilon);
+    static const B me2(2, BT::minus_epsilon);
+    static const B ex2(2, BT::exact);
+    static const B pe2(2, BT::plus_epsilon);
 
     TEST(! null.adjacent(null));
     TEST(! null.adjacent(minf));
@@ -119,15 +118,15 @@ void test_rs_interval_boundary_adjacency() {
 
 void test_rs_interval_boundary_comparison() {
 
-    B null(0, BT::null);
-    B minf(0, BT::minus_infinity);
-    B pinf(0, BT::plus_infinity);
-    B me1(1, BT::minus_epsilon);
-    B ex1(1, BT::exact);
-    B pe1(1, BT::plus_epsilon);
-    B me2(2, BT::minus_epsilon);
-    B ex2(2, BT::exact);
-    B pe2(2, BT::plus_epsilon);
+    static const B null(0, BT::null);
+    static const B minf(0, BT::minus_infinity);
+    static const B pinf(0, BT::plus_infinity);
+    static const B me1(1, BT::minus_epsilon);
+    static const B ex1(1, BT::exact);
+    static const B pe1(1, BT::plus_epsilon);
+    static const B me2(2, BT::minus_epsilon);
+    static const B ex2(2, BT::exact);
+    static const B pe2(2, BT::plus_epsilon);
 
     TEST_EQUAL(null.compare(null), 0);
     TEST_EQUAL(null.compare(minf), -1);

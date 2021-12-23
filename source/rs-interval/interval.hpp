@@ -3,7 +3,6 @@
 #include "rs-interval/type-traits.hpp"
 #include "rs-format/format.hpp"
 #include <algorithm>
-#include <array>
 #include <functional>
 #include <iterator>
 #include <ostream>
@@ -443,41 +442,7 @@ namespace RS::Intervals {
 
         // template <typename IntervalType, typename T, IntervalCategory Cat>
         // IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
-
         //     // TODO
-
-        //     using BT = Detail::Boundary<T>;
-
-        //     std::cout << "==> " << a << " " << b << "\n";
-
-        //     BT la = left_of(a);
-        //     BT ra = right_of(a);
-        //     BT lb = left_of(b);
-        //     BT rb = right_of(b);
-
-        //     std::cout << "... la=" << la.str() << ", ra=" << ra.str() << ", lb=" << lb.str() << ", rb=" << rb.str() << "\n";
-
-        //     std::array<BT, 4> bs;
-        //     bs[0] = la * lb;
-        //     bs[1] = la * rb;
-        //     bs[2] = ra * lb;
-        //     bs[3] = ra * rb;
-
-        //     std::cout << "...";
-        //     for (auto& b: bs) std::cout << " " << b.str() << ";";
-        //     std::cout << "\n";
-
-        //     BT l = *std::min_element(bs.begin(), bs.end());
-        //     BT r = *std::max_element(bs.begin(), bs.end());
-
-        //     std::cout << "... l=" << l.str() << ", r=" << r.str() << "\n";
-
-        //     auto result = from_bounds(l, r);
-
-        //     std::cout << "... " << result << "\n";
-
-        //     return result;
-
         // }
 
         // template <typename IntervalType, typename T, IntervalCategory Cat>

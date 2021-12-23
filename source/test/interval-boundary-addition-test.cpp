@@ -9,15 +9,15 @@ using BT = BoundaryType;
 
 void test_rs_interval_boundary_inversion() {
 
-    B null(0, BT::null);
-    B minf(0, BT::minus_infinity);
-    B pinf(0, BT::plus_infinity);
-    B me2(2, BT::minus_epsilon);
-    B ex2(2, BT::exact);
-    B pe2(2, BT::plus_epsilon);
-    B me_2(-2, BT::minus_epsilon);
-    B ex_2(-2, BT::exact);
-    B pe_2(-2, BT::plus_epsilon);
+    static const B null(0, BT::null);
+    static const B minf(0, BT::minus_infinity);
+    static const B pinf(0, BT::plus_infinity);
+    static const B me2(2, BT::minus_epsilon);
+    static const B ex2(2, BT::exact);
+    static const B pe2(2, BT::plus_epsilon);
+    static const B me_2(-2, BT::minus_epsilon);
+    static const B ex_2(-2, BT::exact);
+    static const B pe_2(-2, BT::plus_epsilon);
 
     TEST_EQUAL(- null, null);
     TEST_EQUAL(- minf, pinf);
@@ -33,18 +33,18 @@ void test_rs_interval_boundary_inversion() {
 
 void test_rs_interval_boundary_addition() {
 
-    B null(0, BT::null);
-    B minf(0, BT::minus_infinity);
-    B pinf(0, BT::plus_infinity);
-    B me1(1, BT::minus_epsilon);
-    B ex1(1, BT::exact);
-    B pe1(1, BT::plus_epsilon);
-    B me2(2, BT::minus_epsilon);
-    B ex2(2, BT::exact);
-    B pe2(2, BT::plus_epsilon);
-    B me3(3, BT::minus_epsilon);
-    B ex3(3, BT::exact);
-    B pe3(3, BT::plus_epsilon);
+    static const B null(0, BT::null);
+    static const B minf(0, BT::minus_infinity);
+    static const B pinf(0, BT::plus_infinity);
+    static const B me1(1, BT::minus_epsilon);
+    static const B ex1(1, BT::exact);
+    static const B pe1(1, BT::plus_epsilon);
+    static const B me2(2, BT::minus_epsilon);
+    static const B ex2(2, BT::exact);
+    static const B pe2(2, BT::plus_epsilon);
+    static const B me3(3, BT::minus_epsilon);
+    static const B ex3(3, BT::exact);
+    static const B pe3(3, BT::plus_epsilon);
 
     TEST_EQUAL(null + null, null);
     TEST_EQUAL(null + minf, null);
@@ -79,18 +79,18 @@ void test_rs_interval_boundary_addition() {
 
 void test_rs_interval_boundary_subtraction() {
 
-    B null(0, BT::null);
-    B minf(0, BT::minus_infinity);
-    B pinf(0, BT::plus_infinity);
-    B me1(1, BT::minus_epsilon);
-    B ex1(1, BT::exact);
-    B pe1(1, BT::plus_epsilon);
-    B me2(2, BT::minus_epsilon);
-    B ex2(2, BT::exact);
-    B pe2(2, BT::plus_epsilon);
-    B me3(3, BT::minus_epsilon);
-    B ex3(3, BT::exact);
-    B pe3(3, BT::plus_epsilon);
+    static const B null(0, BT::null);
+    static const B minf(0, BT::minus_infinity);
+    static const B pinf(0, BT::plus_infinity);
+    static const B me1(1, BT::minus_epsilon);
+    static const B ex1(1, BT::exact);
+    static const B pe1(1, BT::plus_epsilon);
+    static const B me2(2, BT::minus_epsilon);
+    static const B ex2(2, BT::exact);
+    static const B pe2(2, BT::plus_epsilon);
+    static const B me3(3, BT::minus_epsilon);
+    static const B ex3(3, BT::exact);
+    static const B pe3(3, BT::plus_epsilon);
 
     TEST_EQUAL(null - null, null);
     TEST_EQUAL(null - minf, null);
