@@ -469,7 +469,7 @@ namespace RS::Intervals {
             if (a.empty() || b.empty())
                 return {};
 
-            CappedVector<B, 8> boundaries;
+            CappedVector<B, 9> boundaries;
 
             B al = left_boundary_of(a);
             B ar = right_boundary_of(a);
