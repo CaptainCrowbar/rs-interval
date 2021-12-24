@@ -74,14 +74,6 @@ namespace RS::Intervals {
             && has_less_or_equal_operator<T> && has_greater_or_equal_operator<T>);
 
         template <typename T>
-        struct Arithmetic {
-            friend T& operator+=(T& lhs, const T& rhs) { lhs = lhs + rhs; return lhs; }
-            friend T& operator-=(T& lhs, const T& rhs) { lhs = lhs - rhs; return lhs; }
-            friend T& operator*=(T& lhs, const T& rhs) { lhs = lhs * rhs; return lhs; }
-            friend T& operator/=(T& lhs, const T& rhs) { lhs = lhs / rhs; return lhs; }
-        };
-
-        template <typename T>
         struct TotalOrder {
             friend bool operator!=(const T& lhs, const T& rhs) { return ! (lhs == rhs); }
             friend bool operator>(const T& lhs, const T& rhs) { return rhs < lhs; }
