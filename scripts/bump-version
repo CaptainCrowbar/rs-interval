@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Run this script to increment the patch number and propagate the new version
+# to version.hpp. The version number in CMakeLists.txt is the canonical one
+# for the project.
+
 set -euo pipefail
 
 if [[ "${PWD##*/}" =~ build ]]; then

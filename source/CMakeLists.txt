@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.18)
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
-project(rs-interval-lib
-    VERSION 1.0
+# The version number here is the canonical one for the project. Run
+# scripts/bump-version to increment the patch number and propagate the new
+# version to version.hpp.
+
+project(rs-interval
+    VERSION 0.1.3
     LANGUAGES CXX
 )
 
@@ -50,7 +54,7 @@ include_directories(.)
 find_package(Threads REQUIRED)
 
 add_executable(${unittest}
-    test/type-traits-test.cpp
+    test/types-test.cpp
     test/continuous-boundary-basic-test.cpp
     test/integral-boundary-basic-test.cpp
     test/ordered-boundary-basic-test.cpp
