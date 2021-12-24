@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rs-interval/type-traits.hpp"
+#include "rs-interval/types.hpp"
 #include "rs-format/format.hpp"
 #include <algorithm>
 #include <functional>

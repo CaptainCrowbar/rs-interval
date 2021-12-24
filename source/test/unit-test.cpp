@@ -4,7 +4,7 @@ int main(int argc, char** argv) {
 
     RS::UnitTest::begin_tests(argc, argv);
 
-    // type-traits-test.cpp
+    // types-test.cpp
     UNIT_TEST(rs_interval_type_traits)
 
     // continuous-boundary-basic-test.cpp

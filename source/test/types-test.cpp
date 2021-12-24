@@ -1,4 +1,4 @@
-#include "rs-interval/type-traits.hpp"
+#include "rs-interval/types.hpp"
 #include "test/stepwise.hpp"
 #include "rs-unit-test.hpp"
 #include <chrono>
