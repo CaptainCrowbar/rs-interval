@@ -1,6 +1,5 @@
 #include "rs-interval.hpp"
 #include "rs-unit-test.hpp"
-#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>

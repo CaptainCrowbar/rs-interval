@@ -469,26 +469,33 @@ namespace RS::Intervals {
             if (a.empty() || b.empty())
                 return {};
 
+            CappedVector<B, 8> boundaries;
+
             B al = left_boundary_of(a);
             B ar = right_boundary_of(a);
             B bl = left_boundary_of(b);
             B br = right_boundary_of(b);
 
-            std::vector<B> boundaries;
             boundaries.push_back(al * bl);
             boundaries.push_back(al * br);
             boundaries.push_back(ar * bl);
             boundaries.push_back(ar * br);
 
-            if (contains_zero(a)) {
+            bool a_zero = contains_zero(a);
+            bool b_zero = contains_zero(b);
+
+            if (a_zero) {
                 boundaries.push_back(zero * bl);
                 boundaries.push_back(zero * br);
             }
 
-            if (contains_zero(b)) {
+            if (b_zero) {
                 boundaries.push_back(zero * al);
                 boundaries.push_back(zero * ar);
             }
+
+            if (a_zero && b_zero)
+                boundaries.push_back(zero);
 
             auto i = std::min_element(boundaries.begin(), boundaries.end(),
                 [] (auto& a, auto& b) { return a.compare_ll(b); });
