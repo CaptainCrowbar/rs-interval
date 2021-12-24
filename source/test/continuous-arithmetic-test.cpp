@@ -1,5 +1,6 @@
 #include "rs-interval.hpp"
 #include "rs-unit-test.hpp"
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -12,19 +13,6 @@ using IB = IntervalBound;
 using IC = IntervalCategory;
 using IM = IntervalMatch;
 using IO = IntervalOrder;
-
-// TODO
-namespace RS::Intervals {
-
-    template <typename IntervalType, typename T, IntervalCategory Cat>
-    IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
-        // TODO
-        (void)a;
-        (void)b;
-        return {};
-    }
-
-}
 
 void test_rs_continuous_contains_zero() {
 
@@ -169,13 +157,13 @@ void test_rs_continuous_interval_arithmetic() {
         { __LINE__,  {10,10,"<="},  {-86,99,"()"},  {109,109,"<"},   {96,96,"<"},     {-96,-96,">"},   {0,0,"*"},          {},   {}, },
         { __LINE__,  {10,10,">"},   {-86,99,"()"},  {-76,-76,">"},   {-89,-89,">"},   {89,89,"<"},     {0,0,"*"},          {},   {}, },
         { __LINE__,  {10,10,">="},  {-86,99,"()"},  {-76,-76,">"},   {-89,-89,">"},   {89,89,"<"},     {0,0,"*"},          {},   {}, },
-        { __LINE__,  {10,10,"<"},   {42,42,"<"},    {52,52,"<"},     {0,0,"*"},       {0,0,"*"},       {0,0,">="},         {},   {}, },
-        { __LINE__,  {10,10,"<="},  {42,42,"<"},    {52,52,"<"},     {0,0,"*"},       {0,0,"*"},       {0,0,">="},         {},   {}, },
-        { __LINE__,  {10,10,">"},   {42,42,"<"},    {0,0,"*"},       {-32,-32,">"},   {32,32,"<"},     {0,0,">="},         {},   {}, },
-        { __LINE__,  {10,10,">="},  {42,42,"<"},    {0,0,"*"},       {-32,-32,">"},   {32,32,"<"},     {0,0,">="},         {},   {}, },
-        { __LINE__,  {10,10,"<="},  {42,42,"<="},   {52,52,"<="},    {0,0,"*"},       {0,0,"*"},       {0,0,">="},         {},   {}, },
-        { __LINE__,  {10,10,">"},   {42,42,"<="},   {0,0,"*"},       {-32,-32,">"},   {32,32,"<"},     {0,0,">="},         {},   {}, },
-        { __LINE__,  {10,10,">="},  {42,42,"<="},   {0,0,"*"},       {-32,-32,">="},  {32,32,"<="},    {0,0,">="},         {},   {}, },
+        { __LINE__,  {10,10,"<"},   {42,42,"<"},    {52,52,"<"},     {0,0,"*"},       {0,0,"*"},       {0,0,"*"},          {},   {}, },
+        { __LINE__,  {10,10,"<="},  {42,42,"<"},    {52,52,"<"},     {0,0,"*"},       {0,0,"*"},       {0,0,"*"},          {},   {}, },
+        { __LINE__,  {10,10,">"},   {42,42,"<"},    {0,0,"*"},       {-32,-32,">"},   {32,32,"<"},     {0,0,"*"},          {},   {}, },
+        { __LINE__,  {10,10,">="},  {42,42,"<"},    {0,0,"*"},       {-32,-32,">"},   {32,32,"<"},     {0,0,"*"},          {},   {}, },
+        { __LINE__,  {10,10,"<="},  {42,42,"<="},   {52,52,"<="},    {0,0,"*"},       {0,0,"*"},       {0,0,"*"},          {},   {}, },
+        { __LINE__,  {10,10,">"},   {42,42,"<="},   {0,0,"*"},       {-32,-32,">"},   {32,32,"<"},     {0,0,"*"},          {},   {}, },
+        { __LINE__,  {10,10,">="},  {42,42,"<="},   {0,0,"*"},       {-32,-32,">="},  {32,32,"<="},    {0,0,"*"},          {},   {}, },
         { __LINE__,  {10,10,">"},   {42,42,">"},    {52,52,">"},     {0,0,"*"},       {0,0,"*"},       {420,420,">"},      {},   {}, },
         { __LINE__,  {10,10,">="},  {42,42,">"},    {52,52,">"},     {0,0,"*"},       {0,0,"*"},       {420,420,">"},      {},   {}, },
         { __LINE__,  {10,10,">="},  {42,42,">="},   {52,52,">="},    {0,0,"*"},       {0,0,"*"},       {420,420,">="},     {},   {}, },
@@ -191,19 +179,16 @@ void test_rs_continuous_interval_arithmetic() {
         TRY(a = t.lhs);
         TRY(b = t.rhs);
 
-        // TODO
-        (void)c;
-
         TRY(c = a + b);           TEST_EQUAL(c, t.add);   errors += int(c != t.add);
         TRY(c = a - b);           TEST_EQUAL(c, t.sub1);  errors += int(c != t.sub1);
         TRY(c = b - a);           TEST_EQUAL(c, t.sub2);  errors += int(c != t.sub2);
-        // TRY(c = a * b);           TEST_EQUAL(c, t.mul);   errors += int(c != t.mul);
+        TRY(c = a * b);           TEST_EQUAL(c, t.mul);   errors += int(c != t.mul);
         // TRY(c = a / b);           TEST_EQUAL(c, t.div1);  errors += int(c != t.div1);
         // TRY(c = b / a);           TEST_EQUAL(c, t.div2);  errors += int(c != t.div2);
         TRY(c = a); TRY(c += b);  TEST_EQUAL(c, t.add);   errors += int(c != t.add);
         TRY(c = a); TRY(c -= b);  TEST_EQUAL(c, t.sub1);  errors += int(c != t.sub1);
         TRY(c = b); TRY(c -= a);  TEST_EQUAL(c, t.sub2);  errors += int(c != t.sub2);
-        // TRY(c = a); TRY(c *= b);  TEST_EQUAL(c, t.mul);   errors += int(c != t.mul);
+        TRY(c = a); TRY(c *= b);  TEST_EQUAL(c, t.mul);   errors += int(c != t.mul);
         // TRY(c = a); TRY(c /= b);  TEST_EQUAL(c, t.div1);  errors += int(c != t.div1);
         // TRY(c = b); TRY(c /= a);  TEST_EQUAL(c, t.div2);  errors += int(c != t.div2);
 

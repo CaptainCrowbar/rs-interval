@@ -120,13 +120,13 @@ namespace RS::Intervals {
                 case BT::empty:   lbound = IB::empty; break;
                 case BT::open:    lbound = IB::open; break;
                 case BT::closed:  lbound = IB::closed; break;
-                default:           lbound = IB::unbound; break;
+                default:          lbound = IB::unbound; break;
             }
             switch (r.type) {
                 case BT::empty:   rbound = IB::empty; break;
                 case BT::open:    rbound = IB::open; break;
                 case BT::closed:  rbound = IB::closed; break;
-                default:           rbound = IB::unbound; break;
+                default:          rbound = IB::unbound; break;
             }
             return {l.value, r.value, lbound, rbound};
         }
@@ -456,10 +456,50 @@ namespace RS::Intervals {
             return add_intervals(a, negative_interval(b));
         }
 
-        // template <typename IntervalType, typename T, IntervalCategory Cat>
-        // IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
-        //     // TODO
-        // }
+        template <typename IntervalType, typename T, IntervalCategory Cat>
+        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
+
+            using namespace RS::Intervals::Detail;
+
+            using B = Boundary<T>;
+            using BT = BoundaryType;
+
+            static const B zero = {T(), BT::closed};
+
+            if (a.empty() || b.empty())
+                return {};
+
+            B al = left_boundary_of(a);
+            B ar = right_boundary_of(a);
+            B bl = left_boundary_of(b);
+            B br = right_boundary_of(b);
+
+            std::vector<B> boundaries;
+            boundaries.push_back(al * bl);
+            boundaries.push_back(al * br);
+            boundaries.push_back(ar * bl);
+            boundaries.push_back(ar * br);
+
+            if (contains_zero(a)) {
+                boundaries.push_back(zero * bl);
+                boundaries.push_back(zero * br);
+            }
+
+            if (contains_zero(b)) {
+                boundaries.push_back(zero * al);
+                boundaries.push_back(zero * ar);
+            }
+
+            auto i = std::min_element(boundaries.begin(), boundaries.end(),
+                [] (auto& a, auto& b) { return a.compare_ll(b); });
+            auto j = std::max_element(boundaries.begin(), boundaries.end(),
+                [] (auto& a, auto& b) { return a.compare_rr(b); });
+
+            IntervalType result = interval_from_boundaries(*i, *j);
+
+            return result;
+
+        }
 
         // template <typename IntervalType, typename T, IntervalCategory Cat>
         // IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::divide_intervals(const IntervalType& a, const IntervalType& b) {
