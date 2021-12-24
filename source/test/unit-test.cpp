@@ -78,6 +78,7 @@ int main(int argc, char** argv) {
 
     // continuous-arithmetic-test.cpp
     UNIT_TEST(rs_continuous_contains_zero)
+    UNIT_TEST(rs_continuous_interval_reciprocal)
     UNIT_TEST(rs_continuous_interval_arithmetic)
 
     // integral-basic-test.cpp

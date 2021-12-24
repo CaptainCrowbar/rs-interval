@@ -28,8 +28,8 @@ namespace RS::Intervals {
 
         IntervalSet() = default;
         IntervalSet(const T& t): set_{{t}} {}
-        IntervalSet(const interval_type& in): set_{in} {}
-        IntervalSet(std::initializer_list<interval_type> list): set_(list) {}
+        IntervalSet(const interval_type& in) { insert(in); }
+        IntervalSet(std::initializer_list<interval_type> list);
 
         bool operator()(const T& t) const { return contains(t); }
         IntervalSet operator~() const { return complement(); }
@@ -60,6 +60,12 @@ namespace RS::Intervals {
         std::set<Interval<T>> set_;
 
     };
+
+        template <typename T>
+        IntervalSet<T>::IntervalSet(std::initializer_list<interval_type> list) {
+            for (auto& in: list)
+                insert(in);
+        }
 
         template <typename T>
         bool IntervalSet<T>::contains(const T& t) const {

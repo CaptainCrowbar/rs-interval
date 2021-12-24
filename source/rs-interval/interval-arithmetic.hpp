@@ -9,6 +9,7 @@
 namespace RS::Intervals {
 
     template <typename T> class Interval;
+    template <typename T> class IntervalSet;
 
     namespace Detail {
 
@@ -74,6 +75,49 @@ namespace RS::Intervals {
             return {l.value, r.value, lbound, rbound};
         }
 
+        template <typename T>
+        Interval<T> reciprocal_interval(const Interval<T>& i) {
+            using IB = IntervalBound;
+            if (i.empty())
+                return {};
+            T lvalue = {};
+            T rvalue = {};
+            IB lbound, rbound;
+            if (i.left() == IB::unbound) {
+                rbound = IB::open;
+            } else if (i.min() == T()) {
+                rbound = IB::unbound;
+            } else {
+                rvalue = T(1) / i.min();
+                rbound = i.left();
+            }
+            if (i.right() == IB::unbound) {
+                lbound = IB::open;
+            } else if (i.max() == T()) {
+                lbound = IB::unbound;
+            } else {
+                lvalue = T(1) / i.max();
+                lbound = i.right();
+            }
+            return {lvalue, rvalue, lbound, rbound};
+        }
+
+        template <typename T>
+        IntervalSet<T> reciprocal_set(const Interval<T>& i) {
+            using IB = IntervalBound;
+            if (i.empty()) {
+                return {};
+            } else if (contains_zero(i)) {
+                Interval<T> negative_part(i.min(), T(), i.left(), IB::open);
+                Interval<T> positive_part(T(), i.max(), IB::open, i.right());
+                auto negative_reciprocal = reciprocal_interval(negative_part);
+                auto positive_reciprocal = reciprocal_interval(positive_part);
+                return {negative_reciprocal, positive_reciprocal};
+            } else {
+                return reciprocal_interval(i);
+            }
+        }
+
     }
 
     // Interval arithmetic operators
@@ -93,6 +137,8 @@ namespace RS::Intervals {
     template <typename T>
     std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
     operator+(const Interval<T>& a, const Interval<T>& b) {
+        if (a.empty() || b.empty())
+            return {};
         auto l = Detail::left_boundary_of(a) + Detail::left_boundary_of(b);
         auto r = Detail::right_boundary_of(a) + Detail::right_boundary_of(b);
         return Detail::interval_from_boundaries(l, r);
@@ -113,17 +159,17 @@ namespace RS::Intervals {
         using B = Boundary<T>;
         using BT = BoundaryType;
 
-        static const B zero = {T(), BT::closed};
-
         if (a.empty() || b.empty())
             return {};
 
-        CappedVector<B, 9> boundaries;
+        static const B zero = {T(), BT::closed};
 
         B al = left_boundary_of(a);
         B ar = right_boundary_of(a);
         B bl = left_boundary_of(b);
         B br = right_boundary_of(b);
+
+        CappedVector<B, 9> boundaries;
 
         boundaries.push_back(al * bl);
         boundaries.push_back(al * br);
@@ -156,12 +202,15 @@ namespace RS::Intervals {
     }
 
     template <typename T>
-    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    std::enable_if_t<interval_category<T> == IntervalCategory::continuous, IntervalSet<T>>
     operator/(const Interval<T>& a, const Interval<T>& b) {
-        // TODO
-        (void)a;
-        (void)b;
-        return {};
+        if (a.empty() || b.empty())
+            return {};
+        auto b_reciprocals = Detail::reciprocal_set(b);
+        IntervalSet<T> set;
+        for (auto& br: b_reciprocals)
+            set.insert(a * br);
+        return set;
     }
 
     template <typename T>

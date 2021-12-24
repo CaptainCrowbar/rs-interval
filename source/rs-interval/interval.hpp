@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rs-interval/interval-arithmetic-base.hpp"
+#include "rs-interval/interval-arithmetic.hpp"
 #include "rs-interval/interval-category-base.hpp"
 #include "rs-interval/interval-type-base.hpp"
 #include "rs-interval/types.hpp"

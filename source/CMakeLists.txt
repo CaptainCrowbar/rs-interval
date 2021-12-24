@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.18)
 # version to version.hpp.
 
 project(rs-interval
-    VERSION 0.1.9
+    VERSION 0.1.11
     LANGUAGES CXX
 )
 
