@@ -94,6 +94,83 @@ void test_rs_ordered_interval_construction() {
 
 }
 
+void test_rs_ordered_interval_order() {
+
+    Itv a, b;
+    IO io;
+
+    TRY(a = Itv());              TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::equal);              // ...
+    TRY(a = Itv());              TRY(b = Itv("a","a",">"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
+    TRY(a = Itv());              TRY(b = Itv("a","a",">="));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
+    TRY(a = Itv());              TRY(b = Itv("a","a","<"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
+    TRY(a = Itv());              TRY(b = Itv("a","a","<="));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
+    TRY(a = Itv());              TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
+    TRY(a = Itv());              TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
+    TRY(a = Itv());              TRY(b = Itv("a"));           TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // b
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("f","g","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_below_b);          // aaa...bbb
+    TRY(a = Itv("a","a","<"));   TRY(b = Itv("a","a",">"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_below_b);          // aaa.bbb
+    TRY(a = Itv("a","a","<"));   TRY(b = Itv("a","a",">="));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_touches_b);        // aaabbb
+    TRY(a = Itv("a","a","<="));  TRY(b = Itv("a","a",">"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_touches_b);        // aaabbb
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("e","f","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_touches_b);        // aaabbb
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv("e","f","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_touches_b);        // aaabbb
+    TRY(a = Itv("a","a","<="));  TRY(b = Itv("a","a",">="));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_overlaps_b);       // aaa*bbb
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("e","f","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_overlaps_b);       // aaa*bbb
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("c","f","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_overlaps_b);       // aaa***bbb
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv("c","f","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_overlaps_b);       // aaa***bbb
+    TRY(a = Itv("a","e","[)"));  TRY(b = Itv("c","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_overlaps_b);       // aaa***b
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("a","f","(]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_overlaps_b);       // a***bbb
+    TRY(a = Itv("a","e","[)"));  TRY(b = Itv("a","e","(]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_overlaps_b);       // a***b
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("c","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_extends_below_b);  // aaa***
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv("c","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_extends_below_b);  // aaa***
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("a","e","(]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_extends_below_b);  // a***
+    TRY(a = Itv("a","e","[)"));  TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_extends_below_b);  // a***
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("b","d","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_encloses_b);       // aaa***aaa
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv("b","d","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_encloses_b);       // aaa***aaa
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("c","e","[)"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_encloses_b);       // aaa***a
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("a","c","(]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_encloses_b);       // a***aaa
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_encloses_b);       // a***a
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("a","f","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_extends_above_a);  // ***bbb
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv("a","f","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_extends_above_a);  // ***bbb
+    TRY(a = Itv("a","e","[)"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_extends_above_a);  // ***b
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::equal);              // ***
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::equal);              // ***
+    TRY(a = Itv("a","e","[)"));  TRY(b = Itv("a","e","[)"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::equal);              // ***
+    TRY(a = Itv("a","e","[)"));  TRY(b = Itv("a","e","[)"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::equal);              // ***
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv("a","e","[)"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_extends_above_b);  // ***a
+    TRY(a = Itv("a","f","()"));  TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_extends_above_b);  // ***aaa
+    TRY(a = Itv("a","f","[]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_extends_above_b);  // ***aaa
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_encloses_a);       // b***b
+    TRY(a = Itv("a","c","(]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_encloses_a);       // b***bbb
+    TRY(a = Itv("c","e","[)"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_encloses_a);       // bbb***b
+    TRY(a = Itv("b","d","[]"));  TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_encloses_a);       // bbb***bbb
+    TRY(a = Itv("b","d","[]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_encloses_a);       // bbb***bbb
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv("a","e","[)"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_extends_below_a);  // b***
+    TRY(a = Itv("a","e","(]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_extends_below_a);  // b***
+    TRY(a = Itv("c","e","()"));  TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_extends_below_a);  // bbb***
+    TRY(a = Itv("c","e","[]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_extends_below_a);  // bbb***
+    TRY(a = Itv("a","e","(]"));  TRY(b = Itv("a","e","[)"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_overlaps_a);       // b***a
+    TRY(a = Itv("a","f","(]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_overlaps_a);       // b***aaa
+    TRY(a = Itv("c","e","[]"));  TRY(b = Itv("a","e","[)"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_overlaps_a);       // bbb***a
+    TRY(a = Itv("c","f","()"));  TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_overlaps_a);       // bbb***aaa
+    TRY(a = Itv("c","f","[]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_overlaps_a);       // bbb***aaa
+    TRY(a = Itv("e","f","[]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_overlaps_a);       // bbb*aaa
+    TRY(a = Itv("a","a",">="));  TRY(b = Itv("a","a","<="));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_overlaps_a);       // bbb*aaa
+    TRY(a = Itv("e","f","[]"));  TRY(b = Itv("a","e","()"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_touches_a);        // bbbaaa
+    TRY(a = Itv("e","f","()"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_touches_a);        // bbbaaa
+    TRY(a = Itv("a","a",">"));   TRY(b = Itv("a","a","<="));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_touches_a);        // bbbaaa
+    TRY(a = Itv("a","a",">="));  TRY(b = Itv("a","a","<"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_touches_a);        // bbbaaa
+    TRY(a = Itv("a","a",">"));   TRY(b = Itv("a","a","<"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_below_a);          // bbb.aaa
+    TRY(a = Itv("f","g","[]"));  TRY(b = Itv("a","e","[]"));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_below_a);          // bbb...aaa
+    TRY(a = Itv("a"));           TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_only);             // a
+    TRY(a = Itv("a","e","()"));  TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_only);             // aaa
+    TRY(a = Itv("a","e","[]"));  TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_only);             // aaa
+    TRY(a = Itv("a","a","<="));  TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_only);             // aaaa
+    TRY(a = Itv("a","a","<"));   TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_only);             // aaaa
+    TRY(a = Itv("a","a",">="));  TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_only);             // aaaa
+    TRY(a = Itv("a","a",">"));   TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::a_only);             // aaaa
+
+}
+
 void test_rs_ordered_interval_inverse() {
 
     Itv in;
@@ -101,7 +178,7 @@ void test_rs_ordered_interval_inverse() {
     std::string str;
 
     TRY((in = {}));                      TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{*}");
-    TRY((in = Itv::all()));     TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
+    TRY((in = Itv::all()));              TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
     TRY((in = {"hello"}));               TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<hello,>hello}");
     TRY((in = {"hello","hello","<"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=hello}");
     TRY((in = {"hello","hello","<="}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>hello}");

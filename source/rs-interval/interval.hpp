@@ -70,47 +70,47 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        Boundary<T> left_of(const IntervalTypeBase<T>& i) {
+        Boundary<T> left_boundary_of(const IntervalTypeBase<T>& i) {
             using BT = BoundaryType;
             if (i.empty())
-                return {{}, BT::null};
+                return {};
             else if (i.is_left_closed())
-                return {i.min(), BT::exact};
+                return {i.min(), BT::closed_};
             else if (i.is_left_open())
-                return {i.min(), BT::plus_epsilon};
+                return {i.min(), BT::open_};
             else
-                return {{}, BT::minus_infinity};
+                return {{}, BT::minus_infinity_};
         }
 
         template <typename T>
-        Boundary<T> right_of(const IntervalTypeBase<T>& i) {
+        Boundary<T> right_boundary_of(const IntervalTypeBase<T>& i) {
             using BT = BoundaryType;
             if (i.empty())
-                return {{}, BT::null};
+                return {};
             else if (i.is_right_closed())
-                return {i.max(), BT::exact};
+                return {i.max(), BT::closed_};
             else if (i.is_right_open())
-                return {i.max(), BT::minus_epsilon};
+                return {i.max(), BT::open_};
             else
-                return {{}, BT::plus_infinity};
+                return {{}, BT::plus_infinity_};
         }
 
         template <typename T>
-        Interval<T> from_bounds(const Boundary<T>& l, const Boundary<T>& r) {
+        Interval<T> interval_from_boundaries(const Boundary<T>& l, const Boundary<T>& r) {
             using BT = BoundaryType;
             using IB = IntervalBound;
             IB lbound, rbound;
             switch (l.type) {
-                case BT::null:            lbound = IB::empty; break;
-                case BT::plus_epsilon:    lbound = IB::open; break;
-                case BT::minus_infinity:  lbound = IB::unbound; break;
-                default:                  lbound = IB::closed; break;
+                case BT::empty_:   lbound = IB::empty; break;
+                case BT::open_:    lbound = IB::open; break;
+                case BT::closed_:  lbound = IB::closed; break;
+                default:           lbound = IB::unbound; break;
             }
             switch (r.type) {
-                case BT::null:           rbound = IB::empty; break;
-                case BT::minus_epsilon:  rbound = IB::open; break;
-                case BT::plus_infinity:  rbound = IB::unbound; break;
-                default:                 rbound = IB::closed; break;
+                case BT::empty_:   rbound = IB::empty; break;
+                case BT::open_:    rbound = IB::open; break;
+                case BT::closed_:  rbound = IB::closed; break;
+                default:           rbound = IB::unbound; break;
             }
             return {l.value, r.value, lbound, rbound};
         }
@@ -430,9 +430,9 @@ namespace RS::Intervals {
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
         IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::add_intervals(const IntervalType& a, const IntervalType& b) {
-            auto l = left_of(a) + left_of(b);
-            auto r = right_of(a) + right_of(b);
-            return from_bounds(l, r);
+            auto l = left_boundary_of(a) + left_boundary_of(b);
+            auto r = right_boundary_of(a) + right_boundary_of(b);
+            return interval_from_boundaries(l, r);
         }
 
         template <typename IntervalType, typename T, IntervalCategory Cat>
@@ -536,7 +536,7 @@ namespace RS::Intervals {
         template <typename T>
         IntervalOrder Interval<T>::order(const Interval& b) const {
 
-            using BT = Detail::Boundary<T>;
+            using B = Detail::Boundary<T>;
 
             auto& a = *this;
 
@@ -547,39 +547,39 @@ namespace RS::Intervals {
             else if (b.empty())
                 return IntervalOrder::a_only;
 
-            BT al = left_of(a);
-            BT ar = right_of(a);
-            BT bl = left_of(b);
-            BT br = right_of(b);
+            B al = left_boundary_of(a);
+            B ar = right_boundary_of(a);
+            B bl = left_boundary_of(b);
+            B br = right_boundary_of(b);
 
-            if (ar < bl) {
+            if (ar.compare_rl(bl)) {
                 if (ar.adjacent(bl))
                     return IntervalOrder::a_touches_b;
                 else
                     return IntervalOrder::a_below_b;
-            } else if (br < al) {
+            } else if (br.compare_rl(al)) {
                 if (br.adjacent(al))
                     return IntervalOrder::b_touches_a;
                 else
                     return IntervalOrder::b_below_a;
-            } else if (al < bl) {
-                if (ar < br)
+            } else if (al.compare_ll(bl)) {
+                if (ar.compare_rr(br))
                     return IntervalOrder::a_overlaps_b;
-                else if (br < ar)
+                else if (br.compare_rr(ar))
                     return IntervalOrder::a_encloses_b;
                 else
                     return IntervalOrder::a_extends_below_b;
-            } else if (bl < al) {
-                if (ar < br)
+            } else if (bl.compare_ll(al)) {
+                if (ar.compare_rr(br))
                     return IntervalOrder::b_encloses_a;
-                else if (br < ar)
+                else if (br.compare_rr(ar))
                     return IntervalOrder::b_overlaps_a;
                 else
                     return IntervalOrder::b_extends_below_a;
             } else {
-                if (ar < br)
+                if (ar.compare_rr(br))
                     return IntervalOrder::b_extends_above_a;
-                else if (br < ar)
+                else if (br.compare_rr(ar))
                     return IntervalOrder::a_extends_above_b;
                 else
                     return IntervalOrder::equal;

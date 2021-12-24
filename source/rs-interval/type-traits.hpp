@@ -180,40 +180,32 @@ namespace RS::Intervals {
     namespace Detail {
 
         RS_FORMAT_DEFINE_ENUM_CLASS(BoundaryType, int, -3,
-            null,
-            minus_infinity,
-            minus_epsilon,
-            exact,
-            plus_epsilon,
-            plus_infinity
+            empty_,
+            minus_infinity_,
+            closed_,
+            open_,
+            plus_infinity_
         )
 
         template <typename T>
-        struct Boundary:
-        public Arithmetic<Boundary<T>>,
-        public TotalOrder<Boundary<T>> {
+        struct Boundary {
             T value = T();
-            BoundaryType type = BoundaryType::null;
-            Boundary() = default;
-            Boundary(T v, BoundaryType t);
+            BoundaryType type = BoundaryType::empty_;
             bool adjacent(const Boundary& b) const noexcept;
-            int compare(const Boundary& b) const noexcept;
+            bool compare_ll(const Boundary& b) const noexcept;  // Compare left bounds (closed<open)
+            bool compare_rr(const Boundary& b) const noexcept;  // Compare right bounds (open<closed)
+            bool compare_lr(const Boundary& b) const noexcept;  // Compare left bound with right
+            bool compare_rl(const Boundary& b) const noexcept;  // Compare right bound with left
             bool has_value() const noexcept;
             std::string str() const;
-            Boundary operator-() const;
-            Boundary operator+(const Boundary& b) const;
-            Boundary operator-(const Boundary& b) const { return *this + - b; }
-            Boundary operator*(const Boundary& b) const;
-            bool operator==(const Boundary& b) const noexcept { return compare(b) == 0; }
-            bool operator<(const Boundary& b) const noexcept { return compare(b) < 0; }
-        };
+            Boundary<T> operator-() const;
+            Boundary<T> operator+(const Boundary<T>& b) const;
+            Boundary<T> operator-(const Boundary<T>& b) const { return *this + - b; }
+            Boundary<T> operator*(const Boundary<T>& b) const;
+            bool operator==(const Boundary<T>& b) const noexcept;
+            bool operator!=(const Boundary<T>& b) const noexcept { return ! (*this == b); }
 
-            template <typename T>
-            Boundary<T>::Boundary(T v, BoundaryType t):
-            value(), type(t) {
-                if (has_value())
-                    value = v;
-            }
+        };
 
             template <typename T>
             bool Boundary<T>::adjacent(const Boundary& b) const noexcept {
@@ -221,12 +213,12 @@ namespace RS::Intervals {
                 using IC = IntervalCategory;
                 if (! has_value() || ! b.has_value())
                     return false;
-                if (type != BT::exact && b.type != BT::exact)
+                if (type == BT::open_ && b.type == BT::open_)
                     return false;
                 if (value == b.value)
-                    return std::abs(int(type) - int(b.type)) == 1;
+                    return type != b.type;
                 if constexpr (interval_category<T> == IC::stepwise || interval_category<T> == IC::integral) {
-                    if (type == BT::exact && b.type == BT::exact) {
+                    if (type == BT::closed_ && b.type == BT::closed_) {
                         if (value < b.value) {
                             T t = value;
                             return ++t == b.value;
@@ -240,17 +232,48 @@ namespace RS::Intervals {
             }
 
             template <typename T>
-            int Boundary<T>::compare(const Boundary& b) const noexcept {
+            bool Boundary<T>::compare_ll(const Boundary& b) const noexcept {
                 if (has_value() && b.has_value() && value != b.value)
-                    return value < b.value ? -1 : 1;
+                    return value < b.value;
                 else
-                    return type < b.type ? -1 : type > b.type ? 1 : 0;
+                    return type < b.type;
+            }
+
+            template <typename T>
+            bool Boundary<T>::compare_rr(const Boundary& b) const noexcept {
+                if (! has_value() || ! b.has_value())
+                    return type < b.type;
+                else if (value != b.value)
+                    return value < b.value;
+                else
+                    return type > b.type;
+            }
+
+            template <typename T>
+            bool Boundary<T>::compare_lr(const Boundary& b) const noexcept {
+                if (! has_value() || ! b.has_value())
+                    return type < b.type;
+                else if (value != b.value)
+                    return value < b.value;
+                else
+                    return false;
+            }
+
+            template <typename T>
+            bool Boundary<T>::compare_rl(const Boundary& b) const noexcept {
+                using BT = BoundaryType;
+                if (! has_value() || ! b.has_value())
+                    return type < b.type;
+                else if (value != b.value)
+                    return value < b.value;
+                else
+                    return type == BT::open_ || b.type == BT::open_;
             }
 
             template <typename T>
             bool Boundary<T>::has_value() const noexcept {
                 using BT = BoundaryType;
-                return type >= BT::minus_epsilon && type <= BT::plus_epsilon;
+                return type == BT::closed_ || type == BT::open_;
             }
 
             template <typename T>
@@ -258,54 +281,104 @@ namespace RS::Intervals {
                 using namespace RS::Format;
                 using BT = BoundaryType;
                 switch (type) {
-                    case BT::null:            return "{}";
-                    case BT::minus_infinity:  return "-inf";
-                    case BT::plus_infinity:   return "+inf";
-                    default:                  break;
+                    case BT::empty_:           return "{}";
+                    case BT::minus_infinity_:  return "-inf";
+                    case BT::plus_infinity_:   return "+inf";
+                    default:                   break;
                 }
-                auto s = RS::Format::format_object(value);
-                switch (type) {
-                    case BT::minus_epsilon:  s += "-eps"; break;
-                    case BT::plus_epsilon:   s += "+eps"; break;
-                    default:                 break;
-                }
+                std::string s;
+                if (type == BT::open_)
+                    s += '(';
+                s += format_object(value);
+                if (type == BT::open_)
+                    s += ')';
                 return s;
             }
 
             template <typename T>
             Boundary<T> Boundary<T>::operator-() const {
                 using BT = BoundaryType;
-                if (type == BT::null)
-                    return {};
-                else
-                    return {- value, BT(- int(type))};
+                auto b = *this;
+                if (has_value())
+                    b.value = - b.value;
+                if (type == BT::minus_infinity_)
+                    b.type = BT::plus_infinity_;
+                else if (type == BT::plus_infinity_)
+                    b.type = BT::minus_infinity_;
+                return b;
             }
 
             template <typename T>
-            Boundary<T> Boundary<T>::operator+(const Boundary& b) const {
-                // We will only be adding like to like (lower or upper
-                // bounds), so the combinations minus_epsilon+plus_epsilon and
-                // minus_infinity+plus_infinity will never happen.
+            Boundary<T> Boundary<T>::operator+(const Boundary<T>& b) const {
+                // We will only be adding like to like (lower or upper bounds),
+                // so minus_infinity+plus_infinity will never happen.
                 using BT = BoundaryType;
-                if (type == BT::null || b.type == BT::null)
+                if (type == BT::empty_ || b.type == BT::empty_)
                     return {};
                 else if (! has_value())
                     return *this;
                 else if (! b.has_value())
                     return b;
-                T sum = value + b.value;
-                if (type == BT::exact)
-                    return {sum, b.type};
-                else if (b.type == BT::exact)
-                    return {sum, type};
-                else
-                    return {sum, type};
+                Boundary<T> c = {value + b.value, BT::open_};
+                if (type == BT::closed_ & b.type == BT::closed_)
+                    c.type = BT::closed_;
+                return c;
             }
 
-            // TODO
-            // template <typename T>
-            // Boundary<T> Boundary<T>::operator*(const Boundary& b) const {
-            // }
+            template <typename T>
+            Boundary<T> Boundary<T>::operator*(const Boundary& b) const {
+
+                using BT = BoundaryType;
+
+                // If either argument is empty, the result is empty
+                if (type == BT::empty_ || b.type == BT::empty_)
+                    return {};
+
+                // Use symmetry to handle negative arguments
+                bool a_minus = type == BT::minus_infinity_ || (has_value() && value < T());
+                bool b_minus = b.type == BT::minus_infinity_ || (b.has_value() && b.value < T());
+                if (a_minus && b_minus)
+                    return - *this * - b;
+                else if (a_minus)
+                    return - (- *this * b);
+                else if (b_minus)
+                    return - (*this * - b);
+
+                // Use symmetry to ensure a>=b
+                if ((type == BT::minus_infinity_ && b.type != BT::minus_infinity_)
+                        || (b.type == BT::plus_infinity_ && type != BT::plus_infinity_)
+                        || (has_value() && b.has_value() && value < b.value))
+                    return b * *this;
+
+                // If either argument is a closed zero, the result is a closed zero
+                if ((type == BT::closed_ && value == T())
+                        || (b.type == BT::closed_ && b.value == T()))
+                    return {T(), BT::closed_};
+
+                // If either argument is an open zero, the result is an open zero
+                if ((type == BT::open_ && value == T())
+                        || (b.type == BT::open_ && b.value == T()))
+                    return {T(), BT::open_};
+
+                // If either argument is positive infinity, the result is positive infinity
+                if (type == BT::plus_infinity_)
+                    return *this;
+
+                // If both arguments are closed, the result is closed; otherwise, the result is open
+                BT t = type == BT::closed_ && b.type == BT::closed_ ? BT::closed_ : BT::open_;
+                return {value * b.value, t};
+
+            }
+
+            template <typename T>
+            bool Boundary<T>::operator==(const Boundary<T>& b) const noexcept {
+                if (type != b.type)
+                    return false;
+                else if (has_value() && b.has_value())
+                    return value == b.value;
+                else
+                    return true;
+            }
 
             template <typename T>
             std::ostream& operator<<(std::ostream& out, const Boundary<T>& b) {

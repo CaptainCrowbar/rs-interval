@@ -1,6 +1,6 @@
 #include "rs-interval.hpp"
-#include "test/stepwise.hpp"
 #include "rs-unit-test.hpp"
+#include "test/stepwise.hpp"
 #include <string>
 #include <unordered_set>
 

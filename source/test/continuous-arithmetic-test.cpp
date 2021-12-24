@@ -144,6 +144,9 @@ void test_rs_continuous_interval_arithmetic() {
         TRY(a = t.lhs);
         TRY(b = t.rhs);
 
+        // TODO
+        (void)c;
+
         TRY(c = a + b);           TEST_EQUAL(c, t.add);   errors += int(c != t.add);
         TRY(c = a - b);           TEST_EQUAL(c, t.sub1);  errors += int(c != t.sub1);
         TRY(c = b - a);           TEST_EQUAL(c, t.sub2);  errors += int(c != t.sub2);

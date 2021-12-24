@@ -51,23 +51,32 @@ find_package(Threads REQUIRED)
 
 add_executable(${unittest}
     test/type-traits-test.cpp
-    test/interval-boundary-comparison-test.cpp
-    test/interval-boundary-addition-test.cpp
-    test/interval-boundary-multiplication-test.cpp
+    test/continuous-boundary-basic-test.cpp
+    test/integral-boundary-basic-test.cpp
+    test/ordered-boundary-basic-test.cpp
+    test/stepwise-boundary-basic-test.cpp
+    test/continuous-boundary-comparison-test.cpp
+    test/integral-boundary-comparison-test.cpp
+    test/ordered-boundary-comparison-test.cpp
+    test/stepwise-boundary-comparison-test.cpp
+    test/continuous-boundary-addition-test.cpp
+    test/integral-boundary-addition-test.cpp
+    test/continuous-boundary-multiplication-test.cpp
+    test/integral-boundary-multiplication-test.cpp
+    test/continuous-basic-test.cpp
+    test/continuous-set-test.cpp
+    test/continuous-map-test.cpp
+    test/continuous-arithmetic-test.cpp
+    test/integral-basic-test.cpp
+    test/integral-set-test.cpp
+    test/integral-map-test.cpp
+    test/integral-arithmetic-test.cpp
     test/ordered-basic-test.cpp
     test/ordered-set-test.cpp
     test/ordered-map-test.cpp
     test/stepwise-basic-test.cpp
     test/stepwise-set-test.cpp
     test/stepwise-map-test.cpp
-    test/integral-basic-test.cpp
-    test/integral-set-test.cpp
-    test/integral-map-test.cpp
-    test/integral-arithmetic-test.cpp
-    test/continuous-basic-test.cpp
-    test/continuous-set-test.cpp
-    test/continuous-map-test.cpp
-    test/continuous-arithmetic-test.cpp
     test/unit-test.cpp
 )
 
