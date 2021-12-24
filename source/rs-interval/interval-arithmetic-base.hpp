@@ -3,14 +3,19 @@
 #include "rs-interval/interval-category-base.hpp"
 #include "rs-interval/interval-type-base.hpp"
 #include "rs-interval/types.hpp"
-#include "rs-format/format.hpp"
 #include <algorithm>
+#include <type_traits>
 
 namespace RS::Intervals {
 
     template <typename T> class Interval;
 
     namespace Detail {
+
+        template <typename T, IntervalCategory Cat = interval_category<T>> struct IsArithmeticInterval: std::false_type {};
+        template <typename T> struct IsArithmeticInterval<T, IntervalCategory::integral>: std::true_type {};
+        template <typename T> struct IsArithmeticInterval<T, IntervalCategory::continuous>: std::true_type {};
+        template <typename T> constexpr bool is_arithmetic_interval = IsArithmeticInterval<T>::value;
 
         template <typename T>
         bool contains_zero(const Interval<T>& i) noexcept {
@@ -58,146 +63,203 @@ namespace RS::Intervals {
         Interval<T> interval_from_boundaries(const Boundary<T>& l, const Boundary<T>& r) {
             using BT = BoundaryType;
             using IB = IntervalBound;
-            IB lbound, rbound;
-            switch (l.type) {
-                case BT::empty:   lbound = IB::empty; break;
-                case BT::open:    lbound = IB::open; break;
-                case BT::closed:  lbound = IB::closed; break;
-                default:          lbound = IB::unbound; break;
-            }
-            switch (r.type) {
-                case BT::empty:   rbound = IB::empty; break;
-                case BT::open:    rbound = IB::open; break;
-                case BT::closed:  rbound = IB::closed; break;
-                default:          rbound = IB::unbound; break;
-            }
+            static constexpr auto convert_bound = [] (BT t) constexpr {
+                switch (t) {
+                    case BT::empty:   return IB::empty;
+                    case BT::open:    return IB::open;
+                    case BT::closed:  return IB::closed;
+                    default:          return IB::unbound;
+                }
+            };
+            IB lbound = convert_bound(l.type);
+            IB rbound = convert_bound(r.type);
             return {l.value, r.value, lbound, rbound};
         }
 
     }
 
-    // Base class for arithmetic type intervals
+    // Interval arithmetic operators
 
-    template <typename IntervalType, typename T, IntervalCategory Cat = interval_category<T>>
-    class IntervalArithmeticBase {
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator+(const Interval<T>& i) {
+        return i;
+    }
 
-    public:
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator-(const Interval<T>& i) {
+        return Interval<T>(- i.max(), - i.min(), i.right(), i.left());
+    }
 
-        IntervalType operator+() const { auto& a = static_cast<const IntervalType&>(*this); return a; }
-        IntervalType operator-() const { auto& a = static_cast<const IntervalType&>(*this); return negative_interval(a); }
-        IntervalType& operator+=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = add_intervals(a, b); return a; }
-        IntervalType& operator+=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = add_intervals(a, b); return a; }
-        IntervalType& operator-=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = subtract_intervals(a, b); return a; }
-        IntervalType& operator-=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = subtract_intervals(a, b); return a; }
-        IntervalType& operator*=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = multiply_intervals(a, b); return a; }
-        IntervalType& operator*=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = multiply_intervals(a, b); return a; }
-        IntervalType& operator/=(const IntervalType& b) { auto& a = static_cast<IntervalType&>(*this); a = divide_intervals(a, b); return a; }
-        IntervalType& operator/=(const T& b) { auto& a = static_cast<IntervalType&>(*this); a = divide_intervals(a, b); return a; }
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator+(const Interval<T>& a, const Interval<T>& b) {
+        auto l = Detail::left_boundary_of(a) + Detail::left_boundary_of(b);
+        auto r = Detail::right_boundary_of(a) + Detail::right_boundary_of(b);
+        return Detail::interval_from_boundaries(l, r);
+    }
 
-        friend IntervalType operator+(const IntervalType& a, const IntervalType& b) { return add_intervals(a, b); }
-        friend IntervalType operator+(const IntervalType& a, const T& b) { return add_intervals(a, b); }
-        friend IntervalType operator+(const T& a, const IntervalType& b) { return add_intervals(b, a); }
-        friend IntervalType operator-(const IntervalType& a, const IntervalType& b) { return subtract_intervals(a, b); }
-        friend IntervalType operator-(const IntervalType& a, const T& b) { return subtract_intervals(a, b); }
-        friend IntervalType operator-(const T& a, const IntervalType& b) { return subtract_intervals(a, b); }
-        friend IntervalType operator*(const IntervalType& a, const IntervalType& b) { return multiply_intervals(a, b); }
-        friend IntervalType operator*(const IntervalType& a, const T& b) { return multiply_intervals(a, b); }
-        friend IntervalType operator*(const T& a, const IntervalType& b) { return multiply_intervals(b, a); }
-        friend IntervalType operator/(const IntervalType& a, const IntervalType& b) { return divide_intervals(a, b); }
-        friend IntervalType operator/(const IntervalType& a, const T& b) { return divide_intervals(a, b); }
-        friend IntervalType operator/(const T& a, const IntervalType& b) { return divide_intervals(a, b); }
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator-(const Interval<T>& a, const Interval<T>& b) {
+        return a + - b;
+    }
 
-    private:
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator*(const Interval<T>& a, const Interval<T>& b) {
 
-        static IntervalType negative_interval(const IntervalType& a);
-        static IntervalType add_intervals(const IntervalType& a, const IntervalType& b);
-        static IntervalType subtract_intervals(const IntervalType& a, const IntervalType& b);
-        static IntervalType multiply_intervals(const IntervalType& a, const IntervalType& b);
-        static IntervalType divide_intervals(const IntervalType& a, const IntervalType& b);
+        using namespace RS::Intervals::Detail;
 
-    };
+        using B = Boundary<T>;
+        using BT = BoundaryType;
 
-        template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::negative_interval(const IntervalType& a) {
-            return IntervalType(- a.max(), - a.min(), a.right(), a.left());
+        static const B zero = {T(), BT::closed};
+
+        if (a.empty() || b.empty())
+            return {};
+
+        CappedVector<B, 9> boundaries;
+
+        B al = left_boundary_of(a);
+        B ar = right_boundary_of(a);
+        B bl = left_boundary_of(b);
+        B br = right_boundary_of(b);
+
+        boundaries.push_back(al * bl);
+        boundaries.push_back(al * br);
+        boundaries.push_back(ar * bl);
+        boundaries.push_back(ar * br);
+
+        bool a_zero = contains_zero(a);
+        bool b_zero = contains_zero(b);
+
+        if (a_zero) {
+            boundaries.push_back(zero * bl);
+            boundaries.push_back(zero * br);
         }
 
-        template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::add_intervals(const IntervalType& a, const IntervalType& b) {
-            auto l = left_boundary_of(a) + left_boundary_of(b);
-            auto r = right_boundary_of(a) + right_boundary_of(b);
-            return interval_from_boundaries(l, r);
+        if (b_zero) {
+            boundaries.push_back(zero * al);
+            boundaries.push_back(zero * ar);
         }
 
-        template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::subtract_intervals(const IntervalType& a, const IntervalType& b) {
-            return add_intervals(a, negative_interval(b));
-        }
+        if (a_zero && b_zero)
+            boundaries.push_back(zero);
 
-        template <typename IntervalType, typename T, IntervalCategory Cat>
-        IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
+        auto i = std::min_element(boundaries.begin(), boundaries.end(),
+            [] (auto& a, auto& b) { return a.compare_ll(b); });
+        auto j = std::max_element(boundaries.begin(), boundaries.end(),
+            [] (auto& a, auto& b) { return a.compare_rr(b); });
 
-            using namespace RS::Intervals::Detail;
+        return interval_from_boundaries(*i, *j);
 
-            using B = Boundary<T>;
-            using BT = BoundaryType;
+    }
 
-            static const B zero = {T(), BT::closed};
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator/(const Interval<T>& a, const Interval<T>& b) {
+        // TODO
+        (void)a;
+        (void)b;
+        return {};
+    }
 
-            if (a.empty() || b.empty())
-                return {};
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator+(const Interval<T>& a, const T& b) {
+        return a + Interval<T>(b);
+    }
 
-            CappedVector<B, 9> boundaries;
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator-(const Interval<T>& a, const T& b) {
+        return a - Interval<T>(b);
+    }
 
-            B al = left_boundary_of(a);
-            B ar = right_boundary_of(a);
-            B bl = left_boundary_of(b);
-            B br = right_boundary_of(b);
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator*(const Interval<T>& a, const T& b) {
+        return a * Interval<T>(b);
+    }
 
-            boundaries.push_back(al * bl);
-            boundaries.push_back(al * br);
-            boundaries.push_back(ar * bl);
-            boundaries.push_back(ar * br);
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator/(const Interval<T>& a, const T& b) {
+        return a / Interval<T>(b);
+    }
 
-            bool a_zero = contains_zero(a);
-            bool b_zero = contains_zero(b);
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator+(const T& a, const Interval<T>& b) {
+        return Interval<T>(a) + b;
+    }
 
-            if (a_zero) {
-                boundaries.push_back(zero * bl);
-                boundaries.push_back(zero * br);
-            }
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator-(const T& a, const Interval<T>& b) {
+        return Interval<T>(a) - b;
+    }
 
-            if (b_zero) {
-                boundaries.push_back(zero * al);
-                boundaries.push_back(zero * ar);
-            }
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator*(const T& a, const Interval<T>& b) {
+        return Interval<T>(a) * b;
+    }
 
-            if (a_zero && b_zero)
-                boundaries.push_back(zero);
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    operator/(const T& a, const Interval<T>& b) {
+        return Interval<T>(a) / b;
+    }
 
-            auto i = std::min_element(boundaries.begin(), boundaries.end(),
-                [] (auto& a, auto& b) { return a.compare_ll(b); });
-            auto j = std::max_element(boundaries.begin(), boundaries.end(),
-                [] (auto& a, auto& b) { return a.compare_rr(b); });
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
+    operator+=(Interval<T>& a, const Interval<T>& b) {
+        return a = a + b;
+    }
 
-            IntervalType result = interval_from_boundaries(*i, *j);
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
+    operator-=(Interval<T>& a, const Interval<T>& b) {
+        return a = a - b;
+    }
 
-            return result;
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
+    operator*=(Interval<T>& a, const Interval<T>& b) {
+        return a = a * b;
+    }
 
-        }
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
+    operator/=(Interval<T>& a, const Interval<T>& b) {
+        return a = a / b;
+    }
 
-        // template <typename IntervalType, typename T, IntervalCategory Cat>
-        // IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::divide_intervals(const IntervalType& a, const IntervalType& b) {
-        //     // TODO
-        //     (void)a;
-        //     (void)b;
-        //     return {};
-        // }
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
+    operator+=(Interval<T>& a, const T& b) {
+        return a = a + Interval<T>(b);
+    }
 
-    template <typename IntervalType, typename T>
-    class IntervalArithmeticBase<IntervalType, T, IntervalCategory::ordered> {};
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
+    operator-=(Interval<T>& a, const T& b) {
+        return a = a - Interval<T>(b);
+    }
 
-    template <typename IntervalType, typename T>
-    class IntervalArithmeticBase<IntervalType, T, IntervalCategory::stepwise> {};
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
+    operator*=(Interval<T>& a, const T& b) {
+        return a = a * Interval<T>(b);
+    }
+
+    template <typename T>
+    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
+    operator/=(Interval<T>& a, const T& b) {
+        return a = a / Interval<T>(b);
+    }
 
 }

@@ -67,17 +67,17 @@ void test_rs_continuous_interval_arithmetic() {
     TRY(in = - Itv(5,0,">"));   TRY(str = in.str());  TEST_EQUAL(str, "<-5");
     TRY(in = - Itv(5,0,">="));  TRY(str = in.str());  TEST_EQUAL(str, "<=-5");
 
-    TRY(in = Itv() + 42);           TRY(str = in.str());  TEST_EQUAL(str, "{}");
-    TRY(in = Itv::all() + 42);      TRY(str = in.str());  TEST_EQUAL(str, "*");
-    TRY(in = Itv(5) + 42);          TRY(str = in.str());  TEST_EQUAL(str, "47");
-    TRY(in = Itv(5,10,"[]") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "[47,52]");
-    TRY(in = Itv(5,10,"()") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "(47,52)");
-    TRY(in = Itv(5,10,"[)") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "[47,52)");
-    TRY(in = Itv(5,10,"(]") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "(47,52]");
-    TRY(in = Itv(5,10,"<") + 42);   TRY(str = in.str());  TEST_EQUAL(str, "<52");
-    TRY(in = Itv(5,10,"<=") + 42);  TRY(str = in.str());  TEST_EQUAL(str, "<=52");
-    TRY(in = Itv(5,10,">") + 42);   TRY(str = in.str());  TEST_EQUAL(str, ">47");
-    TRY(in = Itv(5,10,">=") + 42);  TRY(str = in.str());  TEST_EQUAL(str, ">=47");
+    TRY(in = Itv() + 42.0);           TRY(str = in.str());  TEST_EQUAL(str, "{}");
+    TRY(in = Itv::all() + 42.0);      TRY(str = in.str());  TEST_EQUAL(str, "*");
+    TRY(in = Itv(5) + 42.0);          TRY(str = in.str());  TEST_EQUAL(str, "47");
+    TRY(in = Itv(5,10,"[]") + 42.0);  TRY(str = in.str());  TEST_EQUAL(str, "[47,52]");
+    TRY(in = Itv(5,10,"()") + 42.0);  TRY(str = in.str());  TEST_EQUAL(str, "(47,52)");
+    TRY(in = Itv(5,10,"[)") + 42.0);  TRY(str = in.str());  TEST_EQUAL(str, "[47,52)");
+    TRY(in = Itv(5,10,"(]") + 42.0);  TRY(str = in.str());  TEST_EQUAL(str, "(47,52]");
+    TRY(in = Itv(5,10,"<") + 42.0);   TRY(str = in.str());  TEST_EQUAL(str, "<52");
+    TRY(in = Itv(5,10,"<=") + 42.0);  TRY(str = in.str());  TEST_EQUAL(str, "<=52");
+    TRY(in = Itv(5,10,">") + 42.0);   TRY(str = in.str());  TEST_EQUAL(str, ">47");
+    TRY(in = Itv(5,10,">=") + 42.0);  TRY(str = in.str());  TEST_EQUAL(str, ">=47");
 
     struct test_info {
         int line;

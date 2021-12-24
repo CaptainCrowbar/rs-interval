@@ -48,7 +48,6 @@ namespace RS::Intervals {
     template <typename T>
     class Interval:
     public IntervalCategoryBase<T>,
-    public IntervalArithmeticBase<Interval<T>, T>,
     public Detail::TotalOrder<Interval<T>> {
 
     public:

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "rs-interval/types.hpp"
-#include "rs-format/format.hpp"
 #include <algorithm>
 #include <functional>
 #include <stdexcept>

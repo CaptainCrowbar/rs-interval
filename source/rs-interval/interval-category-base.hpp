@@ -2,7 +2,6 @@
 
 #include "rs-interval/interval-type-base.hpp"
 #include "rs-interval/types.hpp"
-#include "rs-format/format.hpp"
 #include <iterator>
 #include <string>
 #include <type_traits>
