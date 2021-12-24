@@ -1,6 +1,6 @@
-#include "rs-interval.hpp"
-#include "rs-unit-test.hpp"
+#include "rs-interval/types.hpp"
 #include "test/stepwise.hpp"
+#include "rs-unit-test.hpp"
 
 using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
