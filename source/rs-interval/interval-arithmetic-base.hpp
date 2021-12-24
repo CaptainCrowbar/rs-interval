@@ -12,10 +12,8 @@ namespace RS::Intervals {
 
     namespace Detail {
 
-        template <typename T, IntervalCategory Cat = interval_category<T>> struct IsArithmeticInterval: std::false_type {};
-        template <typename T> struct IsArithmeticInterval<T, IntervalCategory::integral>: std::true_type {};
-        template <typename T> struct IsArithmeticInterval<T, IntervalCategory::continuous>: std::true_type {};
-        template <typename T> constexpr bool is_arithmetic_interval = IsArithmeticInterval<T>::value;
+        template <typename T> constexpr bool is_arithmetic_interval = interval_category<T> == IntervalCategory::integral
+            || interval_category<T> == IntervalCategory::continuous;
 
         template <typename T>
         bool contains_zero(const Interval<T>& i) noexcept {
