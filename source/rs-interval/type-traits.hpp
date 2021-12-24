@@ -133,8 +133,9 @@ namespace RS::Intervals {
         empty   // The interval is empty
     )
 
-    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalOrder, int, -7,
+    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalOrder, int, -8,
         // Name             Index  Picture    Description
+        both_empty,         // -8  ...        Both are empty
         b_only,             // -7  BBB        A is empty, B is not
         a_below_b,          // -6  AAA...BBB  Upper bound of A is less than lower bound of B, with a gap
         a_touches_b,        // -5  AAABBB     Upper bound of A is less than lower bound of B, with no gap
@@ -142,7 +143,7 @@ namespace RS::Intervals {
         a_extends_below_b,  // -3  AAA***     B is a subset of A, with the same upper bound
         a_encloses_b,       // -2  AAA***AAA  B is a subset of A, matching neither bound
         b_extends_above_a,  // -1  ***BBB     A is a subset of B, with the same lower bound
-        equal,              // 0   ***        A and B are the same (this includes the case where both are empty)
+        equal,              // 0   ***        A and B are the same (but not empty)
         a_extends_above_b,  // 1   ***AAA     B is a subset of A, with the same lower bound
         b_encloses_a,       // 2   BBB***BBB  A is a subset of B, matching neither bound
         b_extends_below_a,  // 3   BBB***     A is a subset of B, with the same upper bound

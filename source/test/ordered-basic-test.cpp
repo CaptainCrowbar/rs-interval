@@ -99,7 +99,7 @@ void test_rs_ordered_interval_order() {
     Itv a, b;
     IO io;
 
-    TRY(a = Itv());              TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::equal);              // ...
+    TRY(a = Itv());              TRY(b = Itv());              TRY(io = a.order(b));  TEST_EQUAL(io, IO::both_empty);         // ...
     TRY(a = Itv());              TRY(b = Itv("a","a",">"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
     TRY(a = Itv());              TRY(b = Itv("a","a",">="));  TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
     TRY(a = Itv());              TRY(b = Itv("a","a","<"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb

@@ -541,7 +541,7 @@ namespace RS::Intervals {
             auto& a = *this;
 
             if (a.empty() && b.empty())
-                return IntervalOrder::equal;
+                return IntervalOrder::both_empty;
             else if (a.empty())
                 return IntervalOrder::b_only;
             else if (b.empty())
@@ -627,14 +627,17 @@ namespace RS::Intervals {
             if (ord == IntervalOrder::equal)
                 return ! this->empty();
             else
-                return ord == IntervalOrder::a_extends_above_b || ord == IntervalOrder::a_extends_below_b || ord == IntervalOrder::a_encloses_b;
+                return ord == IntervalOrder::a_extends_above_b || ord == IntervalOrder::a_extends_below_b
+                    || ord == IntervalOrder::a_encloses_b;
         }
 
         template <typename T>
         bool Interval<T>::overlaps(const Interval& b) const {
             IntervalOrder ord = order(b);
-            if (ord == IntervalOrder::equal)
-                return ! this->empty();
+            if (ord == IntervalOrder::both_empty)
+                return false;
+            else if (ord == IntervalOrder::equal)
+                return true;
             else if (ord == IntervalOrder::a_only || ord == IntervalOrder::b_only
                     || ord == IntervalOrder::a_below_b || ord == IntervalOrder::b_below_a
                     || ord == IntervalOrder::a_touches_b || ord == IntervalOrder::b_touches_a)
@@ -646,9 +649,12 @@ namespace RS::Intervals {
         template <typename T>
         bool Interval<T>::touches(const Interval& b) const {
             IntervalOrder ord = order(b);
-            if (ord == IntervalOrder::equal)
-                return ! this->empty();
-            else if (ord == IntervalOrder::a_only || ord == IntervalOrder::b_only || ord == IntervalOrder::a_below_b || ord == IntervalOrder::b_below_a)
+            if (ord == IntervalOrder::both_empty)
+                return false;
+            else if (ord == IntervalOrder::equal)
+                return true;
+            else if (ord == IntervalOrder::a_only || ord == IntervalOrder::b_only
+                    || ord == IntervalOrder::a_below_b || ord == IntervalOrder::b_below_a)
                 return false;
             else
                 return true;

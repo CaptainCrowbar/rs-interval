@@ -130,28 +130,29 @@ less than `B`; a positive value indicates that `A` will compare greater than
 
 In the "picture" layouts here:
 
-* `A` = left hand operand
-* `B` = right hand operand
-* `*` = included in both intervals
-* `.` = gap between the two intervals
+* `AAA` = first interval
+* `BBB` = second interval
+* `***` = included in both intervals
+* `...` = gap between the two intervals
 
-| IntervalOrder        | Value  | Picture      | Description                                                             |
-| -------------        | -----  | -------      | -----------                                                             |
-| `b_only`             | -7     | `BBB`        | `A` is empty, `B` is not                                                |
-| `a_below_b`          | -6     | `AAA...BBB`  | Upper bound of `A` is less than lower bound of `B`, with a gap          |
-| `a_touches_b`        | -5     | `AAABBB`     | Upper bound of `A` is less than lower bound of `B`, with no gap         |
-| `a_overlaps_b`       | -4     | `AAA***BBB`  | Upper bound of `A` overlaps lower bound of `B`                          |
-| `a_extends_below_b`  | -3     | `AAA***`     | `B` is a subset of `A`, with the same upper bound                       |
-| `a_encloses_b`       | -2     | `AAA***AAA`  | `B` is a subset of `A`, matching neither bound                          |
-| `b_extends_above_a`  | -1     | `***BBB`     | `A` is a subset of `B`, with the same lower bound                       |
-| `equal`              | 0      | `***`        | `A` and `B` are the same (this includes the case where both are empty)  |
-| `a_extends_above_b`  | 1      | `***AAA`     | `B` is a subset of `A`, with the same lower bound                       |
-| `b_encloses_a`       | 2      | `BBB***BBB`  | `A` is a subset of `B`, matching neither bound                          |
-| `b_extends_below_a`  | 3      | `BBB***`     | `A` is a subset of `B`, with the same upper bound                       |
-| `b_overlaps_a`       | 4      | `BBB***AAA`  | Upper bound of `B` overlaps lower bound of `A`                          |
-| `b_touches_a`        | 5      | `BBBAAA`     | Upper bound of `B` is less than lower bound of `A`, with no gap         |
-| `b_below_a`          | 6      | `BBB...AAA`  | Upper bound of `B` is less than lower bound of `A`, with a gap          |
-| `a_only`             | 7      | `AAA`        | `B` is empty, `A` is not                                                |
+| IntervalOrder        | Value  | Picture      | Description                                                      |
+| -------------        | -----  | -------      | -----------                                                      |
+| `both_empty`         | -8     | `...`        | Both intervals are empty                                         |
+| `b_only`             | -7     | `BBB`        | `A` is empty, `B` is not                                         |
+| `a_below_b`          | -6     | `AAA...BBB`  | Upper bound of `A` is less than lower bound of `B`, with a gap   |
+| `a_touches_b`        | -5     | `AAABBB`     | Upper bound of `A` is less than lower bound of `B`, with no gap  |
+| `a_overlaps_b`       | -4     | `AAA***BBB`  | Upper bound of `A` overlaps lower bound of `B`                   |
+| `a_extends_below_b`  | -3     | `AAA***`     | `B` is a subset of `A`, with the same upper bound                |
+| `a_encloses_b`       | -2     | `AAA***AAA`  | `B` is a subset of `A`, matching neither bound                   |
+| `b_extends_above_a`  | -1     | `***BBB`     | `A` is a subset of `B`, with the same lower bound                |
+| `equal`              | 0      | `***`        | `A` and `B` are the same (but not empty)                         |
+| `a_extends_above_b`  | 1      | `***AAA`     | `B` is a subset of `A`, with the same lower bound                |
+| `b_encloses_a`       | 2      | `BBB***BBB`  | `A` is a subset of `B`, matching neither bound                   |
+| `b_extends_below_a`  | 3      | `BBB***`     | `A` is a subset of `B`, with the same upper bound                |
+| `b_overlaps_a`       | 4      | `BBB***AAA`  | Upper bound of `B` overlaps lower bound of `A`                   |
+| `b_touches_a`        | 5      | `BBBAAA`     | Upper bound of `B` is less than lower bound of `A`, with no gap  |
+| `b_below_a`          | 6      | `BBB...AAA`  | Upper bound of `B` is less than lower bound of `A`, with a gap   |
+| `a_only`             | 7      | `AAA`        | `B` is empty, `A` is not                                         |
 
 ## Interval class
 
