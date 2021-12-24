@@ -9,13 +9,13 @@ using BT = BoundaryType;
 
 void test_rs_ordered_boundary_adjacency() {
 
-    static const B none = {"", BT::empty_};
-    static const B ninf = {"", BT::minus_infinity_};
-    static const B pinf = {"", BT::plus_infinity_};
-    static const B cl1 = {"a", BT::closed_};
-    static const B op1 = {"a", BT::open_};
-    static const B cl2 = {"b", BT::closed_};
-    static const B op2 = {"b", BT::open_};
+    static const B none = {"", BT::empty};
+    static const B ninf = {"", BT::minus_infinity};
+    static const B pinf = {"", BT::plus_infinity};
+    static const B cl1 = {"a", BT::closed};
+    static const B op1 = {"a", BT::open};
+    static const B cl2 = {"b", BT::closed};
+    static const B op2 = {"b", BT::open};
 
     TEST(! none.adjacent(none));
     TEST(! none.adjacent(ninf));
@@ -55,13 +55,13 @@ void test_rs_ordered_boundary_adjacency() {
 
 void test_rs_ordered_boundary_comparison() {
 
-    static const B none = {"", BT::empty_};
-    static const B ninf = {"", BT::minus_infinity_};
-    static const B pinf = {"", BT::plus_infinity_};
-    static const B cl1 = {"a", BT::closed_};
-    static const B op1 = {"a", BT::open_};
-    static const B cl2 = {"b", BT::closed_};
-    static const B op2 = {"b", BT::open_};
+    static const B none = {"", BT::empty};
+    static const B ninf = {"", BT::minus_infinity};
+    static const B pinf = {"", BT::plus_infinity};
+    static const B cl1 = {"a", BT::closed};
+    static const B op1 = {"a", BT::open};
+    static const B cl2 = {"b", BT::closed};
+    static const B op2 = {"b", BT::open};
 
     TEST(! none.compare_ll(none));
     TEST(none.compare_ll(ninf));

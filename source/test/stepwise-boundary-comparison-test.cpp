@@ -10,11 +10,11 @@ using BT = BoundaryType;
 
 void test_rs_stepwise_boundary_adjacency() {
 
-    static const B none = {0, BT::empty_};
-    static const B ninf = {0, BT::minus_infinity_};
-    static const B pinf = {0, BT::plus_infinity_};
-    static const B cl1 = {1, BT::closed_};
-    static const B cl2 = {2, BT::closed_};
+    static const B none = {0, BT::empty};
+    static const B ninf = {0, BT::minus_infinity};
+    static const B pinf = {0, BT::plus_infinity};
+    static const B cl1 = {1, BT::closed};
+    static const B cl2 = {2, BT::closed};
 
     TEST(! none.adjacent(none));
     TEST(! none.adjacent(ninf));
@@ -39,11 +39,11 @@ void test_rs_stepwise_boundary_adjacency() {
 
 void test_rs_stepwise_boundary_comparison() {
 
-    static const B none = {0, BT::empty_};
-    static const B ninf = {0, BT::minus_infinity_};
-    static const B pinf = {0, BT::plus_infinity_};
-    static const B cl1 = {1, BT::closed_};
-    static const B cl2 = {2, BT::closed_};
+    static const B none = {0, BT::empty};
+    static const B ninf = {0, BT::minus_infinity};
+    static const B pinf = {0, BT::plus_infinity};
+    static const B cl1 = {1, BT::closed};
+    static const B cl2 = {2, BT::closed};
 
     TEST(! none.compare_ll(none));
     TEST(none.compare_ll(ninf));

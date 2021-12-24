@@ -9,13 +9,13 @@ using BT = BoundaryType;
 
 void test_rs_integral_boundary_inversion() {
 
-    static const B none = {0, BT::empty_};
-    static const B ninf = {0, BT::minus_infinity_};
-    static const B pinf = {0, BT::plus_infinity_};
-    static const B cl2 = {2, BT::closed_};
-    static const B op2 = {2, BT::open_};
-    static const B cl_2 = {-2, BT::closed_};
-    static const B op_2 = {-2, BT::open_};
+    static const B none = {0, BT::empty};
+    static const B ninf = {0, BT::minus_infinity};
+    static const B pinf = {0, BT::plus_infinity};
+    static const B cl2 = {2, BT::closed};
+    static const B op2 = {2, BT::open};
+    static const B cl_2 = {-2, BT::closed};
+    static const B op_2 = {-2, BT::open};
 
     TEST_EQUAL(- none, none);
     TEST_EQUAL(- ninf, pinf);
@@ -29,15 +29,15 @@ void test_rs_integral_boundary_inversion() {
 
 void test_rs_integral_boundary_addition() {
 
-    static const B none = {0, BT::empty_};
-    static const B ninf = {0, BT::minus_infinity_};
-    static const B pinf = {0, BT::plus_infinity_};
-    static const B cl1 = {1, BT::closed_};
-    static const B op1 = {1, BT::open_};
-    static const B cl2 = {2, BT::closed_};
-    static const B op2 = {2, BT::open_};
-    static const B cl3 = {3, BT::closed_};
-    static const B op3 = {3, BT::open_};
+    static const B none = {0, BT::empty};
+    static const B ninf = {0, BT::minus_infinity};
+    static const B pinf = {0, BT::plus_infinity};
+    static const B cl1 = {1, BT::closed};
+    static const B op1 = {1, BT::open};
+    static const B cl2 = {2, BT::closed};
+    static const B op2 = {2, BT::open};
+    static const B cl3 = {3, BT::closed};
+    static const B op3 = {3, BT::open};
 
     TEST_EQUAL(none + none, none);
     TEST_EQUAL(none + ninf, none);
@@ -65,15 +65,15 @@ void test_rs_integral_boundary_addition() {
 
 void test_rs_integral_boundary_subtraction() {
 
-    static const B none = {0, BT::empty_};
-    static const B ninf = {0, BT::minus_infinity_};
-    static const B pinf = {0, BT::plus_infinity_};
-    static const B cl1 = {1, BT::closed_};
-    static const B op1 = {1, BT::open_};
-    static const B cl2 = {2, BT::closed_};
-    static const B op2 = {2, BT::open_};
-    static const B cl3 = {3, BT::closed_};
-    static const B op3 = {3, BT::open_};
+    static const B none = {0, BT::empty};
+    static const B ninf = {0, BT::minus_infinity};
+    static const B pinf = {0, BT::plus_infinity};
+    static const B cl1 = {1, BT::closed};
+    static const B op1 = {1, BT::open};
+    static const B cl2 = {2, BT::closed};
+    static const B op2 = {2, BT::open};
+    static const B cl3 = {3, BT::closed};
+    static const B op3 = {3, BT::open};
 
     TEST_EQUAL(none - none, none);
     TEST_EQUAL(none - ninf, none);

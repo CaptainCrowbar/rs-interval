@@ -13,11 +13,11 @@ void test_rs_ordered_boundary_formatting() {
 
     B b;
 
-    TRY((b = {"abc", BT::empty_}));           TEST_EQUAL(b.str(), "{}");
-    TRY((b = {"abc", BT::minus_infinity_}));  TEST_EQUAL(b.str(), "-inf");
-    TRY((b = {"abc", BT::plus_infinity_}));   TEST_EQUAL(b.str(), "+inf");
-    TRY((b = {"abc", BT::closed_}));          TEST_EQUAL(b.str(), "abc");
-    TRY((b = {"abc", BT::open_}));            TEST_EQUAL(b.str(), "(abc)");
+    TRY((b = {"abc", BT::empty}));           TEST_EQUAL(b.str(), "{}");
+    TRY((b = {"abc", BT::minus_infinity}));  TEST_EQUAL(b.str(), "-inf");
+    TRY((b = {"abc", BT::plus_infinity}));   TEST_EQUAL(b.str(), "+inf");
+    TRY((b = {"abc", BT::closed}));          TEST_EQUAL(b.str(), "abc");
+    TRY((b = {"abc", BT::open}));            TEST_EQUAL(b.str(), "(abc)");
 
 }
 
@@ -47,41 +47,41 @@ void test_rs_ordered_boundary_from_interval() {
     TEST_EQUAL(o1c2.str(), "(a,b]");
     TEST_EQUAL(c1o2.str(), "[a,b)");
 
-    TEST_EQUAL(left_boundary_of(none), (B{"", BT::empty_}));
-    TEST_EQUAL(left_boundary_of(all), (B{"", BT::minus_infinity_}));
-    TEST_EQUAL(left_boundary_of(eq1), (B{"a", BT::closed_}));
-    TEST_EQUAL(left_boundary_of(ge1), (B{"a", BT::closed_}));
-    TEST_EQUAL(left_boundary_of(gt1), (B{"a", BT::open_}));
-    TEST_EQUAL(left_boundary_of(le1), (B{"", BT::minus_infinity_}));
-    TEST_EQUAL(left_boundary_of(lt1), (B{"", BT::minus_infinity_}));
-    TEST_EQUAL(left_boundary_of(c12), (B{"a", BT::closed_}));
-    TEST_EQUAL(left_boundary_of(o12), (B{"a", BT::open_}));
-    TEST_EQUAL(left_boundary_of(o1c2), (B{"a", BT::open_}));
-    TEST_EQUAL(left_boundary_of(c1o2), (B{"a", BT::closed_}));
+    TEST_EQUAL(left_boundary_of(none), (B{"", BT::empty}));
+    TEST_EQUAL(left_boundary_of(all), (B{"", BT::minus_infinity}));
+    TEST_EQUAL(left_boundary_of(eq1), (B{"a", BT::closed}));
+    TEST_EQUAL(left_boundary_of(ge1), (B{"a", BT::closed}));
+    TEST_EQUAL(left_boundary_of(gt1), (B{"a", BT::open}));
+    TEST_EQUAL(left_boundary_of(le1), (B{"", BT::minus_infinity}));
+    TEST_EQUAL(left_boundary_of(lt1), (B{"", BT::minus_infinity}));
+    TEST_EQUAL(left_boundary_of(c12), (B{"a", BT::closed}));
+    TEST_EQUAL(left_boundary_of(o12), (B{"a", BT::open}));
+    TEST_EQUAL(left_boundary_of(o1c2), (B{"a", BT::open}));
+    TEST_EQUAL(left_boundary_of(c1o2), (B{"a", BT::closed}));
 
-    TEST_EQUAL(right_boundary_of(none), (B{"", BT::empty_}));
-    TEST_EQUAL(right_boundary_of(all), (B{"", BT::plus_infinity_}));
-    TEST_EQUAL(right_boundary_of(eq1), (B{"a", BT::closed_}));
-    TEST_EQUAL(right_boundary_of(ge1), (B{"", BT::plus_infinity_}));
-    TEST_EQUAL(right_boundary_of(gt1), (B{"", BT::plus_infinity_}));
-    TEST_EQUAL(right_boundary_of(le1), (B{"a", BT::closed_}));
-    TEST_EQUAL(right_boundary_of(lt1), (B{"a", BT::open_}));
-    TEST_EQUAL(right_boundary_of(c12), (B{"b", BT::closed_}));
-    TEST_EQUAL(right_boundary_of(o12), (B{"b", BT::open_}));
-    TEST_EQUAL(right_boundary_of(o1c2), (B{"b", BT::closed_}));
-    TEST_EQUAL(right_boundary_of(c1o2), (B{"b", BT::open_}));
+    TEST_EQUAL(right_boundary_of(none), (B{"", BT::empty}));
+    TEST_EQUAL(right_boundary_of(all), (B{"", BT::plus_infinity}));
+    TEST_EQUAL(right_boundary_of(eq1), (B{"a", BT::closed}));
+    TEST_EQUAL(right_boundary_of(ge1), (B{"", BT::plus_infinity}));
+    TEST_EQUAL(right_boundary_of(gt1), (B{"", BT::plus_infinity}));
+    TEST_EQUAL(right_boundary_of(le1), (B{"a", BT::closed}));
+    TEST_EQUAL(right_boundary_of(lt1), (B{"a", BT::open}));
+    TEST_EQUAL(right_boundary_of(c12), (B{"b", BT::closed}));
+    TEST_EQUAL(right_boundary_of(o12), (B{"b", BT::open}));
+    TEST_EQUAL(right_boundary_of(o1c2), (B{"b", BT::closed}));
+    TEST_EQUAL(right_boundary_of(c1o2), (B{"b", BT::open}));
 
 }
 
 void test_rs_ordered_boundary_to_interval() {
 
-    static const B none = {"", BT::empty_};
-    static const B ninf = {"", BT::minus_infinity_};
-    static const B pinf = {"", BT::plus_infinity_};
-    static const B cl1 = {"a", BT::closed_};
-    static const B op1 = {"a", BT::open_};
-    static const B cl2 = {"b", BT::closed_};
-    static const B op2 = {"b", BT::open_};
+    static const B none = {"", BT::empty};
+    static const B ninf = {"", BT::minus_infinity};
+    static const B pinf = {"", BT::plus_infinity};
+    static const B cl1 = {"a", BT::closed};
+    static const B op1 = {"a", BT::open};
+    static const B cl2 = {"b", BT::closed};
+    static const B op2 = {"b", BT::open};
 
     TEST_EQUAL(interval_from_boundaries(none, none), Itv());
     TEST_EQUAL(interval_from_boundaries(ninf, pinf), Itv::all());

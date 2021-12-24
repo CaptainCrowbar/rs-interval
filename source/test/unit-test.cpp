@@ -77,6 +77,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_continuous_interval_map_hashing)
 
     // continuous-arithmetic-test.cpp
+    UNIT_TEST(rs_continuous_contains_zero)
     UNIT_TEST(rs_continuous_interval_arithmetic)
 
     // integral-basic-test.cpp
@@ -98,6 +99,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_integral_interval_map_hashing)
 
     // integral-arithmetic-test.cpp
+    UNIT_TEST(rs_integral_contains_zero)
     UNIT_TEST(rs_integral_interval_arithmetic)
 
     // ordered-basic-test.cpp

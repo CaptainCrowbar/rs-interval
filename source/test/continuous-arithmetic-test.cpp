@@ -13,6 +13,53 @@ using IC = IntervalCategory;
 using IM = IntervalMatch;
 using IO = IntervalOrder;
 
+// TODO
+namespace RS::Intervals {
+
+    template <typename IntervalType, typename T, IntervalCategory Cat>
+    IntervalType IntervalArithmeticBase<IntervalType, T, Cat>::multiply_intervals(const IntervalType& a, const IntervalType& b) {
+        // TODO
+        (void)a;
+        (void)b;
+        return {};
+    }
+
+}
+
+void test_rs_continuous_contains_zero() {
+
+    Itv in;
+
+    TRY(in = Itv());            TEST(! contains_zero(in));
+    TRY(in = Itv::all());       TEST(contains_zero(in));
+    TRY(in = Itv(-1));          TEST(! contains_zero(in));
+    TRY(in = Itv(0));           TEST(contains_zero(in));
+    TRY(in = Itv(1));           TEST(! contains_zero(in));
+    TRY(in = Itv(-1,-1,"<="));  TEST(! contains_zero(in));
+    TRY(in = Itv(0,0,"<="));    TEST(contains_zero(in));
+    TRY(in = Itv(1,1,"<="));    TEST(contains_zero(in));
+    TRY(in = Itv(-1,-1,"<"));   TEST(! contains_zero(in));
+    TRY(in = Itv(0,0,"<"));     TEST(! contains_zero(in));
+    TRY(in = Itv(1,1,"<"));     TEST(contains_zero(in));
+    TRY(in = Itv(-1,-1,">="));  TEST(contains_zero(in));
+    TRY(in = Itv(0,0,">="));    TEST(contains_zero(in));
+    TRY(in = Itv(1,1,">="));    TEST(! contains_zero(in));
+    TRY(in = Itv(-1,-1,">"));   TEST(contains_zero(in));
+    TRY(in = Itv(0,0,">"));     TEST(! contains_zero(in));
+    TRY(in = Itv(1,1,">"));     TEST(! contains_zero(in));
+    TRY(in = Itv(-2,-1,"[]"));  TEST(! contains_zero(in));
+    TRY(in = Itv(-2,-1,"()"));  TEST(! contains_zero(in));
+    TRY(in = Itv(-1,0,"[]"));   TEST(contains_zero(in));
+    TRY(in = Itv(-1,0,"()"));   TEST(! contains_zero(in));
+    TRY(in = Itv(-1,1,"[]"));   TEST(contains_zero(in));
+    TRY(in = Itv(-1,1,"()"));   TEST(contains_zero(in));
+    TRY(in = Itv(0,1,"[]"));    TEST(contains_zero(in));
+    TRY(in = Itv(0,1,"()"));    TEST(! contains_zero(in));
+    TRY(in = Itv(1,2,"[]"));    TEST(! contains_zero(in));
+    TRY(in = Itv(1,2,"()"));    TEST(! contains_zero(in));
+
+}
+
 void test_rs_continuous_interval_arithmetic() {
 
     Itv in;

@@ -14,10 +14,10 @@ void test_rs_stepwise_boundary_formatting() {
 
     B b;
 
-    TRY((b = {42, BT::empty_}));           TEST_EQUAL(b.str(), "{}");
-    TRY((b = {42, BT::minus_infinity_}));  TEST_EQUAL(b.str(), "-inf");
-    TRY((b = {42, BT::plus_infinity_}));   TEST_EQUAL(b.str(), "+inf");
-    TRY((b = {42, BT::closed_}));          TEST_EQUAL(b.str(), "42");
+    TRY((b = {42, BT::empty}));           TEST_EQUAL(b.str(), "{}");
+    TRY((b = {42, BT::minus_infinity}));  TEST_EQUAL(b.str(), "-inf");
+    TRY((b = {42, BT::plus_infinity}));   TEST_EQUAL(b.str(), "+inf");
+    TRY((b = {42, BT::closed}));          TEST_EQUAL(b.str(), "42");
 
 }
 
@@ -37,31 +37,31 @@ void test_rs_stepwise_boundary_from_interval() {
     TEST_EQUAL(le1.str(), "<=1");
     TEST_EQUAL(c12.str(), "[1,2]");
 
-    TEST_EQUAL(left_boundary_of(none), (B{0, BT::empty_}));
-    TEST_EQUAL(left_boundary_of(all), (B{0, BT::minus_infinity_}));
-    TEST_EQUAL(left_boundary_of(eq1), (B{1, BT::closed_}));
-    TEST_EQUAL(left_boundary_of(ge1), (B{1, BT::closed_}));
-    TEST_EQUAL(left_boundary_of(le1), (B{0, BT::minus_infinity_}));
-    TEST_EQUAL(left_boundary_of(c12), (B{1, BT::closed_}));
+    TEST_EQUAL(left_boundary_of(none), (B{0, BT::empty}));
+    TEST_EQUAL(left_boundary_of(all), (B{0, BT::minus_infinity}));
+    TEST_EQUAL(left_boundary_of(eq1), (B{1, BT::closed}));
+    TEST_EQUAL(left_boundary_of(ge1), (B{1, BT::closed}));
+    TEST_EQUAL(left_boundary_of(le1), (B{0, BT::minus_infinity}));
+    TEST_EQUAL(left_boundary_of(c12), (B{1, BT::closed}));
 
-    TEST_EQUAL(right_boundary_of(none), (B{0, BT::empty_}));
-    TEST_EQUAL(right_boundary_of(all), (B{0, BT::plus_infinity_}));
-    TEST_EQUAL(right_boundary_of(eq1), (B{1, BT::closed_}));
-    TEST_EQUAL(right_boundary_of(ge1), (B{0, BT::plus_infinity_}));
-    TEST_EQUAL(right_boundary_of(le1), (B{1, BT::closed_}));
-    TEST_EQUAL(right_boundary_of(c12), (B{2, BT::closed_}));
+    TEST_EQUAL(right_boundary_of(none), (B{0, BT::empty}));
+    TEST_EQUAL(right_boundary_of(all), (B{0, BT::plus_infinity}));
+    TEST_EQUAL(right_boundary_of(eq1), (B{1, BT::closed}));
+    TEST_EQUAL(right_boundary_of(ge1), (B{0, BT::plus_infinity}));
+    TEST_EQUAL(right_boundary_of(le1), (B{1, BT::closed}));
+    TEST_EQUAL(right_boundary_of(c12), (B{2, BT::closed}));
 
 }
 
 void test_rs_stepwise_boundary_to_interval() {
 
-    static const B none = {0, BT::empty_};
-    static const B ninf = {0, BT::minus_infinity_};
-    static const B pinf = {0, BT::plus_infinity_};
-    static const B cl1 = {1, BT::closed_};
-    static const B op1 = {1, BT::open_};
-    static const B cl4 = {4, BT::closed_};
-    static const B op4 = {4, BT::open_};
+    static const B none = {0, BT::empty};
+    static const B ninf = {0, BT::minus_infinity};
+    static const B pinf = {0, BT::plus_infinity};
+    static const B cl1 = {1, BT::closed};
+    static const B op1 = {1, BT::open};
+    static const B cl4 = {4, BT::closed};
+    static const B op4 = {4, BT::open};
 
     TEST_EQUAL(interval_from_boundaries(none, none), Itv());
     TEST_EQUAL(interval_from_boundaries(ninf, pinf), Itv::all());

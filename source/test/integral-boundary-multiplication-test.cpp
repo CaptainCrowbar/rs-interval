@@ -9,16 +9,16 @@ using BT = BoundaryType;
 
 void test_rs_integral_boundary_multiplication() {
 
-    static const B none = {0, BT::empty_};
-    static const B ninf = {0, BT::minus_infinity_};
-    static const B pinf = {0, BT::plus_infinity_};
-    static const B cl0 = {0, BT::closed_};
-    static const B cl2 = {2, BT::closed_};
-    static const B cl3 = {3, BT::closed_};
-    static const B cl6 = {6, BT::closed_};
-    static const B cl_2 = {-2, BT::closed_};
-    static const B cl_3 = {-3, BT::closed_};
-    static const B cl_6 = {-6, BT::closed_};
+    static const B none = {0, BT::empty};
+    static const B ninf = {0, BT::minus_infinity};
+    static const B pinf = {0, BT::plus_infinity};
+    static const B cl0 = {0, BT::closed};
+    static const B cl2 = {2, BT::closed};
+    static const B cl3 = {3, BT::closed};
+    static const B cl6 = {6, BT::closed};
+    static const B cl_2 = {-2, BT::closed};
+    static const B cl_3 = {-3, BT::closed};
+    static const B cl_6 = {-6, BT::closed};
 
     TEST_EQUAL(none * none, none);
     TEST_EQUAL(none * ninf, none);

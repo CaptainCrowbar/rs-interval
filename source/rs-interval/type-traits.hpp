@@ -181,17 +181,17 @@ namespace RS::Intervals {
     namespace Detail {
 
         RS_FORMAT_DEFINE_ENUM_CLASS(BoundaryType, int, -3,
-            empty_,
-            minus_infinity_,
-            closed_,
-            open_,
-            plus_infinity_
+            empty,
+            minus_infinity,
+            closed,
+            open,
+            plus_infinity
         )
 
         template <typename T>
         struct Boundary {
             T value = T();
-            BoundaryType type = BoundaryType::empty_;
+            BoundaryType type = BoundaryType::empty;
             bool adjacent(const Boundary& b) const noexcept;
             bool compare_ll(const Boundary& b) const noexcept;  // Compare left bounds (closed<open)
             bool compare_rr(const Boundary& b) const noexcept;  // Compare right bounds (open<closed)
@@ -214,12 +214,12 @@ namespace RS::Intervals {
                 using IC = IntervalCategory;
                 if (! has_value() || ! b.has_value())
                     return false;
-                if (type == BT::open_ && b.type == BT::open_)
+                if (type == BT::open && b.type == BT::open)
                     return false;
                 if (value == b.value)
                     return type != b.type;
                 if constexpr (interval_category<T> == IC::stepwise || interval_category<T> == IC::integral) {
-                    if (type == BT::closed_ && b.type == BT::closed_) {
+                    if (type == BT::closed && b.type == BT::closed) {
                         if (value < b.value) {
                             T t = value;
                             return ++t == b.value;
@@ -268,13 +268,13 @@ namespace RS::Intervals {
                 else if (value != b.value)
                     return value < b.value;
                 else
-                    return type == BT::open_ || b.type == BT::open_;
+                    return type == BT::open || b.type == BT::open;
             }
 
             template <typename T>
             bool Boundary<T>::has_value() const noexcept {
                 using BT = BoundaryType;
-                return type == BT::closed_ || type == BT::open_;
+                return type == BT::closed || type == BT::open;
             }
 
             template <typename T>
@@ -282,16 +282,16 @@ namespace RS::Intervals {
                 using namespace RS::Format;
                 using BT = BoundaryType;
                 switch (type) {
-                    case BT::empty_:           return "{}";
-                    case BT::minus_infinity_:  return "-inf";
-                    case BT::plus_infinity_:   return "+inf";
+                    case BT::empty:           return "{}";
+                    case BT::minus_infinity:  return "-inf";
+                    case BT::plus_infinity:   return "+inf";
                     default:                   break;
                 }
                 std::string s;
-                if (type == BT::open_)
+                if (type == BT::open)
                     s += '(';
                 s += format_object(value);
-                if (type == BT::open_)
+                if (type == BT::open)
                     s += ')';
                 return s;
             }
@@ -302,10 +302,10 @@ namespace RS::Intervals {
                 auto b = *this;
                 if (has_value())
                     b.value = - b.value;
-                if (type == BT::minus_infinity_)
-                    b.type = BT::plus_infinity_;
-                else if (type == BT::plus_infinity_)
-                    b.type = BT::minus_infinity_;
+                if (type == BT::minus_infinity)
+                    b.type = BT::plus_infinity;
+                else if (type == BT::plus_infinity)
+                    b.type = BT::minus_infinity;
                 return b;
             }
 
@@ -314,15 +314,15 @@ namespace RS::Intervals {
                 // We will only be adding like to like (lower or upper bounds),
                 // so minus_infinity+plus_infinity will never happen.
                 using BT = BoundaryType;
-                if (type == BT::empty_ || b.type == BT::empty_)
+                if (type == BT::empty || b.type == BT::empty)
                     return {};
                 else if (! has_value())
                     return *this;
                 else if (! b.has_value())
                     return b;
-                Boundary<T> c = {value + b.value, BT::open_};
-                if (type == BT::closed_ & b.type == BT::closed_)
-                    c.type = BT::closed_;
+                Boundary<T> c = {value + b.value, BT::open};
+                if (type == BT::closed & b.type == BT::closed)
+                    c.type = BT::closed;
                 return c;
             }
 
@@ -332,12 +332,12 @@ namespace RS::Intervals {
                 using BT = BoundaryType;
 
                 // If either argument is empty, the result is empty
-                if (type == BT::empty_ || b.type == BT::empty_)
+                if (type == BT::empty || b.type == BT::empty)
                     return {};
 
                 // Use symmetry to handle negative arguments
-                bool a_minus = type == BT::minus_infinity_ || (has_value() && value < T());
-                bool b_minus = b.type == BT::minus_infinity_ || (b.has_value() && b.value < T());
+                bool a_minus = type == BT::minus_infinity || (has_value() && value < T());
+                bool b_minus = b.type == BT::minus_infinity || (b.has_value() && b.value < T());
                 if (a_minus && b_minus)
                     return - *this * - b;
                 else if (a_minus)
@@ -346,27 +346,27 @@ namespace RS::Intervals {
                     return - (*this * - b);
 
                 // Use symmetry to ensure a>=b
-                if ((type == BT::minus_infinity_ && b.type != BT::minus_infinity_)
-                        || (b.type == BT::plus_infinity_ && type != BT::plus_infinity_)
+                if ((type == BT::minus_infinity && b.type != BT::minus_infinity)
+                        || (b.type == BT::plus_infinity && type != BT::plus_infinity)
                         || (has_value() && b.has_value() && value < b.value))
                     return b * *this;
 
                 // If either argument is a closed zero, the result is a closed zero
-                if ((type == BT::closed_ && value == T())
-                        || (b.type == BT::closed_ && b.value == T()))
-                    return {T(), BT::closed_};
+                if ((type == BT::closed && value == T())
+                        || (b.type == BT::closed && b.value == T()))
+                    return {T(), BT::closed};
 
                 // If either argument is an open zero, the result is an open zero
-                if ((type == BT::open_ && value == T())
-                        || (b.type == BT::open_ && b.value == T()))
-                    return {T(), BT::open_};
+                if ((type == BT::open && value == T())
+                        || (b.type == BT::open && b.value == T()))
+                    return {T(), BT::open};
 
                 // If either argument is positive infinity, the result is positive infinity
-                if (type == BT::plus_infinity_)
+                if (type == BT::plus_infinity)
                     return *this;
 
                 // If both arguments are closed, the result is closed; otherwise, the result is open
-                BT t = type == BT::closed_ && b.type == BT::closed_ ? BT::closed_ : BT::open_;
+                BT t = type == BT::closed && b.type == BT::closed ? BT::closed : BT::open;
                 return {value * b.value, t};
 
             }

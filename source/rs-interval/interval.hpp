@@ -70,29 +70,45 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        Boundary<T> left_boundary_of(const IntervalTypeBase<T>& i) {
+        bool contains_zero(const Interval<T>& i) noexcept {
+            using IB = IntervalBound;
+            if (i.empty())
+                return false;
+            bool right_zero = i.right() == IB::unbound
+                || (i.right() == IB::closed && i.max() >= T())
+                || (i.right() == IB::open && i.max() > T());
+            if (! right_zero)
+                return false;
+            bool left_zero = i.left() == IB::unbound
+                || (i.left() == IB::closed && i.min() <= T())
+                || (i.left() == IB::open && i.min() < T());
+            return left_zero;
+        }
+
+        template <typename T>
+        Boundary<T> left_boundary_of(const Interval<T>& i) {
             using BT = BoundaryType;
             if (i.empty())
                 return {};
             else if (i.is_left_closed())
-                return {i.min(), BT::closed_};
+                return {i.min(), BT::closed};
             else if (i.is_left_open())
-                return {i.min(), BT::open_};
+                return {i.min(), BT::open};
             else
-                return {{}, BT::minus_infinity_};
+                return {{}, BT::minus_infinity};
         }
 
         template <typename T>
-        Boundary<T> right_boundary_of(const IntervalTypeBase<T>& i) {
+        Boundary<T> right_boundary_of(const Interval<T>& i) {
             using BT = BoundaryType;
             if (i.empty())
                 return {};
             else if (i.is_right_closed())
-                return {i.max(), BT::closed_};
+                return {i.max(), BT::closed};
             else if (i.is_right_open())
-                return {i.max(), BT::open_};
+                return {i.max(), BT::open};
             else
-                return {{}, BT::plus_infinity_};
+                return {{}, BT::plus_infinity};
         }
 
         template <typename T>
@@ -101,15 +117,15 @@ namespace RS::Intervals {
             using IB = IntervalBound;
             IB lbound, rbound;
             switch (l.type) {
-                case BT::empty_:   lbound = IB::empty; break;
-                case BT::open_:    lbound = IB::open; break;
-                case BT::closed_:  lbound = IB::closed; break;
+                case BT::empty:   lbound = IB::empty; break;
+                case BT::open:    lbound = IB::open; break;
+                case BT::closed:  lbound = IB::closed; break;
                 default:           lbound = IB::unbound; break;
             }
             switch (r.type) {
-                case BT::empty_:   rbound = IB::empty; break;
-                case BT::open_:    rbound = IB::open; break;
-                case BT::closed_:  rbound = IB::closed; break;
+                case BT::empty:   rbound = IB::empty; break;
+                case BT::open:    rbound = IB::open; break;
+                case BT::closed:  rbound = IB::closed; break;
                 default:           rbound = IB::unbound; break;
             }
             return {l.value, r.value, lbound, rbound};
