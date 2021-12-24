@@ -1,6 +1,6 @@
 #include "rs-interval/interval.hpp"
-#include "rs-interval/interval-map.hpp"
-#include "rs-interval/interval-set.hpp"
+#include "rs-interval/map.hpp"
+#include "rs-interval/set.hpp"
 #include "rs-interval/types.hpp"
 #include "rs-unit-test.hpp"
 #include "test/stepwise.hpp"
