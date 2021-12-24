@@ -338,12 +338,13 @@ whether the value is an element of the interval. The function call operator
 is equivalent to `contains()`.
 
 ```c++
-IntervalSet<T> Interval::inverse() const;
+IntervalSet<T> Interval::complement() const;
+IntervalSet<T> Interval::operator~() const;
 ```
 
-Returns the inverse interval (the set of all values that are not in the
-interval). The inverse may in general consist of more than one interval, so
-the return type is `IntervalSet`, not `Interval`.
+Return the complementary interval (the set of all values that are not in the
+interval). The complement may in general consist of more than one interval,
+so the return type is `IntervalSet`, not `Interval`.
 
 ```c++
 IntervalOrder Interval::order(const Interval& b) const;
@@ -556,7 +557,7 @@ interval will be modified or removed as necessary. This will have no effect if
 this interval does not overlap any existing interval in the set.
 
 ```c++
-IntervalSet IntervalSet::inverse() const;
+IntervalSet IntervalSet::complement() const;
 IntervalSet IntervalSet::operator~() const;
 ```
 

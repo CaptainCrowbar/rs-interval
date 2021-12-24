@@ -32,7 +32,7 @@ namespace RS::Intervals {
         IntervalSet(std::initializer_list<interval_type> list): set_(list) {}
 
         bool operator()(const T& t) const { return contains(t); }
-        IntervalSet operator~() const { return inverse(); }
+        IntervalSet operator~() const { return complement(); }
         IntervalSet& operator&=(const IntervalSet<T>& b) { *this = set_intersection(b); return *this; }
         IntervalSet& operator|=(const IntervalSet<T>& b) { *this = set_union(b); return *this; }
         IntervalSet& operator-=(const IntervalSet<T>& b) { *this = set_difference(b); return *this; }
@@ -46,7 +46,7 @@ namespace RS::Intervals {
         void clear() noexcept { set_.clear(); }
         void insert(const interval_type& in);
         void erase(const interval_type& in);
-        IntervalSet inverse() const;
+        IntervalSet complement() const;
         IntervalSet set_intersection(const IntervalSet& b) const;
         IntervalSet set_union(const IntervalSet& b) const;
         IntervalSet set_difference(const IntervalSet& b) const;
@@ -122,7 +122,7 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        IntervalSet<T> IntervalSet<T>::inverse() const {
+        IntervalSet<T> IntervalSet<T>::complement() const {
             if (empty())
                 return interval_type::all();
             IntervalSet result;
@@ -138,7 +138,7 @@ namespace RS::Intervals {
 
         template <typename T>
         IntervalSet<T> IntervalSet<T>::set_intersection(const IntervalSet& b) const {
-            return inverse().set_union(b.inverse()).inverse();
+            return complement().set_union(b.complement()).complement();
         }
 
         template <typename T>

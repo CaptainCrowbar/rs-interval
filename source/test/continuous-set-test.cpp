@@ -17,7 +17,7 @@ using IO = IntervalOrder;
 
 void test_rs_continuous_interval_set_construct_insert_erase() {
 
-    Set set, inv;
+    Set set, com;
     Set::iterator it;
     Itv in;
     std::string str;
@@ -52,26 +52,26 @@ void test_rs_continuous_interval_set_construct_insert_erase() {
     TRY((set = {{1,2,"[]"},{3,4,"[]"},{5,6,"[]"}}));  TRY(str = set.str());  TEST_EQUAL(str, "{[1,2],[3,4],[5,6]}");
 
     TRY((set = {{1,2,"[)"},{3,4,"(]"},{5,6,"()"}}));
-    TRY(inv = set.inverse());
+    TRY(com = set.complement());
     TRY(str = set.str());
     TEST_EQUAL(str, "{[1,2),(3,4],(5,6)}");
-    TRY(str = inv.str());
+    TRY(str = com.str());
     TEST_EQUAL(str, "{<1,[2,3],(4,5],>=6}");
 
-    TEST(! set.contains(0.5));  TEST(inv.contains(0.5));
-    TEST(set.contains(1.0));    TEST(! inv.contains(1.0));
-    TEST(set.contains(1.5));    TEST(! inv.contains(1.5));
-    TEST(! set.contains(2.0));  TEST(inv.contains(2.0));
-    TEST(! set.contains(2.5));  TEST(inv.contains(2.5));
-    TEST(! set.contains(3.0));  TEST(inv.contains(3.0));
-    TEST(set.contains(3.5));    TEST(! inv.contains(3.5));
-    TEST(set.contains(4.0));    TEST(! inv.contains(4.0));
-    TEST(! set.contains(4.5));  TEST(inv.contains(4.5));
-    TEST(! set.contains(5.0));  TEST(inv.contains(5.0));
-    TEST(set.contains(5.5));    TEST(! inv.contains(5.5));
-    TEST(! set.contains(6.0));  TEST(inv.contains(6.0));
-    TEST(! set.contains(6.5));  TEST(inv.contains(6.5));
-    TEST(! set.contains(7.0));  TEST(inv.contains(7.0));
+    TEST(! set.contains(0.5));  TEST(com.contains(0.5));
+    TEST(set.contains(1.0));    TEST(! com.contains(1.0));
+    TEST(set.contains(1.5));    TEST(! com.contains(1.5));
+    TEST(! set.contains(2.0));  TEST(com.contains(2.0));
+    TEST(! set.contains(2.5));  TEST(com.contains(2.5));
+    TEST(! set.contains(3.0));  TEST(com.contains(3.0));
+    TEST(set.contains(3.5));    TEST(! com.contains(3.5));
+    TEST(set.contains(4.0));    TEST(! com.contains(4.0));
+    TEST(! set.contains(4.5));  TEST(com.contains(4.5));
+    TEST(! set.contains(5.0));  TEST(com.contains(5.0));
+    TEST(set.contains(5.5));    TEST(! com.contains(5.5));
+    TEST(! set.contains(6.0));  TEST(com.contains(6.0));
+    TEST(! set.contains(6.5));  TEST(com.contains(6.5));
+    TEST(! set.contains(7.0));  TEST(com.contains(7.0));
 
     TRY(set.clear());
     TEST(set.empty());

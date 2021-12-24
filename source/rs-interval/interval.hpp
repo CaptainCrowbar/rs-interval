@@ -547,7 +547,8 @@ namespace RS::Intervals {
         bool operator()(const T& t) const { return contains(t); }
 
         bool contains(const T& t) const { return this->match(t) == IntervalMatch::match; }
-        IntervalSet<T> inverse() const;
+        IntervalSet<T> complement() const;
+        IntervalSet<T> operator~() const { return complement(); }
         IntervalOrder order(const Interval& b) const;
         int compare(const Interval& b) const noexcept;
         bool includes(const Interval& b) const;      // True if b is a subset of this
@@ -583,7 +584,7 @@ namespace RS::Intervals {
         }
 
         template <typename T>
-        IntervalSet<T> Interval<T>::inverse() const {
+        IntervalSet<T> Interval<T>::complement() const {
             if (this->empty())
                 return all();
             if (this->is_universal())

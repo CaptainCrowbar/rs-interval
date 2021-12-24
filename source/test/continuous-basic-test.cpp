@@ -172,23 +172,23 @@ void test_rs_continuous_interval_order() {
 
 }
 
-void test_rs_continuous_interval_inverse() {
+void test_rs_continuous_interval_complement() {
 
     Itv in;
     Set set;
     std::string str;
 
-    TRY((in = {}));            TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{*}");
-    TRY((in = Itv::all()));    TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
-    TRY((in = 42));            TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<42,>42}");
-    TRY((in = {42,42,"<"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=42}");
-    TRY((in = {42,42,"<="}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>42}");
-    TRY((in = {42,42,">"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=42}");
-    TRY((in = {42,42,">="}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<42}");
-    TRY((in = {86,99,"()"}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=86,>=99}");
-    TRY((in = {86,99,"(]"}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=86,>99}");
-    TRY((in = {86,99,"[)"}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<86,>=99}");
-    TRY((in = {86,99,"[]"}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<86,>99}");
+    TRY((in = {}));            TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{*}");
+    TRY((in = Itv::all()));    TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{}");
+    TRY((in = 42));            TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<42,>42}");
+    TRY((in = {42,42,"<"}));   TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{>=42}");
+    TRY((in = {42,42,"<="}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{>42}");
+    TRY((in = {42,42,">"}));   TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<=42}");
+    TRY((in = {42,42,">="}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<42}");
+    TRY((in = {86,99,"()"}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<=86,>=99}");
+    TRY((in = {86,99,"(]"}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<=86,>99}");
+    TRY((in = {86,99,"[)"}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<86,>=99}");
+    TRY((in = {86,99,"[]"}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<86,>99}");
 
 }
 

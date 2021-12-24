@@ -18,7 +18,7 @@ using IO = IntervalOrder;
 
 void test_rs_stepwise_interval_set_construct_insert_erase() {
 
-    Set set, inv;
+    Set set, com;
     Set::iterator it;
     Itv in;
     std::string str;
@@ -52,32 +52,32 @@ void test_rs_stepwise_interval_set_construct_insert_erase() {
     TRY((set = {{0_sw,5_sw,"()"},{10_sw,15_sw,"()"},{20_sw,25_sw,"()"}}));  TRY(str = set.str());  TEST_EQUAL(str, "{[1,4],[11,14],[21,24]}");
 
     TRY((set = {{3_sw,6_sw},{9_sw,12_sw},{15_sw,18_sw}}));
-    TRY(inv = set.inverse());
+    TRY(com = set.complement());
     TRY(str = set.str());
     TEST_EQUAL(str, "{[3,6],[9,12],[15,18]}");
-    TRY(str = inv.str());
+    TRY(str = com.str());
     TEST_EQUAL(str, "{<=2,[7,8],[13,14],>=19}");
 
-    TEST(! set.contains(1_sw));   TEST(inv.contains(1_sw));
-    TEST(! set.contains(2_sw));   TEST(inv.contains(2_sw));
-    TEST(set.contains(3_sw));     TEST(! inv.contains(3_sw));
-    TEST(set.contains(4_sw));     TEST(! inv.contains(4_sw));
-    TEST(set.contains(5_sw));     TEST(! inv.contains(5_sw));
-    TEST(set.contains(6_sw));     TEST(! inv.contains(6_sw));
-    TEST(! set.contains(7_sw));   TEST(inv.contains(7_sw));
-    TEST(! set.contains(8_sw));   TEST(inv.contains(8_sw));
-    TEST(set.contains(9_sw));     TEST(! inv.contains(9_sw));
-    TEST(set.contains(10_sw));    TEST(! inv.contains(10_sw));
-    TEST(set.contains(11_sw));    TEST(! inv.contains(11_sw));
-    TEST(set.contains(12_sw));    TEST(! inv.contains(12_sw));
-    TEST(! set.contains(13_sw));  TEST(inv.contains(13_sw));
-    TEST(! set.contains(14_sw));  TEST(inv.contains(14_sw));
-    TEST(set.contains(15_sw));    TEST(! inv.contains(15_sw));
-    TEST(set.contains(16_sw));    TEST(! inv.contains(16_sw));
-    TEST(set.contains(17_sw));    TEST(! inv.contains(17_sw));
-    TEST(set.contains(18_sw));    TEST(! inv.contains(18_sw));
-    TEST(! set.contains(19_sw));  TEST(inv.contains(19_sw));
-    TEST(! set.contains(20_sw));  TEST(inv.contains(20_sw));
+    TEST(! set.contains(1_sw));   TEST(com.contains(1_sw));
+    TEST(! set.contains(2_sw));   TEST(com.contains(2_sw));
+    TEST(set.contains(3_sw));     TEST(! com.contains(3_sw));
+    TEST(set.contains(4_sw));     TEST(! com.contains(4_sw));
+    TEST(set.contains(5_sw));     TEST(! com.contains(5_sw));
+    TEST(set.contains(6_sw));     TEST(! com.contains(6_sw));
+    TEST(! set.contains(7_sw));   TEST(com.contains(7_sw));
+    TEST(! set.contains(8_sw));   TEST(com.contains(8_sw));
+    TEST(set.contains(9_sw));     TEST(! com.contains(9_sw));
+    TEST(set.contains(10_sw));    TEST(! com.contains(10_sw));
+    TEST(set.contains(11_sw));    TEST(! com.contains(11_sw));
+    TEST(set.contains(12_sw));    TEST(! com.contains(12_sw));
+    TEST(! set.contains(13_sw));  TEST(com.contains(13_sw));
+    TEST(! set.contains(14_sw));  TEST(com.contains(14_sw));
+    TEST(set.contains(15_sw));    TEST(! com.contains(15_sw));
+    TEST(set.contains(16_sw));    TEST(! com.contains(16_sw));
+    TEST(set.contains(17_sw));    TEST(! com.contains(17_sw));
+    TEST(set.contains(18_sw));    TEST(! com.contains(18_sw));
+    TEST(! set.contains(19_sw));  TEST(com.contains(19_sw));
+    TEST(! set.contains(20_sw));  TEST(com.contains(20_sw));
 
     TRY(set.clear());
     TEST(set.empty());

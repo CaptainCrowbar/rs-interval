@@ -18,7 +18,7 @@ using IO = IntervalOrder;
 
 void test_rs_ordered_interval_set_construct_insert_erase() {
 
-    Set set, inv;
+    Set set, com;
     Set::iterator it;
     Itv in;
     std::string str;
@@ -53,26 +53,26 @@ void test_rs_ordered_interval_set_construct_insert_erase() {
     TRY((set = {{"a","b","[]"},{"c","d","[]"},{"e","f","[]"}}));  TRY(str = set.str());  TEST_EQUAL(str, "{[a,b],[c,d],[e,f]}");
 
     TRY((set = {{"a","b","[)"},{"c","d","(]"},{"e","f","()"}}));
-    TRY(inv = set.inverse());
+    TRY(com = set.complement());
     TRY(str = set.str());
     TEST_EQUAL(str, "{[a,b),(c,d],(e,f)}");
-    TRY(str = inv.str());
+    TRY(str = com.str());
     TEST_EQUAL(str, "{<a,[b,c],(d,e],>=f}");
 
-    TEST(! set.contains("@x"));  TEST(inv.contains("@x"));
-    TEST(set.contains("a"));     TEST(! inv.contains("a"));
-    TEST(set.contains("ax"));    TEST(! inv.contains("ax"));
-    TEST(! set.contains("b"));   TEST(inv.contains("b"));
-    TEST(! set.contains("bx"));  TEST(inv.contains("bx"));
-    TEST(! set.contains("c"));   TEST(inv.contains("c"));
-    TEST(set.contains("cx"));    TEST(! inv.contains("cx"));
-    TEST(set.contains("d"));     TEST(! inv.contains("d"));
-    TEST(! set.contains("dx"));  TEST(inv.contains("dx"));
-    TEST(! set.contains("e"));   TEST(inv.contains("e"));
-    TEST(set.contains("ex"));    TEST(! inv.contains("ex"));
-    TEST(! set.contains("f"));   TEST(inv.contains("f"));
-    TEST(! set.contains("fx"));  TEST(inv.contains("fx"));
-    TEST(! set.contains("g"));   TEST(inv.contains("g"));
+    TEST(! set.contains("@x"));  TEST(com.contains("@x"));
+    TEST(set.contains("a"));     TEST(! com.contains("a"));
+    TEST(set.contains("ax"));    TEST(! com.contains("ax"));
+    TEST(! set.contains("b"));   TEST(com.contains("b"));
+    TEST(! set.contains("bx"));  TEST(com.contains("bx"));
+    TEST(! set.contains("c"));   TEST(com.contains("c"));
+    TEST(set.contains("cx"));    TEST(! com.contains("cx"));
+    TEST(set.contains("d"));     TEST(! com.contains("d"));
+    TEST(! set.contains("dx"));  TEST(com.contains("dx"));
+    TEST(! set.contains("e"));   TEST(com.contains("e"));
+    TEST(set.contains("ex"));    TEST(! com.contains("ex"));
+    TEST(! set.contains("f"));   TEST(com.contains("f"));
+    TEST(! set.contains("fx"));  TEST(com.contains("fx"));
+    TEST(! set.contains("g"));   TEST(com.contains("g"));
 
     TRY(set.clear());
     TEST(set.empty());

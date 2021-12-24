@@ -171,23 +171,23 @@ void test_rs_ordered_interval_order() {
 
 }
 
-void test_rs_ordered_interval_inverse() {
+void test_rs_ordered_interval_complement() {
 
     Itv in;
     Set set;
     std::string str;
 
-    TRY((in = {}));                      TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{*}");
-    TRY((in = Itv::all()));              TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{}");
-    TRY((in = {"hello"}));               TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<hello,>hello}");
-    TRY((in = {"hello","hello","<"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>=hello}");
-    TRY((in = {"hello","hello","<="}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{>hello}");
-    TRY((in = {"hello","hello",">"}));   TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=hello}");
-    TRY((in = {"hello","hello",">="}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<hello}");
-    TRY((in = {"hello","world","()"}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=hello,>=world}");
-    TRY((in = {"hello","world","(]"}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<=hello,>world}");
-    TRY((in = {"hello","world","[)"}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<hello,>=world}");
-    TRY((in = {"hello","world","[]"}));  TRY(set = in.inverse());  TRY(str = set.str());  TEST_EQUAL(str, "{<hello,>world}");
+    TRY((in = {}));                      TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{*}");
+    TRY((in = Itv::all()));              TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{}");
+    TRY((in = {"hello"}));               TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<hello,>hello}");
+    TRY((in = {"hello","hello","<"}));   TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{>=hello}");
+    TRY((in = {"hello","hello","<="}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{>hello}");
+    TRY((in = {"hello","hello",">"}));   TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<=hello}");
+    TRY((in = {"hello","hello",">="}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<hello}");
+    TRY((in = {"hello","world","()"}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<=hello,>=world}");
+    TRY((in = {"hello","world","(]"}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<=hello,>world}");
+    TRY((in = {"hello","world","[)"}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<hello,>=world}");
+    TRY((in = {"hello","world","[]"}));  TRY(set = ~ in);  TRY(str = set.str());  TEST_EQUAL(str, "{<hello,>world}");
 
 }
 

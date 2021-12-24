@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_continuous_interval_basic_properties)
     UNIT_TEST(rs_continuous_interval_construction)
     UNIT_TEST(rs_continuous_interval_order)
-    UNIT_TEST(rs_continuous_interval_inverse)
+    UNIT_TEST(rs_continuous_interval_complement)
     UNIT_TEST(rs_continuous_interval_binary_operations)
     UNIT_TEST(rs_continuous_interval_hashing)
 
@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_integral_interval_construction)
     UNIT_TEST(rs_integral_interval_iterators)
     UNIT_TEST(rs_integral_interval_order)
-    UNIT_TEST(rs_integral_interval_inverse)
+    UNIT_TEST(rs_integral_interval_complement)
     UNIT_TEST(rs_integral_interval_binary_operations)
     UNIT_TEST(rs_integral_interval_hashing)
 
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_ordered_interval_basic_properties)
     UNIT_TEST(rs_ordered_interval_construction)
     UNIT_TEST(rs_ordered_interval_order)
-    UNIT_TEST(rs_ordered_interval_inverse)
+    UNIT_TEST(rs_ordered_interval_complement)
     UNIT_TEST(rs_ordered_interval_binary_operations)
     UNIT_TEST(rs_ordered_interval_hashing)
 
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_stepwise_interval_construction)
     UNIT_TEST(rs_stepwise_interval_iterators)
     UNIT_TEST(rs_stepwise_interval_order)
-    UNIT_TEST(rs_stepwise_interval_inverse)
+    UNIT_TEST(rs_stepwise_interval_complement)
     UNIT_TEST(rs_stepwise_interval_binary_operations)
     UNIT_TEST(rs_stepwise_interval_hashing)
 
