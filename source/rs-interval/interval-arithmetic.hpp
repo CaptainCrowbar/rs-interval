@@ -232,7 +232,7 @@ namespace RS::Intervals {
     }
 
     template <typename T>
-    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    std::enable_if_t<interval_category<T> == IntervalCategory::continuous, IntervalSet<T>>
     operator/(const Interval<T>& a, const T& b) {
         return a / Interval<T>(b);
     }
@@ -256,7 +256,7 @@ namespace RS::Intervals {
     }
 
     template <typename T>
-    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>>
+    std::enable_if_t<interval_category<T> == IntervalCategory::continuous, IntervalSet<T>>
     operator/(const T& a, const Interval<T>& b) {
         return Interval<T>(a) / b;
     }
@@ -281,12 +281,6 @@ namespace RS::Intervals {
 
     template <typename T>
     std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
-    operator/=(Interval<T>& a, const Interval<T>& b) {
-        return a = a / b;
-    }
-
-    template <typename T>
-    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
     operator+=(Interval<T>& a, const T& b) {
         return a = a + Interval<T>(b);
     }
@@ -301,12 +295,6 @@ namespace RS::Intervals {
     std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
     operator*=(Interval<T>& a, const T& b) {
         return a = a * Interval<T>(b);
-    }
-
-    template <typename T>
-    std::enable_if_t<Detail::is_arithmetic_interval<T>, Interval<T>&>
-    operator/=(Interval<T>& a, const T& b) {
-        return a = a / Interval<T>(b);
     }
 
 }

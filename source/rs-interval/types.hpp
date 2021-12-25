@@ -114,6 +114,8 @@ namespace RS::Intervals {
 
     }
 
+    using RS::Format::FormatSpec;
+
     RS_FORMAT_DEFINE_ENUM_CLASS(IntervalBound, unsigned char, 0,
         empty,   // The interval is empty
         closed,  // The interval includes the boundary value
@@ -148,7 +150,7 @@ namespace RS::Intervals {
         a_extends_below_b,  // -3  AAA***     B is a subset of A, with the same upper bound
         a_encloses_b,       // -2  AAA***AAA  B is a subset of A, matching neither bound
         b_extends_above_a,  // -1  ***BBB     A is a subset of B, with the same lower bound
-        equal,              // 0   ***        A and B are the same (but not empty)
+        equal,              // 0   ***        A and B are the same
         a_extends_above_b,  // 1   ***AAA     B is a subset of A, with the same lower bound
         b_encloses_a,       // 2   BBB***BBB  A is a subset of B, matching neither bound
         b_extends_below_a,  // 3   BBB***     A is a subset of B, with the same upper bound

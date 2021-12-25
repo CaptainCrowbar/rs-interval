@@ -16,8 +16,6 @@
 
 namespace RS::Intervals {
 
-    using RS::Format::FormatSpec;
-
     template <typename T> class IntervalSet;
 
     namespace Detail {
