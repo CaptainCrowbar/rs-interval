@@ -43,7 +43,7 @@ if [ "$minor_version_etc" != "$version" ]; then
     fi
 fi
 
-namespace=$(grep -EIhr '^ *namespace [^ ]+' . \
+namespace=$(grep -EIhr '^ *namespace [^ {}]+' . \
     | sed -E 's/^ *namespace ([^ ]+).*$/\1/' \
     | sort \
     | uniq -c \
@@ -68,7 +68,7 @@ cat > "$version_header" << EOF
 #include <string>
 #include <array>
 
-namespace RS::Format {
+namespace $namespace {
 
     inline std::array<int, 3> version() noexcept {
         return {{ $major_version, $minor_version, $patch_version }};

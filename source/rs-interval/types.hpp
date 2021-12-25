@@ -2,7 +2,6 @@
 
 #include "rs-format/enum.hpp"
 #include "rs-format/format.hpp"
-#include <array>
 #include <limits>
 #include <ostream>
 #include <string>
@@ -98,19 +97,6 @@ namespace RS::Intervals {
             }
             return vec;
         }
-
-        template <typename T, size_t N>
-        class CappedVector {
-        public:
-            const T* begin() const noexcept { return array_.data(); }
-            const T* end() const noexcept { return begin() + size_; }
-            bool empty() const noexcept { return size_ == 0; }
-            size_t size() const noexcept { return size_; }
-            void push_back(const T& t) { array_[size_++] = t; }
-        private:
-            std::array<T, N> array_;
-            size_t size_ = 0;
-        };
 
     }
 

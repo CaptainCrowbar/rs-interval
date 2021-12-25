@@ -4,6 +4,7 @@
 #include "rs-interval/interval-type-base.hpp"
 #include "rs-interval/types.hpp"
 #include <algorithm>
+#include <array>
 #include <type_traits>
 
 namespace RS::Intervals {
@@ -157,40 +158,21 @@ namespace RS::Intervals {
         using namespace RS::Intervals::Detail;
 
         using B = Boundary<T>;
-        using BT = BoundaryType;
 
         if (a.empty() || b.empty())
             return {};
-
-        static const B zero = {T(), BT::closed};
 
         B al = left_boundary_of(a);
         B ar = right_boundary_of(a);
         B bl = left_boundary_of(b);
         B br = right_boundary_of(b);
 
-        CappedVector<B, 9> boundaries;
-
-        boundaries.push_back(al * bl);
-        boundaries.push_back(al * br);
-        boundaries.push_back(ar * bl);
-        boundaries.push_back(ar * br);
-
-        bool a_zero = contains_zero(a);
-        bool b_zero = contains_zero(b);
-
-        if (a_zero) {
-            boundaries.push_back(zero * bl);
-            boundaries.push_back(zero * br);
-        }
-
-        if (b_zero) {
-            boundaries.push_back(zero * al);
-            boundaries.push_back(zero * ar);
-        }
-
-        if (a_zero && b_zero)
-            boundaries.push_back(zero);
+        std::array<B, 4> boundaries = {{
+            al * bl,
+            al * br,
+            ar * bl,
+            ar * br,
+        }};
 
         auto i = std::min_element(boundaries.begin(), boundaries.end(),
             [] (auto& a, auto& b) { return a.compare_ll(b); });
