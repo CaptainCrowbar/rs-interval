@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.18)
 # version to version.hpp.
 
 project(rs-interval
-    VERSION 0.1.13
+    VERSION 0.1.14
     LANGUAGES CXX
 )
 
@@ -54,6 +54,7 @@ include_directories(.)
 find_package(Threads REQUIRED)
 
 add_executable(${unittest}
+    test/version-test.cpp
     test/types-test.cpp
     test/continuous-boundary-basic-test.cpp
     test/integral-boundary-basic-test.cpp

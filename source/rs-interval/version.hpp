@@ -1,14 +1,14 @@
 #include <string>
 #include <array>
 
-namespace RS::Format {
+namespace RS::Intervals {
 
     inline std::array<int, 3> version() noexcept {
-        return {{ 0, 1, 13 }};
+        return {{ 0, 1, 14 }};
     }
 
     inline std::string version_string() {
-        return "0.1.13";
+        return "0.1.14";
     }
 
 }

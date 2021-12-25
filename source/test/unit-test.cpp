@@ -4,6 +4,9 @@ int main(int argc, char** argv) {
 
     RS::UnitTest::begin_tests(argc, argv);
 
+    // version-test.cpp
+    UNIT_TEST(rs_interval_version)
+
     // types-test.cpp
     UNIT_TEST(rs_interval_type_traits)
 

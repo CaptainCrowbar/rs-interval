@@ -272,16 +272,16 @@ Interval properties.
 [see below] Interval::size() const
 ```
 
-Returns the length of the interval. For `integral` types, the return type is
+Returns the length of the interval. For integral types, the return type is
 `size_t`, and `size()` returns the number of values in the interval, or
 `npos` if one or both bounds is `unbound`.
 
-For `continuous` types, the return type is `T`, and `size()` returns the
+For continuous types, the return type is `T`, and `size()` returns the
 difference between the upper and lower bounds, without regard to whether they
 are open or closed bounds. Behaviour is undefined if one or both of the
 bounds is `unbound`.
 
-For `ordered` types, the `size()` function is not defined.
+For ordered and stepwise types, the `size()` function is not defined.
 
 ```c++
 std::string Interval::str(const FormatSpec& spec = {}) const;
@@ -357,30 +357,30 @@ Swap two intervals.
 
 ```c++
 // Unary arithmetic operators
-template <typename T> Interval<T> operator+(const Interval<T>& i);
-template <typename T> Interval<T> operator-(const Interval<T>& i);
+Interval<T> operator+(const Interval<T>& i);
+Interval<T> operator-(const Interval<T>& i);
 // Addition operators
-template <typename T> Interval<T> operator+(const Interval<T>& a, const Interval<T>& b);
-template <typename T> Interval<T> operator+(const Interval<T>& a, const T& b);
-template <typename T> Interval<T> operator+(const T& a, const Interval<T>& b);
-template <typename T> Interval<T>& operator+=(Interval<T>& a, const Interval<T>& b);
-template <typename T> Interval<T>& operator+=(Interval<T>& a, const T& b);
+Interval<T> operator+(const Interval<T>& a, const Interval<T>& b);
+Interval<T> operator+(const Interval<T>& a, const T& b);
+Interval<T> operator+(const T& a, const Interval<T>& b);
+Interval<T>& operator+=(Interval<T>& a, const Interval<T>& b);
+Interval<T>& operator+=(Interval<T>& a, const T& b);
 // Subtraction operators
-template <typename T> Interval<T> operator-(const Interval<T>& a, const Interval<T>& b);
-template <typename T> Interval<T> operator-(const Interval<T>& a, const T& b);
-template <typename T> Interval<T> operator-(const T& a, const Interval<T>& b);
-template <typename T> Interval<T>& operator-=(Interval<T>& a, const Interval<T>& b);
-template <typename T> Interval<T>& operator-=(Interval<T>& a, const T& b);
+Interval<T> operator-(const Interval<T>& a, const Interval<T>& b);
+Interval<T> operator-(const Interval<T>& a, const T& b);
+Interval<T> operator-(const T& a, const Interval<T>& b);
+Interval<T>& operator-=(Interval<T>& a, const Interval<T>& b);
+Interval<T>& operator-=(Interval<T>& a, const T& b);
 // Multiplication operators
-template <typename T> Interval<T> operator*(const Interval<T>& a, const Interval<T>& b);
-template <typename T> Interval<T> operator*(const Interval<T>& a, const T& b);
-template <typename T> Interval<T> operator*(const T& a, const Interval<T>& b);
-template <typename T> Interval<T>& operator*=(Interval<T>& a, const Interval<T>& b);
-template <typename T> Interval<T>& operator*=(Interval<T>& a, const T& b);
+Interval<T> operator*(const Interval<T>& a, const Interval<T>& b);
+Interval<T> operator*(const Interval<T>& a, const T& b);
+Interval<T> operator*(const T& a, const Interval<T>& b);
+Interval<T>& operator*=(Interval<T>& a, const Interval<T>& b);
+Interval<T>& operator*=(Interval<T>& a, const T& b);
 // Division operators
-template <typename T> IntervalSet<T> operator/(const Interval<T>& a, const Interval<T>& b);
-template <typename T> IntervalSet<T> operator/(const Interval<T>& a, const T& b);
-template <typename T> IntervalSet<T> operator/(const T& a, const Interval<T>& b);
+IntervalSet<T> operator/(const Interval<T>& a, const Interval<T>& b);
+IntervalSet<T> operator/(const Interval<T>& a, const T& b);
+IntervalSet<T> operator/(const T& a, const Interval<T>& b);
 
 ```
 
