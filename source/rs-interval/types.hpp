@@ -102,7 +102,7 @@ namespace RS::Intervals {
 
     using RS::Format::FormatSpec;
 
-    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalBound, unsigned char, 0,
+    RS_DEFINE_ENUM_CLASS(IntervalBound, unsigned char, 0,
         empty,   // The interval is empty
         closed,  // The interval includes the boundary value
         open,    // The interval does not include the boundary value
@@ -111,7 +111,7 @@ namespace RS::Intervals {
 
     constexpr IntervalBound operator~(IntervalBound b) noexcept { return IntervalBound(3 - int(b)); }
 
-    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalCategory, int, 0,
+    RS_DEFINE_ENUM_CLASS(IntervalCategory, int, 0,
         none,       // Not usable in an interval
         ordered,    // Ordered but not an arithmetic type (e.g. string)
         stepwise,   // Incrementable and decrementable (e.g. pointer)
@@ -119,14 +119,14 @@ namespace RS::Intervals {
         continuous  // Models a continuous arithmetic type (e.g. floating point)
     )
 
-    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalMatch, int, -1,
+    RS_DEFINE_ENUM_CLASS(IntervalMatch, int, -1,
         low,    // The value is less than the interval's lower bound
         match,  // The value is an element of the interval
         high,   // The value is greater than the interval's upper bound
         empty   // The interval is empty
     )
 
-    RS_FORMAT_DEFINE_ENUM_CLASS(IntervalOrder, int, -8,
+    RS_DEFINE_ENUM_CLASS(IntervalOrder, int, -8,
         // Name             Index  Picture    Description
         both_empty,         // -8  ...        Both are empty
         b_only,             // -7  BBB        A is empty, B is not
@@ -173,7 +173,7 @@ namespace RS::Intervals {
 
     namespace Detail {
 
-        RS_FORMAT_DEFINE_ENUM_CLASS(BoundaryType, int, -3,
+        RS_DEFINE_ENUM_CLASS(BoundaryType, int, -3,
             empty,
             minus_infinity,
             closed,
