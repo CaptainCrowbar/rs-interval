@@ -43,8 +43,8 @@ if [ "$minor_version_etc" != "$version" ]; then
     fi
 fi
 
-namespace=$(grep -EIhr '^ *namespace [^ {}]+' . \
-    | sed -E 's/^ *namespace ([^ ]+).*$/\1/' \
+namespace=$(grep -EIhr '^ *namespace [A-Za-z]' . \
+    | sed -E 's/^ *namespace ([A-Za-z0-9_:]+).*$/\1/' \
     | sort \
     | uniq -c \
     | sort \
@@ -65,6 +65,8 @@ sed -E -e 's/^( *VERSION )[0-9.]+$/\1'"$new_version/" "$cmake_file" > "$cmake_fi
 mv "$cmake_file.out" "$cmake_file"
 
 cat > "$version_header" << EOF
+#pragma once
+
 #include <string>
 #include <array>
 
