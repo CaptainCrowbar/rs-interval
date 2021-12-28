@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.18)
 # and propagate the new version to version.hpp.
 
 project(rs-interval
-    VERSION 0.1.20
+    VERSION 0.1.21
     LANGUAGES CXX
 )
 
@@ -49,7 +49,7 @@ check_for_library(yes rs-format rs-format.hpp https://github.com/CaptainCrowbar/
 check_for_library(no rs-unit-test rs-unit-test.hpp https://github.com/CaptainCrowbar/rs-unit-test)
 
 set(library rs-interval)
-set(unittest ${library}-test)
+set(unittest test-${library})
 include_directories(.)
 find_package(Threads REQUIRED)
 
