@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.18)
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
-# The version number here is the canonical one for the project. Run
-# scripts/bump-version to increment the patch number and propagate the new
-# version to version.hpp.
+# The version number here is the canonical one for the project.
+# Run rs-bump-version to increment the patch number
+# and propagate the new version to version.hpp.
 
 project(rs-interval
-    VERSION 0.1.18
+    VERSION 0.1.19
     LANGUAGES CXX
 )
 
