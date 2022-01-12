@@ -5,6 +5,7 @@
 #include "rs-interval/interval-type-base.hpp"
 #include "rs-interval/types.hpp"
 #include "rs-format/format.hpp"
+#include "rs-tl/types.hpp"
 #include <algorithm>
 #include <ostream>
 #include <stdexcept>
@@ -20,7 +21,8 @@ namespace RS::Intervals {
 
     namespace Detail {
 
-        inline std::pair<IntervalBound, IntervalBound> parse_interval_mode(std::string_view mode) {
+        inline std::pair<IntervalBound, IntervalBound>
+        parse_interval_mode(std::string_view mode) {
             using namespace std::literals;
             static const std::unordered_map<std::string_view, std::pair<IntervalBound, IntervalBound>> map = {
                 { "()"sv,  { IntervalBound::open,     IntervalBound::open     }},
@@ -46,7 +48,7 @@ namespace RS::Intervals {
     template <typename T>
     class Interval:
     public IntervalCategoryBase<T>,
-    public Detail::TotalOrder<Interval<T>> {
+    public TL::TotalOrder<Interval<T>> {
 
     public:
 
@@ -118,7 +120,9 @@ namespace RS::Intervals {
         template <typename T>
         IntervalOrder Interval<T>::order(const Interval& b) const {
 
-            using B = Detail::Boundary<T>;
+            using namespace Detail;
+
+            using B = Boundary<T>;
 
             auto& a = *this;
 

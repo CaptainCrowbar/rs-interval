@@ -2,6 +2,7 @@
 
 #include "rs-interval/interval.hpp"
 #include "rs-format/format.hpp"
+#include "rs-tl/types.hpp"
 #include <algorithm>
 #include <initializer_list>
 #include <map>
@@ -16,7 +17,7 @@ namespace RS::Intervals {
 
     template <typename K, typename T>
     class IntervalMap:
-    public Detail::TotalOrder<IntervalMap<K, T>> {
+    public TL::TotalOrder<IntervalMap<K, T>> {
 
     public:
 

@@ -15,6 +15,8 @@ using IO = IntervalOrder;
 
 void test_rs_integral_contains_zero() {
 
+    using namespace RS::Intervals::Detail;
+
     Itv in;
 
     TRY(in = Itv());            TEST(! contains_zero(in));

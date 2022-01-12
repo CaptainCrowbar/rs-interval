@@ -2,6 +2,7 @@
 
 #include "rs-format/enum.hpp"
 #include "rs-format/format.hpp"
+#include "rs-format/string.hpp"
 #include <limits>
 #include <ostream>
 #include <string>
@@ -73,29 +74,8 @@ namespace RS::Intervals {
             && has_less_or_equal_operator<T> && has_greater_or_equal_operator<T>);
 
         template <typename T>
-        struct TotalOrder {
-            friend bool operator!=(const T& lhs, const T& rhs) { return ! (lhs == rhs); }
-            friend bool operator>(const T& lhs, const T& rhs) { return rhs < lhs; }
-            friend bool operator<=(const T& lhs, const T& rhs) { return ! (rhs < lhs); }
-            friend bool operator>=(const T& lhs, const T& rhs) { return ! (lhs < rhs); }
-        };
-
-        template <typename T>
         inline int compare_3way(const T& a, const T& b) noexcept {
             return a == b ? 0 : a < b ? -1 : 1;
-        }
-
-        inline std::vector<std::string> split_string(const std::string& str, const std::string& chars = "\t\n\f\r ") {
-            std::vector<std::string> vec;
-            size_t i = 0, j = 0;
-            while (j < str.size()) {
-                i = str.find_first_not_of(chars, j);
-                if (i == std::string::npos)
-                    break;
-                j = str.find_first_of(chars, i);
-                vec.push_back(str.substr(i, j - i));
-            }
-            return vec;
         }
 
     }

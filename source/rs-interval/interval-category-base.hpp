@@ -2,6 +2,7 @@
 
 #include "rs-interval/interval-type-base.hpp"
 #include "rs-interval/types.hpp"
+#include "rs-tl/types.hpp"
 #include <iterator>
 #include <string>
 #include <type_traits>
@@ -33,7 +34,7 @@ namespace RS::Intervals {
     public:
 
         class iterator:
-        public Detail::TotalOrder<iterator> {
+        public TL::TotalOrder<iterator> {
         public:
             using difference_type = delta_type;
             using iterator_category = std::conditional_t<has_random_access, std::random_access_iterator_tag, std::bidirectional_iterator_tag>;
@@ -114,7 +115,7 @@ namespace RS::Intervals {
     public:
 
         class iterator:
-        public Detail::TotalOrder<iterator> {
+        public TL::TotalOrder<iterator> {
         public:
             using difference_type = delta_type;
             using iterator_category = std::conditional_t<has_random_access, std::random_access_iterator_tag, std::bidirectional_iterator_tag>;

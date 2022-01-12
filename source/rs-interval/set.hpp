@@ -2,6 +2,7 @@
 
 #include "rs-interval/interval.hpp"
 #include "rs-format/format.hpp"
+#include "rs-tl/types.hpp"
 #include <algorithm>
 #include <initializer_list>
 #include <iterator>
@@ -16,7 +17,7 @@ namespace RS::Intervals {
 
     template <typename T>
     class IntervalSet:
-    public Detail::TotalOrder<IntervalSet<T>> {
+    public TL::TotalOrder<IntervalSet<T>> {
 
     public:
 
