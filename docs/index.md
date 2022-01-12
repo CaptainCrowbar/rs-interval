@@ -17,10 +17,11 @@ run the unit tests), and no binaries to install. The CMake file includes an
 equivalent. Headers can be included individually as required, or the entire
 library can be included using `"rs-interval.hpp"`.
 
-This uses my [formatting](https://github.com/CaptainCrowbar/rs-format) and
-[unit test](https://github.com/CaptainCrowbar/rs-unit-test) libraries. Both of
-these are header-only libraries; the unit test library is not required if you
-only want to use this library without building its unit tests.
+Other libraries required (all header only):
+
+[My formatting library](https://github.com/CaptainCrowbar/rs-format)
+[My template library](https://github.com/CaptainCrowbar/rs-tl)
+[My unit test library](https://github.com/CaptainCrowbar/rs-unit-test)
 
 ## Index
 
