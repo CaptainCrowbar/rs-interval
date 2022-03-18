@@ -1,8 +1,8 @@
 #pragma once
 
-#include "rs-format/enum.hpp"
 #include "rs-format/format.hpp"
 #include "rs-format/string.hpp"
+#include "rs-tl/enum.hpp"
 #include <limits>
 #include <ostream>
 #include <string>
