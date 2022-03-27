@@ -96,6 +96,31 @@ void test_rs_ordered_interval_construction() {
 
 }
 
+void test_rs_ordered_interval_from_string() {
+
+    Itv in;
+
+    TRY(in = Itv::from_string(""));       TEST_EQUAL(in.str(), "{}");
+    TRY(in = Itv::from_string("{}"));     TEST_EQUAL(in.str(), "{}");
+    TRY(in = Itv::from_string("*"));      TEST_EQUAL(in.str(), "*");
+    TRY(in = Itv::from_string("a"));      TEST_EQUAL(in.str(), "a");
+    TRY(in = Itv::from_string(">e"));     TEST_EQUAL(in.str(), ">e");
+    TRY(in = Itv::from_string("<e"));     TEST_EQUAL(in.str(), "<e");
+    TRY(in = Itv::from_string(">=e"));    TEST_EQUAL(in.str(), ">=e");
+    TRY(in = Itv::from_string("<=e"));    TEST_EQUAL(in.str(), "<=e");
+    TRY(in = Itv::from_string("e+"));     TEST_EQUAL(in.str(), ">=e");
+    TRY(in = Itv::from_string("e-"));     TEST_EQUAL(in.str(), "<=e");
+    TRY(in = Itv::from_string("[e,j]"));  TEST_EQUAL(in.str(), "[e,j]");
+    TRY(in = Itv::from_string("[e,j)"));  TEST_EQUAL(in.str(), "[e,j)");
+    TRY(in = Itv::from_string("(e,j]"));  TEST_EQUAL(in.str(), "(e,j]");
+    TRY(in = Itv::from_string("(e,j)"));  TEST_EQUAL(in.str(), "(e,j)");
+    TRY(in = Itv::from_string("e-j"));    TEST_EQUAL(in.str(), "[e,j]");
+    TRY(in = Itv::from_string("e..j"));   TEST_EQUAL(in.str(), "[e,j]");
+    TRY(in = Itv::from_string("e...j"));  TEST_EQUAL(in.str(), "[e,j]");
+    TRY(in = Itv::from_string("e..<j"));  TEST_EQUAL(in.str(), "[e,j)");
+
+}
+
 void test_rs_ordered_interval_order() {
 
     Itv a, b;

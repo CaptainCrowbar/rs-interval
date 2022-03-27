@@ -160,6 +160,38 @@ explicit Interval::operator bool() const noexcept;
 
 Explicit conversion to `bool`; true if the interval is not empty.
 
+```c++
+static Interval Interval::from_string(const std::string& str);
+```
+
+Interprets a string as an interval. The value type `T` must have either a
+constructor that takes a string or an input operator. This will not be
+reliable for all value types because the characters that form part of the
+interval syntax may also appear in the value type's string format.
+
+Valid string formats are:
+
+| Format     | Interpretation  |
+| ------     | --------------  |
+| `""`       | `{}`            |
+| `"{}"`     | `{}`            |
+| `"*"`      | `*`             |
+| `"A"`      | `A`             |
+| `">A"`     | `>A`            |
+| `"<A"`     | `<A`            |
+| `">=A"`    | `>=A`           |
+| `"<=A"`    | `<=A`           |
+| `"A+"`     | `>=A`           |
+| `"A-"`     | `<=A`           |
+| `"[A,B]"`  | `[A,B]`         |
+| `"[A,B)"`  | `[A,B)`         |
+| `"(A,B]"`  | `(A,B]`         |
+| `"(A,B)"`  | `(A,B)`         |
+| `"A-B"`    | `[A,B]`         |
+| `"A..B"`   | `[A,B]`         |
+| `"A...B"`  | `[A,B]`         |
+| `"A..<B"`  | `[A,B)`         |
+
 ### Comparison functions
 
 ```c++

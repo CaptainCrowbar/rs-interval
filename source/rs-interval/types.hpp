@@ -3,8 +3,11 @@
 #include "rs-format/format.hpp"
 #include "rs-format/string.hpp"
 #include "rs-tl/enum.hpp"
+#include "rs-tl/types.hpp"
+#include <istream>
 #include <limits>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -73,9 +76,28 @@ namespace RS::Intervals {
             && has_less_than_operator<T> && has_greater_than_operator<T>
             && has_less_or_equal_operator<T> && has_greater_or_equal_operator<T>);
 
+        template <typename T, typename = void> struct HasInputOperator: std::false_type {};
         template <typename T>
-        inline int compare_3way(const T& a, const T& b) noexcept {
+            struct HasInputOperator<T, std::void_t<decltype(std::declval<std::istream&&>() >> std::declval<T&>())>>:
+            std::true_type {};
+
+        template <typename T>
+        int compare_3way(const T& a, const T& b) noexcept {
             return a == b ? 0 : a < b ? -1 : 1;
+        }
+
+        template <typename T>
+        T from_string(const std::string& s) {
+            if constexpr (std::is_constructible_v<T, std::string>) {
+                return T(s);
+            } else if constexpr (HasInputOperator<T>::value) {
+                T t;
+                std::istringstream in(s);
+                in >> t;
+                return t;
+            } else {
+                static_assert(TL::dependent_false<T>, "No conversion from string to this type");
+            }
         }
 
     }

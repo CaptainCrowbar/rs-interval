@@ -13,6 +13,12 @@ using IC = IntervalCategory;
 using IM = IntervalMatch;
 using IO = IntervalOrder;
 
+struct Thing {
+    std::string name;
+    Thing() = default;
+    explicit Thing(const std::string& s): name(s) {}
+};
+
 void test_rs_interval_type_traits() {
 
     TEST_EQUAL(interval_category<bool>, IC::none);
@@ -51,5 +57,21 @@ void test_rs_interval_type_traits() {
     TEST_EQUAL(interval_category<volatile float>, IC::continuous);
     TEST_EQUAL(interval_category<const volatile float>, IC::continuous);
     TEST_EQUAL(interval_category<double>, IC::continuous);
+
+}
+
+void test_rs_interval_string_conversion() {
+
+    int n = 0;
+    std::string s;
+    Thing t;
+
+    s = "Hello";
+    TRY(t = Detail::from_string<Thing>(s));
+    TEST_EQUAL(t.name, "Hello");
+
+    s = "42";
+    TRY(n = Detail::from_string<int>(s));
+    TEST_EQUAL(n, 42);
 
 }

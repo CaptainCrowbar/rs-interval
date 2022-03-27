@@ -11,6 +11,7 @@ int main(int argc, char** argv) {
 
     // types-test.cpp
     UNIT_TEST(rs_interval_type_traits)
+    UNIT_TEST(rs_interval_string_conversion)
 
     // continuous-boundary-basic-test.cpp
     UNIT_TEST(rs_continuous_boundary_formatting)
@@ -67,6 +68,7 @@ int main(int argc, char** argv) {
     // continuous-basic-test.cpp
     UNIT_TEST(rs_continuous_interval_basic_properties)
     UNIT_TEST(rs_continuous_interval_construction)
+    UNIT_TEST(rs_continuous_interval_from_string)
     UNIT_TEST(rs_continuous_interval_order)
     UNIT_TEST(rs_continuous_interval_complement)
     UNIT_TEST(rs_continuous_interval_binary_operations)
@@ -89,6 +91,7 @@ int main(int argc, char** argv) {
     // integral-basic-test.cpp
     UNIT_TEST(rs_integral_interval_basic_properties)
     UNIT_TEST(rs_integral_interval_construction)
+    UNIT_TEST(rs_integral_interval_from_string)
     UNIT_TEST(rs_integral_interval_iterators)
     UNIT_TEST(rs_integral_interval_order)
     UNIT_TEST(rs_integral_interval_complement)
@@ -111,6 +114,7 @@ int main(int argc, char** argv) {
     // ordered-basic-test.cpp
     UNIT_TEST(rs_ordered_interval_basic_properties)
     UNIT_TEST(rs_ordered_interval_construction)
+    UNIT_TEST(rs_ordered_interval_from_string)
     UNIT_TEST(rs_ordered_interval_order)
     UNIT_TEST(rs_ordered_interval_complement)
     UNIT_TEST(rs_ordered_interval_binary_operations)
@@ -128,6 +132,7 @@ int main(int argc, char** argv) {
     // stepwise-basic-test.cpp
     UNIT_TEST(rs_stepwise_interval_basic_properties)
     UNIT_TEST(rs_stepwise_interval_construction)
+    UNIT_TEST(rs_stepwise_interval_from_string)
     UNIT_TEST(rs_stepwise_interval_iterators)
     UNIT_TEST(rs_stepwise_interval_order)
     UNIT_TEST(rs_stepwise_interval_complement)

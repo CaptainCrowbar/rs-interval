@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <istream>
 #include <ostream>
 
 class Stepwise {
@@ -23,6 +24,13 @@ private:
 
 constexpr Stepwise operator""_sw(unsigned long long n) noexcept { return Stepwise(int(n)); }
 inline std::ostream& operator<<(std::ostream& out, Stepwise s) { return out << s.get(); }
+
+inline std::istream& operator>>(std::istream& in, Stepwise& s) {
+    int i;
+    in >> i;
+    s = i;
+    return in;
+}
 
 namespace std {
 

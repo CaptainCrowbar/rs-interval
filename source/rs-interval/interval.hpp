@@ -11,37 +11,13 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <tuple>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace RS::Intervals {
 
     template <typename T> class IntervalSet;
-
-    namespace Detail {
-
-        inline std::pair<IntervalBound, IntervalBound>
-        parse_interval_mode(std::string_view mode) {
-            using namespace std::literals;
-            static const std::unordered_map<std::string_view, std::pair<IntervalBound, IntervalBound>> map = {
-                { "()"sv,  { IntervalBound::open,     IntervalBound::open     }},
-                { "(]"sv,  { IntervalBound::open,     IntervalBound::closed   }},
-                { "[)"sv,  { IntervalBound::closed,   IntervalBound::open     }},
-                { "[]"sv,  { IntervalBound::closed,   IntervalBound::closed   }},
-                { ">"sv,   { IntervalBound::open,     IntervalBound::unbound  }},
-                { "<"sv,   { IntervalBound::unbound,  IntervalBound::open     }},
-                { ">="sv,  { IntervalBound::closed,   IntervalBound::unbound  }},
-                { "<="sv,  { IntervalBound::unbound,  IntervalBound::closed   }},
-                { "*"sv,   { IntervalBound::unbound,  IntervalBound::unbound  }},
-            };
-            auto it = map.find(mode);
-            if (it == map.end())
-                throw std::invalid_argument("Invalid interval mode: " + std::string(mode));
-            return it->second;
-        }
-
-    }
 
     // Interval class
 
@@ -83,6 +59,7 @@ namespace RS::Intervals {
         void swap(Interval& in) noexcept { this->do_swap(in); }
 
         static Interval all() noexcept { return Interval(T(), IntervalBound::unbound, IntervalBound::unbound); }
+        static Interval from_string(const std::string& str);
 
     };
 
@@ -97,10 +74,31 @@ namespace RS::Intervals {
 
         template <typename T>
         Interval<T>::Interval(const T& min, const T& max, std::string_view mode) {
+
+            using namespace std::literals;
+
+            static const std::unordered_map<std::string_view, std::pair<IntervalBound, IntervalBound>> map = {
+                { "()"sv,  { IntervalBound::open,     IntervalBound::open     }},
+                { "(]"sv,  { IntervalBound::open,     IntervalBound::closed   }},
+                { "[)"sv,  { IntervalBound::closed,   IntervalBound::open     }},
+                { "[]"sv,  { IntervalBound::closed,   IntervalBound::closed   }},
+                { ">"sv,   { IntervalBound::open,     IntervalBound::unbound  }},
+                { "<"sv,   { IntervalBound::unbound,  IntervalBound::open     }},
+                { ">="sv,  { IntervalBound::closed,   IntervalBound::unbound  }},
+                { "<="sv,  { IntervalBound::unbound,  IntervalBound::closed   }},
+                { "*"sv,   { IntervalBound::unbound,  IntervalBound::unbound  }},
+            };
+
+            auto it = map.find(mode);
+            if (it == map.end())
+                throw std::invalid_argument("Invalid interval mode: " + std::string(mode));
+
             this->min_ = min;
             this->max_ = max;
-            std::tie(this->left_, this->right_) = Detail::parse_interval_mode(mode);
+            this->left_ = it->second.first;
+            this->right_ = it->second.second;
             this->adjust_bounds();
+
         }
 
         template <typename T>
@@ -377,6 +375,70 @@ namespace RS::Intervals {
             else
                 return (this->is_left_closed() ? '[' : '(') + format_object(this->min(), spec) + ','
                     + format_object(this->max(), spec) + (this->is_right_closed() ? ']' : ')');
+        }
+
+        template <typename T>
+        Interval<T> Interval<T>::from_string(const std::string& str) {
+
+            const auto fail = [&] { throw std::invalid_argument("Invalid interval: " + Format::quote(str)); };
+
+            if (str.empty() || str == "{}")
+                return {};
+            else if (str == "*")
+                return Interval::all();
+
+            char first = str.front();
+            char last = str.back();
+            T min, max;
+            std::string mode;
+
+            if ((first == '(' || first == '[') && (last == ')' || last == ']')) {
+
+                size_t comma = str.find(',');
+
+                if (comma == TL::npos)
+                    fail();
+
+                min = Detail::from_string<T>(str.substr(1, comma - 1));
+                max = Detail::from_string<T>(str.substr(comma + 1, str.size() - comma - 2));
+                mode = {first, last};
+
+            } else if (first == '<' || first == '>') {
+
+                mode = str.substr(0, size_t(str[1] == '=') + 1);
+                min = max = Detail::from_string<T>(str.substr(mode.size()));
+
+            } else if (last == '+' || last == '-') {
+
+                mode = last == '+' ? ">=" : "<=";
+                min = max = Detail::from_string<T>(str.substr(0, str.size() - 1));
+
+            } else {
+
+                static const std::vector<std::string> delimiters = { "..<", "...", "..", "-" };
+
+                size_t cut = TL::npos;
+                size_t len = 0;
+
+                for (auto& d: delimiters) {
+                    cut = str.find(d);
+                    if (cut != TL::npos) {
+                        len = d.size();
+                        break;
+                    }
+                }
+
+                if (cut == TL::npos)
+                    return Interval(Detail::from_string<T>(str));
+
+                mode = str[cut + len - 1] == '<' ? "[)" : "[]";
+                min = Detail::from_string<T>(str.substr(0, cut));
+                max = Detail::from_string<T>(str.substr(cut + len));
+
+            }
+
+            return Interval(min, max, mode);
+
         }
 
     template <typename T> bool operator==(const Interval<T>& a, const Interval<T>& b) noexcept { return a.compare(b) == 0; }
