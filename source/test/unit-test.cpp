@@ -6,87 +6,81 @@ int main(int argc, char** argv) {
 
     RS::UnitTest::begin_tests(argc, argv);
 
-    // version-test.cpp
-    UNIT_TEST(rs_interval_version)
-
     // types-test.cpp
     UNIT_TEST(rs_interval_type_traits)
     UNIT_TEST(rs_interval_string_conversion)
-
-    // continuous-boundary-basic-test.cpp
-    UNIT_TEST(rs_continuous_boundary_formatting)
-    UNIT_TEST(rs_continuous_boundary_from_interval)
-    UNIT_TEST(rs_continuous_boundary_to_interval)
-
-    // integral-boundary-basic-test.cpp
-    UNIT_TEST(rs_integral_boundary_formatting)
-    UNIT_TEST(rs_integral_boundary_from_interval)
-    UNIT_TEST(rs_integral_boundary_to_interval)
 
     // ordered-boundary-basic-test.cpp
     UNIT_TEST(rs_ordered_boundary_formatting)
     UNIT_TEST(rs_ordered_boundary_from_interval)
     UNIT_TEST(rs_ordered_boundary_to_interval)
 
+    // ordered-boundary-comparison-test.cpp
+    UNIT_TEST(rs_ordered_boundary_adjacency)
+    UNIT_TEST(rs_ordered_boundary_comparison)
+
+    // ordered-basic-test.cpp
+    UNIT_TEST(rs_ordered_interval_basic_properties)
+    UNIT_TEST(rs_ordered_interval_construction)
+    UNIT_TEST(rs_ordered_interval_from_string)
+    UNIT_TEST(rs_ordered_interval_order)
+    UNIT_TEST(rs_ordered_interval_complement)
+    UNIT_TEST(rs_ordered_interval_binary_operations)
+    UNIT_TEST(rs_ordered_interval_hashing)
+
+    // ordered-set-test.cpp
+    UNIT_TEST(rs_ordered_interval_set_construct_insert_erase)
+    UNIT_TEST(rs_ordered_interval_set_operations)
+    UNIT_TEST(rs_ordered_interval_set_hashing)
+
+    // ordered-map-test.cpp
+    UNIT_TEST(rs_ordered_interval_map)
+    UNIT_TEST(rs_ordered_interval_map_hashing)
+
     // stepwise-boundary-basic-test.cpp
     UNIT_TEST(rs_stepwise_boundary_formatting)
     UNIT_TEST(rs_stepwise_boundary_from_interval)
     UNIT_TEST(rs_stepwise_boundary_to_interval)
 
-    // continuous-boundary-comparison-test.cpp
-    UNIT_TEST(rs_continuous_boundary_adjacency)
-    UNIT_TEST(rs_continuous_boundary_comparison)
-
-    // integral-boundary-comparison-test.cpp
-    UNIT_TEST(rs_integral_boundary_adjacency)
-    UNIT_TEST(rs_integral_boundary_comparison)
-
-    // ordered-boundary-comparison-test.cpp
-    UNIT_TEST(rs_ordered_boundary_adjacency)
-    UNIT_TEST(rs_ordered_boundary_comparison)
-
     // stepwise-boundary-comparison-test.cpp
     UNIT_TEST(rs_stepwise_boundary_adjacency)
     UNIT_TEST(rs_stepwise_boundary_comparison)
 
-    // continuous-boundary-addition-test.cpp
-    UNIT_TEST(rs_continuous_boundary_inversion)
-    UNIT_TEST(rs_continuous_boundary_addition)
-    UNIT_TEST(rs_continuous_boundary_subtraction)
+    // stepwise-basic-test.cpp
+    UNIT_TEST(rs_stepwise_interval_basic_properties)
+    UNIT_TEST(rs_stepwise_interval_construction)
+    UNIT_TEST(rs_stepwise_interval_from_string)
+    UNIT_TEST(rs_stepwise_interval_iterators)
+    UNIT_TEST(rs_stepwise_interval_order)
+    UNIT_TEST(rs_stepwise_interval_complement)
+    UNIT_TEST(rs_stepwise_interval_binary_operations)
+    UNIT_TEST(rs_stepwise_interval_hashing)
+
+    // stepwise-set-test.cpp
+    UNIT_TEST(rs_stepwise_interval_set_construct_insert_erase)
+    UNIT_TEST(rs_stepwise_interval_set_operations)
+    UNIT_TEST(rs_stepwise_interval_set_hashing)
+
+    // stepwise-map-test.cpp
+    UNIT_TEST(rs_stepwise_interval_map)
+    UNIT_TEST(rs_stepwise_interval_map_hashing)
+
+    // integral-boundary-basic-test.cpp
+    UNIT_TEST(rs_integral_boundary_formatting)
+    UNIT_TEST(rs_integral_boundary_from_interval)
+    UNIT_TEST(rs_integral_boundary_to_interval)
+
+    // integral-boundary-comparison-test.cpp
+    UNIT_TEST(rs_integral_boundary_adjacency)
+    UNIT_TEST(rs_integral_boundary_comparison)
 
     // integral-boundary-addition-test.cpp
     UNIT_TEST(rs_integral_boundary_inversion)
     UNIT_TEST(rs_integral_boundary_addition)
     UNIT_TEST(rs_integral_boundary_subtraction)
 
-    // continuous-boundary-multiplication-test.cpp
-    UNIT_TEST(rs_continuous_boundary_multiplication)
-
     // integral-boundary-multiplication-test.cpp
     UNIT_TEST(rs_integral_boundary_multiplication)
-
-    // continuous-basic-test.cpp
-    UNIT_TEST(rs_continuous_interval_basic_properties)
-    UNIT_TEST(rs_continuous_interval_construction)
-    UNIT_TEST(rs_continuous_interval_from_string)
-    UNIT_TEST(rs_continuous_interval_order)
-    UNIT_TEST(rs_continuous_interval_complement)
-    UNIT_TEST(rs_continuous_interval_binary_operations)
-    UNIT_TEST(rs_continuous_interval_hashing)
-
-    // continuous-set-test.cpp
-    UNIT_TEST(rs_continuous_interval_set_construct_insert_erase)
-    UNIT_TEST(rs_continuous_interval_set_operations)
-    UNIT_TEST(rs_continuous_interval_set_hashing)
-
-    // continuous-map-test.cpp
-    UNIT_TEST(rs_continuous_interval_map)
-    UNIT_TEST(rs_continuous_interval_map_hashing)
-
-    // continuous-arithmetic-test.cpp
-    UNIT_TEST(rs_continuous_contains_zero)
-    UNIT_TEST(rs_continuous_interval_reciprocal)
-    UNIT_TEST(rs_continuous_interval_arithmetic)
 
     // integral-basic-test.cpp
     UNIT_TEST(rs_integral_interval_basic_properties)
@@ -111,42 +105,48 @@ int main(int argc, char** argv) {
     UNIT_TEST(rs_integral_contains_zero)
     UNIT_TEST(rs_integral_interval_arithmetic)
 
-    // ordered-basic-test.cpp
-    UNIT_TEST(rs_ordered_interval_basic_properties)
-    UNIT_TEST(rs_ordered_interval_construction)
-    UNIT_TEST(rs_ordered_interval_from_string)
-    UNIT_TEST(rs_ordered_interval_order)
-    UNIT_TEST(rs_ordered_interval_complement)
-    UNIT_TEST(rs_ordered_interval_binary_operations)
-    UNIT_TEST(rs_ordered_interval_hashing)
+    // continuous-boundary-basic-test.cpp
+    UNIT_TEST(rs_continuous_boundary_formatting)
+    UNIT_TEST(rs_continuous_boundary_from_interval)
+    UNIT_TEST(rs_continuous_boundary_to_interval)
 
-    // ordered-set-test.cpp
-    UNIT_TEST(rs_ordered_interval_set_construct_insert_erase)
-    UNIT_TEST(rs_ordered_interval_set_operations)
-    UNIT_TEST(rs_ordered_interval_set_hashing)
+    // continuous-boundary-comparison-test.cpp
+    UNIT_TEST(rs_continuous_boundary_adjacency)
+    UNIT_TEST(rs_continuous_boundary_comparison)
 
-    // ordered-map-test.cpp
-    UNIT_TEST(rs_ordered_interval_map)
-    UNIT_TEST(rs_ordered_interval_map_hashing)
+    // continuous-boundary-addition-test.cpp
+    UNIT_TEST(rs_continuous_boundary_inversion)
+    UNIT_TEST(rs_continuous_boundary_addition)
+    UNIT_TEST(rs_continuous_boundary_subtraction)
 
-    // stepwise-basic-test.cpp
-    UNIT_TEST(rs_stepwise_interval_basic_properties)
-    UNIT_TEST(rs_stepwise_interval_construction)
-    UNIT_TEST(rs_stepwise_interval_from_string)
-    UNIT_TEST(rs_stepwise_interval_iterators)
-    UNIT_TEST(rs_stepwise_interval_order)
-    UNIT_TEST(rs_stepwise_interval_complement)
-    UNIT_TEST(rs_stepwise_interval_binary_operations)
-    UNIT_TEST(rs_stepwise_interval_hashing)
+    // continuous-boundary-multiplication-test.cpp
+    UNIT_TEST(rs_continuous_boundary_multiplication)
 
-    // stepwise-set-test.cpp
-    UNIT_TEST(rs_stepwise_interval_set_construct_insert_erase)
-    UNIT_TEST(rs_stepwise_interval_set_operations)
-    UNIT_TEST(rs_stepwise_interval_set_hashing)
+    // continuous-basic-test.cpp
+    UNIT_TEST(rs_continuous_interval_basic_properties)
+    UNIT_TEST(rs_continuous_interval_construction)
+    UNIT_TEST(rs_continuous_interval_from_string)
+    UNIT_TEST(rs_continuous_interval_order)
+    UNIT_TEST(rs_continuous_interval_complement)
+    UNIT_TEST(rs_continuous_interval_binary_operations)
+    UNIT_TEST(rs_continuous_interval_hashing)
 
-    // stepwise-map-test.cpp
-    UNIT_TEST(rs_stepwise_interval_map)
-    UNIT_TEST(rs_stepwise_interval_map_hashing)
+    // continuous-set-test.cpp
+    UNIT_TEST(rs_continuous_interval_set_construct_insert_erase)
+    UNIT_TEST(rs_continuous_interval_set_operations)
+    UNIT_TEST(rs_continuous_interval_set_hashing)
+
+    // continuous-map-test.cpp
+    UNIT_TEST(rs_continuous_interval_map)
+    UNIT_TEST(rs_continuous_interval_map_hashing)
+
+    // continuous-arithmetic-test.cpp
+    UNIT_TEST(rs_continuous_contains_zero)
+    UNIT_TEST(rs_continuous_interval_reciprocal)
+    UNIT_TEST(rs_continuous_interval_arithmetic)
+
+    // version-test.cpp
+    UNIT_TEST(rs_interval_version)
 
     // unit-test.cpp
 

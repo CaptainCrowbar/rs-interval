@@ -417,23 +417,31 @@ namespace RS::Intervals {
 
                 static const std::vector<std::string> delimiters = { "..<", "...", "..", "-" };
 
-                size_t cut = TL::npos;
-                size_t len = 0;
+                mode = "[]";
+                size_t i = i = str.find('-');
+                size_t j = TL::npos;
 
-                for (auto& d: delimiters) {
-                    cut = str.find(d);
-                    if (cut != TL::npos) {
-                        len = d.size();
-                        break;
-                    }
+                if (i == TL::npos) {
+                    i = str.find("..");
+                    if (i == TL::npos)
+                        return Interval(Detail::from_string<T>(str));
+                    j = i + 2;
+                    if (i >= 2 && str[i - 1] == '<')
+                        --i;
+                    if (j < str.size() && (str[j] == '.' || str[j] == '<'))
+                        ++j;
+                    if (i == 0 || j >= str.size())
+                        return Interval(Detail::from_string<T>(str));
+                    if (str[i] == '<')
+                        mode[0] = '(';
+                    if (str[j - 1] == '<')
+                        mode[1] = ')';
+                } else {
+                    j = i + 1;
                 }
 
-                if (cut == TL::npos)
-                    return Interval(Detail::from_string<T>(str));
-
-                mode = str[cut + len - 1] == '<' ? "[)" : "[]";
-                min = Detail::from_string<T>(str.substr(0, cut));
-                max = Detail::from_string<T>(str.substr(cut + len));
+                min = Detail::from_string<T>(str.substr(0, i));
+                max = Detail::from_string<T>(str.substr(j));
 
             }
 

@@ -102,24 +102,26 @@ void test_rs_stepwise_interval_from_string() {
 
     Itv in;
 
-    TRY(in = Itv::from_string(""));        TEST_EQUAL(in.str(), "{}");
-    TRY(in = Itv::from_string("{}"));      TEST_EQUAL(in.str(), "{}");
-    TRY(in = Itv::from_string("*"));       TEST_EQUAL(in.str(), "*");
-    TRY(in = Itv::from_string("5"));       TEST_EQUAL(in.str(), "5");
-    TRY(in = Itv::from_string(">5"));      TEST_EQUAL(in.str(), ">=6");
-    TRY(in = Itv::from_string("<5"));      TEST_EQUAL(in.str(), "<=4");
-    TRY(in = Itv::from_string(">=5"));     TEST_EQUAL(in.str(), ">=5");
-    TRY(in = Itv::from_string("<=5"));     TEST_EQUAL(in.str(), "<=5");
-    TRY(in = Itv::from_string("5+"));      TEST_EQUAL(in.str(), ">=5");
-    TRY(in = Itv::from_string("5-"));      TEST_EQUAL(in.str(), "<=5");
-    TRY(in = Itv::from_string("[5,10]"));  TEST_EQUAL(in.str(), "[5,10]");
-    TRY(in = Itv::from_string("[5,10)"));  TEST_EQUAL(in.str(), "[5,9]");
-    TRY(in = Itv::from_string("(5,10]"));  TEST_EQUAL(in.str(), "[6,10]");
-    TRY(in = Itv::from_string("(5,10)"));  TEST_EQUAL(in.str(), "[6,9]");
-    TRY(in = Itv::from_string("5-10"));    TEST_EQUAL(in.str(), "[5,10]");
-    TRY(in = Itv::from_string("5..10"));   TEST_EQUAL(in.str(), "[5,10]");
-    TRY(in = Itv::from_string("5...10"));  TEST_EQUAL(in.str(), "[5,10]");
-    TRY(in = Itv::from_string("5..<10"));  TEST_EQUAL(in.str(), "[5,9]");
+    TRY(in = Itv::from_string(""));         TEST_EQUAL(in.str(), "{}");
+    TRY(in = Itv::from_string("{}"));       TEST_EQUAL(in.str(), "{}");
+    TRY(in = Itv::from_string("*"));        TEST_EQUAL(in.str(), "*");
+    TRY(in = Itv::from_string("5"));        TEST_EQUAL(in.str(), "5");
+    TRY(in = Itv::from_string(">5"));       TEST_EQUAL(in.str(), ">=6");
+    TRY(in = Itv::from_string("<5"));       TEST_EQUAL(in.str(), "<=4");
+    TRY(in = Itv::from_string(">=5"));      TEST_EQUAL(in.str(), ">=5");
+    TRY(in = Itv::from_string("<=5"));      TEST_EQUAL(in.str(), "<=5");
+    TRY(in = Itv::from_string("5+"));       TEST_EQUAL(in.str(), ">=5");
+    TRY(in = Itv::from_string("5-"));       TEST_EQUAL(in.str(), "<=5");
+    TRY(in = Itv::from_string("[5,10]"));   TEST_EQUAL(in.str(), "[5,10]");
+    TRY(in = Itv::from_string("[5,10)"));   TEST_EQUAL(in.str(), "[5,9]");
+    TRY(in = Itv::from_string("(5,10]"));   TEST_EQUAL(in.str(), "[6,10]");
+    TRY(in = Itv::from_string("(5,10)"));   TEST_EQUAL(in.str(), "[6,9]");
+    TRY(in = Itv::from_string("5-10"));     TEST_EQUAL(in.str(), "[5,10]");
+    TRY(in = Itv::from_string("5..10"));    TEST_EQUAL(in.str(), "[5,10]");
+    TRY(in = Itv::from_string("5...10"));   TEST_EQUAL(in.str(), "[5,10]");
+    TRY(in = Itv::from_string("5..<10"));   TEST_EQUAL(in.str(), "[5,9]");
+    TRY(in = Itv::from_string("5<..10"));   TEST_EQUAL(in.str(), "[6,10]");
+    TRY(in = Itv::from_string("5<..<10"));  TEST_EQUAL(in.str(), "[6,9]");
 
 }
 
