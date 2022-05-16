@@ -316,7 +316,7 @@ namespace RS::Intervals {
                 else if (! b.has_value())
                     return b;
                 Boundary<T> c = {value + b.value, BT::open};
-                if (type == BT::closed & b.type == BT::closed)
+                if (type == BT::closed && b.type == BT::closed)
                     c.type = BT::closed;
                 return c;
             }

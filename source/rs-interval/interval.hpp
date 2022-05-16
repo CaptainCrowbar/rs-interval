@@ -418,7 +418,7 @@ namespace RS::Intervals {
                 static const std::vector<std::string> delimiters = { "..<", "...", "..", "-" };
 
                 mode = "[]";
-                size_t i = i = str.find('-');
+                size_t i = str.find('-');
                 size_t j = TL::npos;
 
                 if (i == TL::npos) {
