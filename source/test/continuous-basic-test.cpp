@@ -127,7 +127,7 @@ void test_rs_continuous_interval_from_string() {
 void test_rs_continuous_interval_order() {
 
     Itv a, b;
-    IO io;
+    IO io = {};
 
     TRY(a = Itv());            TRY(b = Itv());            TRY(io = a.order(b));  TEST_EQUAL(io, IO::both_empty);         // ...
     TRY(a = Itv());            TRY(b = Itv(10,10,">"));   TRY(io = a.order(b));  TEST_EQUAL(io, IO::b_only);             // bbb
