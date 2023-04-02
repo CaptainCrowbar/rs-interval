@@ -15,6 +15,18 @@ This library provides classes for the manipulation of intervals within an
 ordered type; for example, a range of integers or floating point values.
 Other ordered but non-arithmetic types, such as strings, are also supported.
 
+Some simple examples:
+
+```c++
+Interval<int> ii(10, 20);
+    // Contains all integers from 10 to 20
+Interval<double> di(0, 1, IntervalBound::open);
+    // Contains all values from 0 to 1, excluding 0 and 1
+Interval<std::string> si("A", "B",
+    IntervalBound::closed, IntervalBound::open);
+    // Contains all strings starting with A
+```
+
 The library is header-only; there are no binaries to build or install. A CMake
 file is supplied to build the tests, but this is not required if you only
 want to use the library and not run the tests. Installing it simply requires
