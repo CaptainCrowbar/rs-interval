@@ -1,0 +1,6 @@
+.DS_Store
+Icon?
+build*
+_*
+*.bkp
+*.log
