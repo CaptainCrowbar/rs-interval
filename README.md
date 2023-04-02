@@ -45,10 +45,10 @@ You can include `"rs-intervals.hpp"` to import the whole library, or a
 selection from the following headers if you don't need all of the library's
 features:
 
-* `"rs-intervals/interval.hpp"` -- [Interval class](interval.html)
-* `"rs-intervals/interval-map.hpp"` -- [Interval map class](interval-map.html)
-* `"rs-intervals/interval-set.hpp"` -- [Interval set class](interval-set.html)
-* `"rs-intervals/version.hpp"` -- [Version information](version.html)
+* `"rs-intervals/interval.hpp"` -- Interval class
+* `"rs-intervals/interval-map.hpp"` -- Interval map class
+* `"rs-intervals/interval-set.hpp"` -- Interval set class
+* `"rs-intervals/version.hpp"` -- Version information
 
 The following principal classes are defined (in addition to a number of
 supporting infrastructure types):
