@@ -52,7 +52,7 @@ dereferencing to an `Interval<T>`.
 ### Member constants
 
 ```c++
-static constexpr IntervalCategory IntervalMap::category
+static constexpr Category IntervalMap::category
     = interval_category<K>;
 ```
 

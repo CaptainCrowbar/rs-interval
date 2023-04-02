@@ -46,7 +46,7 @@ dereferencing to an `Interval<T>`.
 ### Member constants
 
 ```c++
-static constexpr IntervalCategory IntervalSet::category
+static constexpr Category IntervalSet::category
     = interval_category<T>;
 ```
 

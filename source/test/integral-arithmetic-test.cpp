@@ -8,10 +8,6 @@
 using namespace RS::Intervals;
 
 using Itv = Interval<int>;
-using IB = IntervalBound;
-using IC = IntervalCategory;
-using IM = IntervalMatch;
-using IO = IntervalOrder;
 
 void test_rs_interval_integral_contains_zero() {
 

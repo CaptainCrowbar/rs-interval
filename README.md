@@ -20,10 +20,9 @@ Some simple examples:
 ```c++
 Interval<int> ii(10, 20);
     // Contains all integers from 10 to 20
-Interval<double> di(0, 1, IntervalBound::open);
+Interval<double> di(0, 1, Bound::open);
     // Contains all values from 0 to 1, excluding 0 and 1
-Interval<std::string> si("A", "B",
-    IntervalBound::closed, IntervalBound::open);
+Interval<std::string> si("A", "B", Bound::closed, Bound::open);
     // Contains all strings starting with A
 ```
 

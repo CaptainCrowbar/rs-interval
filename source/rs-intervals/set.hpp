@@ -76,9 +76,9 @@ namespace RS::Intervals {
                 --i;
             for (; i != set_.end(); ++i) {
                 auto m = i->match(t);
-                if (m == IntervalMatch::match)
+                if (m == Match::match)
                     return true;
-                else if (m == IntervalMatch::low)
+                else if (m == Match::low)
                     return false;
             }
             return false;
@@ -94,10 +94,10 @@ namespace RS::Intervals {
             auto add = in;
             while (i != set_.end()) {
                 auto ord = in.order(*i);
-                if (ord <= IntervalOrder::a_below_b)
+                if (ord <= Order::a_below_b)
                     break;
                 auto j = i++;
-                if (ord <= IntervalOrder::b_touches_a) {
+                if (ord <= Order::b_touches_a) {
                     add = add.envelope(*j);
                     set_.erase(j);
                 }
@@ -116,10 +116,10 @@ namespace RS::Intervals {
             std::vector<interval_type> vec;
             while (i != set_.end()) {
                 auto ord = in.order(*i);
-                if (ord <= IntervalOrder::a_touches_b)
+                if (ord <= Order::a_touches_b)
                     break;
                 auto j = i++;
-                if (ord <= IntervalOrder::b_overlaps_a) {
+                if (ord <= Order::b_overlaps_a) {
                     temp = j->set_difference(in);
                     std::copy(temp.begin(), temp.end(), std::back_inserter(vec));
                     set_.erase(j);
@@ -135,11 +135,11 @@ namespace RS::Intervals {
             IntervalSet result;
             auto i = set_.begin();
             if (i->is_left_bounded())
-                result.set_.insert({{}, i->min(), IntervalBound::unbound, ~ i->left()});
+                result.set_.insert({{}, i->min(), Bound::unbound, ~ i->left()});
             for (auto j = std::next(i), end = set_.end(); j != end; i = j++)
                 result.set_.insert({i->max(), j->min(), ~ i->right(), ~ j->left()});
             if (i->is_right_bounded())
-                result.set_.insert({i->max(), {}, ~ i->right(), IntervalBound::unbound});
+                result.set_.insert({i->max(), {}, ~ i->right(), Bound::unbound});
             return result;
         }
 

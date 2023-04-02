@@ -26,20 +26,20 @@ namespace RS::Intervals {
 
     namespace Detail {
 
-        inline std::pair<IntervalBound, IntervalBound> decode_interval_bounds(std::string_view mode) {
+        inline std::pair<Bound, Bound> decode_interval_bounds(std::string_view mode) {
 
-            using IB = IntervalBound;
+            using Bound = Bound;
 
-            static const std::unordered_map<std::string_view, std::pair<IntervalBound, IntervalBound>> map = {
-                { "()",  { IB::open,     IB::open     }},
-                { "(]",  { IB::open,     IB::closed   }},
-                { "[)",  { IB::closed,   IB::open     }},
-                { "[]",  { IB::closed,   IB::closed   }},
-                { ">",   { IB::open,     IB::unbound  }},
-                { "<",   { IB::unbound,  IB::open     }},
-                { ">=",  { IB::closed,   IB::unbound  }},
-                { "<=",  { IB::unbound,  IB::closed   }},
-                { "*",   { IB::unbound,  IB::unbound  }},
+            static const std::unordered_map<std::string_view, std::pair<Bound, Bound>> map = {
+                { "()",  { Bound::open,     Bound::open     }},
+                { "(]",  { Bound::open,     Bound::closed   }},
+                { "[)",  { Bound::closed,   Bound::open     }},
+                { "[]",  { Bound::closed,   Bound::closed   }},
+                { ">",   { Bound::open,     Bound::unbound  }},
+                { "<",   { Bound::unbound,  Bound::open     }},
+                { ">=",  { Bound::closed,   Bound::unbound  }},
+                { "<=",  { Bound::unbound,  Bound::closed   }},
+                { "*",   { Bound::unbound,  Bound::unbound  }},
             };
 
             auto it = map.find(mode);
@@ -62,19 +62,19 @@ namespace RS::Intervals {
         static constexpr auto category = interval_category<T>;
 
         Interval() = default;
-        Interval(const T& t): Interval(t, t, IntervalBound::closed, IntervalBound::closed) {}
-        Interval(const T& t, IntervalBound l, IntervalBound r): Interval(t, t, l, r) {}
-        Interval(const T& min, const T& max, IntervalBound lr = IntervalBound::closed): Interval(min, max, lr, lr) {}
-        Interval(const T& min, const T& max, IntervalBound l, IntervalBound r);
+        Interval(const T& t): Interval(t, t, Bound::closed, Bound::closed) {}
+        Interval(const T& t, Bound l, Bound r): Interval(t, t, l, r) {}
+        Interval(const T& min, const T& max, Bound lr = Bound::closed): Interval(min, max, lr, lr) {}
+        Interval(const T& min, const T& max, Bound l, Bound r);
         Interval(const T& min, const T& max, std::string_view mode);
 
         explicit operator bool() const noexcept { return ! this->empty(); }
         bool operator()(const T& t) const { return contains(t); }
 
-        bool contains(const T& t) const { return this->match(t) == IntervalMatch::match; }
+        bool contains(const T& t) const { return this->match(t) == Match::match; }
         IntervalSet<T> complement() const;
         IntervalSet<T> operator~() const { return complement(); }
-        IntervalOrder order(const Interval& b) const;
+        Order order(const Interval& b) const;
         bool includes(const Interval& b) const;      // True if b is a subset of this
         bool overlaps(const Interval& b) const;      // True if the intersection is not empty
         bool touches(const Interval& b) const;       // True if there is no gap between this and b
@@ -87,7 +87,7 @@ namespace RS::Intervals {
         std::string str() const { return str(DefaultFormatter()); }
         void swap(Interval& in) noexcept { this->do_swap(in); }
 
-        static Interval all() { return Interval(T(), IntervalBound::unbound, IntervalBound::unbound); }
+        static Interval all() { return Interval(T(), Bound::unbound, Bound::unbound); }
         static Interval from_string(const std::string& str);
 
         friend bool operator==(const Interval& a, const Interval& b) noexcept { return a.compare(b) == 0; }
@@ -100,7 +100,7 @@ namespace RS::Intervals {
     };
 
         template <IntervalCompatible T>
-        Interval<T>::Interval(const T& min, const T& max, IntervalBound l, IntervalBound r) {
+        Interval<T>::Interval(const T& min, const T& max, Bound l, Bound r) {
             this->min_ = min;
             this->max_ = max;
             this->left_ = l;
@@ -129,17 +129,17 @@ namespace RS::Intervals {
             IntervalSet<T> set;
 
             if (this->is_left_bounded())
-                set.insert({this->min(), IntervalBound::unbound, ~ this->left()});
+                set.insert({this->min(), Bound::unbound, ~ this->left()});
 
             if (this->is_right_bounded())
-                set.insert({this->max(), ~ this->right(), IntervalBound::unbound});
+                set.insert({this->max(), ~ this->right(), Bound::unbound});
 
             return set;
 
         }
 
         template <IntervalCompatible T>
-        IntervalOrder Interval<T>::order(const Interval& b) const {
+        Order Interval<T>::order(const Interval& b) const {
 
             using namespace Detail;
 
@@ -148,11 +148,11 @@ namespace RS::Intervals {
             auto& a = *this;
 
             if (a.empty() && b.empty())
-                return IntervalOrder::equal;
+                return Order::equal;
             else if (a.empty())
-                return IntervalOrder::b_only;
+                return Order::b_only;
             else if (b.empty())
-                return IntervalOrder::a_only;
+                return Order::a_only;
 
             B al = left_boundary_of(a);
             B ar = right_boundary_of(a);
@@ -161,35 +161,35 @@ namespace RS::Intervals {
 
             if (ar.compare_rl(bl)) {
                 if (ar.adjacent(bl))
-                    return IntervalOrder::a_touches_b;
+                    return Order::a_touches_b;
                 else
-                    return IntervalOrder::a_below_b;
+                    return Order::a_below_b;
             } else if (br.compare_rl(al)) {
                 if (br.adjacent(al))
-                    return IntervalOrder::b_touches_a;
+                    return Order::b_touches_a;
                 else
-                    return IntervalOrder::b_below_a;
+                    return Order::b_below_a;
             } else if (al.compare_ll(bl)) {
                 if (ar.compare_rr(br))
-                    return IntervalOrder::a_overlaps_b;
+                    return Order::a_overlaps_b;
                 else if (br.compare_rr(ar))
-                    return IntervalOrder::a_encloses_b;
+                    return Order::a_encloses_b;
                 else
-                    return IntervalOrder::a_extends_below_b;
+                    return Order::a_extends_below_b;
             } else if (bl.compare_ll(al)) {
                 if (ar.compare_rr(br))
-                    return IntervalOrder::b_encloses_a;
+                    return Order::b_encloses_a;
                 else if (br.compare_rr(ar))
-                    return IntervalOrder::b_overlaps_a;
+                    return Order::b_overlaps_a;
                 else
-                    return IntervalOrder::b_extends_below_a;
+                    return Order::b_extends_below_a;
             } else {
                 if (ar.compare_rr(br))
-                    return IntervalOrder::b_extends_above_a;
+                    return Order::b_extends_above_a;
                 else if (br.compare_rr(ar))
-                    return IntervalOrder::a_extends_above_b;
+                    return Order::a_extends_above_b;
                 else
-                    return IntervalOrder::equal;
+                    return Order::equal;
             }
 
         }
@@ -197,12 +197,12 @@ namespace RS::Intervals {
         template <IntervalCompatible T>
         bool Interval<T>::includes(const Interval& b) const {
             auto& a = *this;
-            IntervalOrder ord = order(b);
-            if (ord == IntervalOrder::equal)
+            Order ord = order(b);
+            if (ord == Order::equal)
                 return ! a.empty();
             else
-                return ord == IntervalOrder::a_extends_above_b || ord == IntervalOrder::a_extends_below_b
-                    || ord == IntervalOrder::a_encloses_b;
+                return ord == Order::a_extends_above_b || ord == Order::a_extends_below_b
+                    || ord == Order::a_encloses_b;
         }
 
         template <IntervalCompatible T>
@@ -213,12 +213,12 @@ namespace RS::Intervals {
             if (a.empty() || b.empty())
                 return false;
 
-            IntervalOrder ord = order(b);
+            Order ord = order(b);
 
-            if (ord == IntervalOrder::equal)
+            if (ord == Order::equal)
                 return true;
-            else if (ord == IntervalOrder::a_below_b || ord == IntervalOrder::b_below_a
-                    || ord == IntervalOrder::a_touches_b || ord == IntervalOrder::b_touches_a)
+            else if (ord == Order::a_below_b || ord == Order::b_below_a
+                    || ord == Order::a_touches_b || ord == Order::b_touches_a)
                 return false;
             else
                 return true;
@@ -233,11 +233,11 @@ namespace RS::Intervals {
             if (a.empty() || b.empty())
                 return false;
 
-            IntervalOrder ord = order(b);
+            Order ord = order(b);
 
-            if (ord == IntervalOrder::equal)
+            if (ord == Order::equal)
                 return true;
-            else if (ord == IntervalOrder::a_below_b || ord == IntervalOrder::b_below_a)
+            else if (ord == Order::a_below_b || ord == Order::b_below_a)
                 return false;
             else
                 return true;
@@ -256,19 +256,19 @@ namespace RS::Intervals {
 
             switch (order(b)) {
 
-                case IntervalOrder::a_below_b:
-                case IntervalOrder::a_overlaps_b:
-                case IntervalOrder::a_touches_b:
+                case Order::a_below_b:
+                case Order::a_overlaps_b:
+                case Order::a_touches_b:
                     return {a.min(), b.max(), a.left(), b.right()};
 
-                case IntervalOrder::b_below_a:
-                case IntervalOrder::b_overlaps_a:
-                case IntervalOrder::b_touches_a:
+                case Order::b_below_a:
+                case Order::b_overlaps_a:
+                case Order::b_touches_a:
                     return {b.min(), a.max(), b.left(), a.right()};
 
-                case IntervalOrder::b_encloses_a:
-                case IntervalOrder::b_extends_above_a:
-                case IntervalOrder::b_extends_below_a:
+                case Order::b_encloses_a:
+                case Order::b_extends_above_a:
+                case Order::b_extends_below_a:
                     return b;
 
                 default:
@@ -288,21 +288,21 @@ namespace RS::Intervals {
 
             switch (order(b)) {
 
-                case IntervalOrder::b_overlaps_a:
+                case Order::b_overlaps_a:
                     return {a.min(), b.max(), a.left(), b.right()};
 
-                case IntervalOrder::a_overlaps_b:
+                case Order::a_overlaps_b:
                     return {b.min(), a.max(), b.left(), a.right()};
 
-                case IntervalOrder::b_encloses_a:
-                case IntervalOrder::b_extends_above_a:
-                case IntervalOrder::b_extends_below_a:
-                case IntervalOrder::equal:
+                case Order::b_encloses_a:
+                case Order::b_extends_above_a:
+                case Order::b_extends_below_a:
+                case Order::equal:
                     return a;
 
-                case IntervalOrder::a_encloses_b:
-                case IntervalOrder::a_extends_above_b:
-                case IntervalOrder::a_extends_below_b:
+                case Order::a_encloses_b:
+                case Order::a_extends_above_b:
+                case Order::a_extends_below_b:
                     return b;
 
                 default:
@@ -322,24 +322,24 @@ namespace RS::Intervals {
 
             switch (order(b)) {
 
-                case IntervalOrder::a_below_b:
+                case Order::a_below_b:
                     return {a,b};
 
-                case IntervalOrder::a_overlaps_b:
-                case IntervalOrder::a_touches_b:
+                case Order::a_overlaps_b:
+                case Order::a_touches_b:
                     return {{a.min(), b.max(), a.left(), b.right()}};
 
-                case IntervalOrder::b_below_a:
+                case Order::b_below_a:
                     return {b,a};
 
-                case IntervalOrder::b_overlaps_a:
-                case IntervalOrder::b_touches_a:
+                case Order::b_overlaps_a:
+                case Order::b_touches_a:
                     return {{b.min(), a.max(), b.left(), a.right()}};
 
-                case IntervalOrder::b_encloses_a:
-                case IntervalOrder::b_extends_above_a:
-                case IntervalOrder::b_extends_below_a:
-                case IntervalOrder::b_only:
+                case Order::b_encloses_a:
+                case Order::b_extends_above_a:
+                case Order::b_extends_below_a:
+                case Order::b_only:
                     return {b};
 
                 default:
@@ -356,22 +356,22 @@ namespace RS::Intervals {
 
             switch (order(b)) {
 
-                case IntervalOrder::a_extends_above_b:
-                case IntervalOrder::b_overlaps_a:
+                case Order::a_extends_above_b:
+                case Order::b_overlaps_a:
                     return {{b.max(), a.max(), ~ b.right(), a.right()}};
 
-                case IntervalOrder::a_extends_below_b:
-                case IntervalOrder::a_overlaps_b:
+                case Order::a_extends_below_b:
+                case Order::a_overlaps_b:
                     return {{a.min(), b.min(), a.left(), ~ b.left()}};
 
-                case IntervalOrder::a_encloses_b:
+                case Order::a_encloses_b:
                     return {{a.min(), b.min(), a.left(), ~ b.left()}, {b.max(), a.max(), ~ b.right(), a.right()}};
 
-                case IntervalOrder::a_below_b:
-                case IntervalOrder::a_only:
-                case IntervalOrder::a_touches_b:
-                case IntervalOrder::b_below_a:
-                case IntervalOrder::b_touches_a:
+                case Order::a_below_b:
+                case Order::a_only:
+                case Order::a_touches_b:
+                case Order::b_below_a:
+                case Order::b_touches_a:
                     return {a};
 
                 default:
@@ -387,33 +387,33 @@ namespace RS::Intervals {
             auto& a = *this;
 
             switch (order(b)) {
-                case IntervalOrder::b_only:
+                case Order::b_only:
                     return {b};
-                case IntervalOrder::a_below_b:
+                case Order::a_below_b:
                     return {a, b};
-                case IntervalOrder::a_touches_b:
+                case Order::a_touches_b:
                     return {{a.min(), b.max(), a.left(), b.right()}};
-                case IntervalOrder::a_overlaps_b:
+                case Order::a_overlaps_b:
                     return {{a.min(), b.min(), a.left(), ~ b.left()}, {a.max(), b.max(), ~ a.right(), b.right()}};
-                case IntervalOrder::a_extends_below_b:
+                case Order::a_extends_below_b:
                     return {{a.min(), b.min(), a.left(), ~ b.left()}};
-                case IntervalOrder::a_encloses_b:
+                case Order::a_encloses_b:
                     return {{a.min(), b.min(), a.left(), ~ b.left()}, {b.max(), a.max(), ~ b.right(), a.right()}};
-                case IntervalOrder::b_extends_above_a:
+                case Order::b_extends_above_a:
                     return {{a.max(), b.max(), ~ a.right(), b.right()}};
-                case IntervalOrder::a_extends_above_b:
+                case Order::a_extends_above_b:
                     return {{b.max(), a.max(), ~ b.right(), a.right()}};
-                case IntervalOrder::b_encloses_a:
+                case Order::b_encloses_a:
                     return {{b.min(), a.min(), b.left(), ~ a.left()}, {a.max(), b.max(), ~ a.right(), b.right()}};
-                case IntervalOrder::b_extends_below_a:
+                case Order::b_extends_below_a:
                     return {{b.min(), a.min(), b.left(), ~ a.left()}};
-                case IntervalOrder::b_overlaps_a:
+                case Order::b_overlaps_a:
                     return {{b.min(), a.min(), b.left(), ~ a.left()}, {b.max(), a.max(), ~ b.right(), a.right()}};
-                case IntervalOrder::b_touches_a:
+                case Order::b_touches_a:
                     return {{b.min(), a.max(), b.left(), a.right()}};
-                case IntervalOrder::b_below_a:
+                case Order::b_below_a:
                     return {b, a};
-                case IntervalOrder::a_only:
+                case Order::a_only:
                     return {a};
                 default:
                     return {};
@@ -515,6 +515,7 @@ namespace RS::Intervals {
         std::strong_ordering Interval<T>::compare(const Interval& b) const noexcept {
 
             using namespace Detail;
+            using SO = std::strong_ordering;
 
             auto& a = *this;
 
@@ -562,17 +563,17 @@ namespace RS::Intervals {
     }
 
     template <IntervalCompatible T>
-    Interval<T> make_interval(const T& t, IntervalBound l, IntervalBound r) {
+    Interval<T> make_interval(const T& t, Bound l, Bound r) {
         return Interval<T>(t, l, r);
     }
 
     template <IntervalCompatible T>
-    Interval<T> make_interval(const T& min, const T& max, IntervalBound lr = IntervalBound::closed) {
+    Interval<T> make_interval(const T& min, const T& max, Bound lr = Bound::closed) {
         return Interval<T>(min, max, lr);
     }
 
     template <IntervalCompatible T>
-    Interval<T> make_interval(const T& min, const T& max, IntervalBound l, IntervalBound r) {
+    Interval<T> make_interval(const T& min, const T& max, Bound l, Bound r) {
         return Interval<T>(min, max, l, r);
     }
 
@@ -582,7 +583,7 @@ namespace RS::Intervals {
     }
 
     template <IntervalCompatible T>
-    Interval<T> ordered_interval(const T& a, const T& b, IntervalBound lr = IntervalBound::closed) {
+    Interval<T> ordered_interval(const T& a, const T& b, Bound lr = Bound::closed) {
         if (a <= b)
             return Interval<T>(a, b, lr);
         else
@@ -590,7 +591,7 @@ namespace RS::Intervals {
     }
 
     template <IntervalCompatible T>
-    Interval<T> ordered_interval(const T& a, const T& b, IntervalBound l, IntervalBound r) {
+    Interval<T> ordered_interval(const T& a, const T& b, Bound l, Bound r) {
         if (a <= b)
             return Interval<T>(a, b, l, r);
         else

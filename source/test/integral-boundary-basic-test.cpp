@@ -6,7 +6,6 @@ using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
 
 using Itv = Interval<int>;
-using IB = IntervalBound;
 using B = Boundary<int>;
 using BT = BoundaryType;
 
@@ -26,9 +25,9 @@ void test_rs_interval_integral_boundary_from_interval() {
     static const Itv none;
     static const Itv all = Itv::all();
     static const Itv eq1(1);
-    static const Itv ge1(1, 1, IB::closed, IB::unbound);
-    static const Itv le1(1, 1, IB::unbound, IB::closed);
-    static const Itv c14(1, 4, IB::closed, IB::closed);
+    static const Itv ge1(1, 1, Bound::closed, Bound::unbound);
+    static const Itv le1(1, 1, Bound::unbound, Bound::closed);
+    static const Itv c14(1, 4, Bound::closed, Bound::closed);
 
     TEST_EQUAL(none.str(), "{}");
     TEST_EQUAL(all.str(), "*");

@@ -17,17 +17,17 @@ namespace RS::Intervals {
 
         template <Arithmetic T>
         bool contains_zero(const Interval<T>& i) noexcept {
-            using IB = IntervalBound;
+            using Bound = Bound;
             if (i.empty())
                 return false;
-            bool right_zero = i.right() == IB::unbound
-                || (i.right() == IB::closed && i.max() >= T())
-                || (i.right() == IB::open && i.max() > T());
+            bool right_zero = i.right() == Bound::unbound
+                || (i.right() == Bound::closed && i.max() >= T())
+                || (i.right() == Bound::open && i.max() > T());
             if (! right_zero)
                 return false;
-            bool left_zero = i.left() == IB::unbound
-                || (i.left() == IB::closed && i.min() <= T())
-                || (i.left() == IB::open && i.min() < T());
+            bool left_zero = i.left() == Bound::unbound
+                || (i.left() == Bound::closed && i.min() <= T())
+                || (i.left() == Bound::open && i.min() < T());
             return left_zero;
         }
 
@@ -60,40 +60,40 @@ namespace RS::Intervals {
         template <Arithmetic T>
         Interval<T> interval_from_boundaries(const Boundary<T>& l, const Boundary<T>& r) {
             using BT = BoundaryType;
-            using IB = IntervalBound;
+            using Bound = Bound;
             static constexpr auto convert_bound = [] (BT t) constexpr {
                 switch (t) {
-                    case BT::empty:   return IB::empty;
-                    case BT::open:    return IB::open;
-                    case BT::closed:  return IB::closed;
-                    default:          return IB::unbound;
+                    case BT::empty:   return Bound::empty;
+                    case BT::open:    return Bound::open;
+                    case BT::closed:  return Bound::closed;
+                    default:          return Bound::unbound;
                 }
             };
-            IB lbound = convert_bound(l.type);
-            IB rbound = convert_bound(r.type);
+            Bound lbound = convert_bound(l.type);
+            Bound rbound = convert_bound(r.type);
             return {l.value, r.value, lbound, rbound};
         }
 
         template <Continuous T>
         Interval<T> reciprocal_interval(const Interval<T>& i) {
-            using IB = IntervalBound;
+            using Bound = Bound;
             if (i.empty())
                 return {};
             T lvalue = {};
             T rvalue = {};
-            IB lbound, rbound;
-            if (i.left() == IB::unbound) {
-                rbound = IB::open;
+            Bound lbound, rbound;
+            if (i.left() == Bound::unbound) {
+                rbound = Bound::open;
             } else if (i.min() == T()) {
-                rbound = IB::unbound;
+                rbound = Bound::unbound;
             } else {
                 rvalue = T(1) / i.min();
                 rbound = i.left();
             }
-            if (i.right() == IB::unbound) {
-                lbound = IB::open;
+            if (i.right() == Bound::unbound) {
+                lbound = Bound::open;
             } else if (i.max() == T()) {
-                lbound = IB::unbound;
+                lbound = Bound::unbound;
             } else {
                 lvalue = T(1) / i.max();
                 lbound = i.right();
@@ -103,12 +103,12 @@ namespace RS::Intervals {
 
         template <Continuous T>
         IntervalSet<T> reciprocal_set(const Interval<T>& i) {
-            using IB = IntervalBound;
+            using Bound = Bound;
             if (i.empty()) {
                 return {};
             } else if (contains_zero(i)) {
-                Interval<T> negative_part(i.min(), T(), i.left(), IB::open);
-                Interval<T> positive_part(T(), i.max(), IB::open, i.right());
+                Interval<T> negative_part(i.min(), T(), i.left(), Bound::open);
+                Interval<T> positive_part(T(), i.max(), Bound::open, i.right());
                 auto negative_reciprocal = reciprocal_interval(negative_part);
                 auto positive_reciprocal = reciprocal_interval(positive_part);
                 return {negative_reciprocal, positive_reciprocal};

@@ -7,7 +7,6 @@ using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
 
 using Itv = Interval<StepwiseType>;
-using IB = IntervalBound;
 using B = Boundary<StepwiseType>;
 using BT = BoundaryType;
 
@@ -27,9 +26,9 @@ void test_rs_interval_stepwise_boundary_from_interval() {
     static const Itv none;
     static const Itv all = Itv::all();
     static const Itv eq1(1);
-    static const Itv ge1(1, 1, IB::closed, IB::unbound);
-    static const Itv le1(1, 1, IB::unbound, IB::closed);
-    static const Itv c12(1, 2, IB::closed, IB::closed);
+    static const Itv ge1(1, 1, Bound::closed, Bound::unbound);
+    static const Itv le1(1, 1, Bound::unbound, Bound::closed);
+    static const Itv c12(1, 2, Bound::closed, Bound::closed);
 
     TEST_EQUAL(none.str(), "{}");
     TEST_EQUAL(all.str(), "*");

@@ -98,14 +98,14 @@ namespace RS::Intervals {
             std::vector<iterator> del;
             for (; i != map_.end(); ++i) {
                 auto ord = key.order(i->first);
-                if (ord <= IntervalOrder::a_below_b) {
+                if (ord <= Order::a_below_b) {
                     break;
-                } else if (ord <= IntervalOrder::b_touches_a && i->second == t) {
+                } else if (ord <= Order::b_touches_a && i->second == t) {
                     key = key.envelope(i->first);
                     del.push_back(i);
-                } else if (ord == IntervalOrder::b_touches_a) {
+                } else if (ord == Order::b_touches_a) {
                     break;
-                } else if (ord <= IntervalOrder::b_overlaps_a) {
+                } else if (ord <= Order::b_overlaps_a) {
                     auto diff = i->first.set_difference(in);
                     for (auto& d: diff)
                         add.push_back({d, i->second});
@@ -129,10 +129,10 @@ namespace RS::Intervals {
             std::vector<value_type> vec;
             while (i != map_.end()) {
                 auto ord = in.order(i->first);
-                if (ord <= IntervalOrder::a_touches_b)
+                if (ord <= Order::a_touches_b)
                     break;
                 auto j = i++;
-                if (ord <= IntervalOrder::b_overlaps_a) {
+                if (ord <= Order::b_overlaps_a) {
                     auto temp = j->first.set_difference(in);
                     for (auto& t: temp)
                         vec.push_back({t, j->second});
@@ -168,8 +168,8 @@ namespace RS::Intervals {
                 --it;
             for (; it != map_.end(); ++it) {
                 auto m = it->first.match(key);
-                if (m != IntervalMatch::high)
-                    return {it, m == IntervalMatch::match};
+                if (m != Match::high)
+                    return {it, m == Match::match};
             }
             return {end(), false};
         }

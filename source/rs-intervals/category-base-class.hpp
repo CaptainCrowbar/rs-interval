@@ -42,15 +42,15 @@ namespace RS::Intervals {
 
     // Base class for intervals in the same category
 
-    template <IntervalCompatible T, IntervalCategory Cat = interval_category<T>>
+    template <IntervalCompatible T, Category Cat = interval_category<T>>
     class IntervalCategoryBase;
 
     template <IntervalCompatible T>
-    class IntervalCategoryBase<T, IntervalCategory::ordered>:
+    class IntervalCategoryBase<T, Category::ordered>:
     public IntervalTypeBase<T> {};
 
     template <IntervalCompatible T>
-    class IntervalCategoryBase<T, IntervalCategory::stepwise>:
+    class IntervalCategoryBase<T, Category::stepwise>:
     public IntervalTypeBase<T> {
 
     private:
@@ -100,7 +100,7 @@ namespace RS::Intervals {
     };
 
         template <IntervalCompatible T>
-        std::size_t IntervalCategoryBase<T, IntervalCategory::stepwise>::size() const {
+        std::size_t IntervalCategoryBase<T, Category::stepwise>::size() const {
             if (this->empty())
                 return 0;
             if (this->is_infinite())
@@ -115,20 +115,20 @@ namespace RS::Intervals {
         }
 
         template <IntervalCompatible T>
-        void IntervalCategoryBase<T, IntervalCategory::stepwise>::adjust_bounds() {
-            if (this->left_ == IntervalBound::open) {
+        void IntervalCategoryBase<T, Category::stepwise>::adjust_bounds() {
+            if (this->left_ == Bound::open) {
                 ++this->min_;
-                this->left_ = IntervalBound::closed;
+                this->left_ = Bound::closed;
             }
-            if (this->right_ == IntervalBound::open) {
+            if (this->right_ == Bound::open) {
                 --this->max_;
-                this->right_ = IntervalBound::closed;
+                this->right_ = Bound::closed;
             }
             IntervalTypeBase<T>::adjust_bounds();
         }
 
     template <IntervalCompatible T>
-    class IntervalCategoryBase<T, IntervalCategory::integral>:
+    class IntervalCategoryBase<T, Category::integral>:
     public IntervalTypeBase<T> {
 
     private:
@@ -178,7 +178,7 @@ namespace RS::Intervals {
     };
 
         template <IntervalCompatible T>
-        std::size_t IntervalCategoryBase<T, IntervalCategory::integral>::size() const {
+        std::size_t IntervalCategoryBase<T, Category::integral>::size() const {
             if (this->empty())
                 return 0;
             if (this->is_infinite())
@@ -193,20 +193,20 @@ namespace RS::Intervals {
         }
 
         template <IntervalCompatible T>
-        void IntervalCategoryBase<T, IntervalCategory::integral>::adjust_bounds() {
-            if (this->left_ == IntervalBound::open) {
+        void IntervalCategoryBase<T, Category::integral>::adjust_bounds() {
+            if (this->left_ == Bound::open) {
                 ++this->min_;
-                this->left_ = IntervalBound::closed;
+                this->left_ = Bound::closed;
             }
-            if (this->right_ == IntervalBound::open) {
+            if (this->right_ == Bound::open) {
                 --this->max_;
-                this->right_ = IntervalBound::closed;
+                this->right_ = Bound::closed;
             }
             IntervalTypeBase<T>::adjust_bounds();
         }
 
     template <IntervalCompatible T>
-    class IntervalCategoryBase<T, IntervalCategory::continuous>:
+    class IntervalCategoryBase<T, Category::continuous>:
     public IntervalTypeBase<T> {
     public:
         T size() const {

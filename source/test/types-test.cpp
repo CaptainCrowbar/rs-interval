@@ -10,11 +10,6 @@
 using namespace RS::Intervals;
 using namespace std::literals;
 
-using IB = IntervalBound;
-using IC = IntervalCategory;
-using IM = IntervalMatch;
-using IO = IntervalOrder;
-
 struct Thing {
     std::string name;
     Thing() = default;
@@ -23,42 +18,42 @@ struct Thing {
 
 void test_rs_interval_types_traits() {
 
-    TEST_EQUAL(interval_category<bool>, IC::none);
-    TEST_EQUAL(interval_category<const bool>, IC::none);
-    TEST_EQUAL(interval_category<volatile bool>, IC::none);
-    TEST_EQUAL(interval_category<const volatile bool>, IC::none);
-    TEST_EQUAL(interval_category<void>, IC::none);
-    TEST_EQUAL(interval_category<std::complex<float>>, IC::none);
+    TEST_EQUAL(interval_category<bool>, Category::none);
+    TEST_EQUAL(interval_category<const bool>, Category::none);
+    TEST_EQUAL(interval_category<volatile bool>, Category::none);
+    TEST_EQUAL(interval_category<const volatile bool>, Category::none);
+    TEST_EQUAL(interval_category<void>, Category::none);
+    TEST_EQUAL(interval_category<std::complex<float>>, Category::none);
 
-    TEST_EQUAL(interval_category<std::string>, IC::ordered);
-    TEST_EQUAL(interval_category<const std::string>, IC::ordered);
-    TEST_EQUAL(interval_category<volatile std::string>, IC::ordered);
-    TEST_EQUAL(interval_category<const volatile std::string>, IC::ordered);
-    TEST_EQUAL(interval_category<std::vector<int>>, IC::ordered);
-    TEST_EQUAL(interval_category<void*>, IC::ordered);
-    TEST_EQUAL(interval_category<const void*>, IC::ordered);
+    TEST_EQUAL(interval_category<std::string>, Category::ordered);
+    TEST_EQUAL(interval_category<const std::string>, Category::ordered);
+    TEST_EQUAL(interval_category<volatile std::string>, Category::ordered);
+    TEST_EQUAL(interval_category<const volatile std::string>, Category::ordered);
+    TEST_EQUAL(interval_category<std::vector<int>>, Category::ordered);
+    TEST_EQUAL(interval_category<void*>, Category::ordered);
+    TEST_EQUAL(interval_category<const void*>, Category::ordered);
 
-    TEST_EQUAL(interval_category<char*>, IC::stepwise);
-    TEST_EQUAL(interval_category<const char*>, IC::stepwise);
-    TEST_EQUAL(interval_category<std::string::const_iterator>, IC::stepwise);
-    TEST_EQUAL(interval_category<std::string::iterator>, IC::stepwise);
-    TEST_EQUAL(interval_category<std::vector<int>::const_iterator>, IC::stepwise);
-    TEST_EQUAL(interval_category<std::vector<int>::iterator>, IC::stepwise);
-    TEST_EQUAL(interval_category<std::chrono::microseconds>, IC::stepwise);
-    TEST_EQUAL(interval_category<StepwiseType>, IC::stepwise);
+    TEST_EQUAL(interval_category<char*>, Category::stepwise);
+    TEST_EQUAL(interval_category<const char*>, Category::stepwise);
+    TEST_EQUAL(interval_category<std::string::const_iterator>, Category::stepwise);
+    TEST_EQUAL(interval_category<std::string::iterator>, Category::stepwise);
+    TEST_EQUAL(interval_category<std::vector<int>::const_iterator>, Category::stepwise);
+    TEST_EQUAL(interval_category<std::vector<int>::iterator>, Category::stepwise);
+    TEST_EQUAL(interval_category<std::chrono::microseconds>, Category::stepwise);
+    TEST_EQUAL(interval_category<StepwiseType>, Category::stepwise);
 
-    TEST_EQUAL(interval_category<int>, IC::integral);
-    TEST_EQUAL(interval_category<const int>, IC::integral);
-    TEST_EQUAL(interval_category<volatile int>, IC::integral);
-    TEST_EQUAL(interval_category<const volatile int>, IC::integral);
-    TEST_EQUAL(interval_category<std::uint8_t>, IC::integral);
-    TEST_EQUAL(interval_category<std::int64_t>, IC::integral);
+    TEST_EQUAL(interval_category<int>, Category::integral);
+    TEST_EQUAL(interval_category<const int>, Category::integral);
+    TEST_EQUAL(interval_category<volatile int>, Category::integral);
+    TEST_EQUAL(interval_category<const volatile int>, Category::integral);
+    TEST_EQUAL(interval_category<std::uint8_t>, Category::integral);
+    TEST_EQUAL(interval_category<std::int64_t>, Category::integral);
 
-    TEST_EQUAL(interval_category<float>, IC::continuous);
-    TEST_EQUAL(interval_category<const float>, IC::continuous);
-    TEST_EQUAL(interval_category<volatile float>, IC::continuous);
-    TEST_EQUAL(interval_category<const volatile float>, IC::continuous);
-    TEST_EQUAL(interval_category<double>, IC::continuous);
+    TEST_EQUAL(interval_category<float>, Category::continuous);
+    TEST_EQUAL(interval_category<const float>, Category::continuous);
+    TEST_EQUAL(interval_category<volatile float>, Category::continuous);
+    TEST_EQUAL(interval_category<const volatile float>, Category::continuous);
+    TEST_EQUAL(interval_category<double>, Category::continuous);
 
     TEST(Ordered<std::string>);
     TEST(Ordered<const std::string>);

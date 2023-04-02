@@ -12,10 +12,6 @@ using namespace RS::Intervals;
 
 using Itv = Interval<StepwiseType>;
 using Set = IntervalSet<StepwiseType>;
-using IB = IntervalBound;
-using IC = IntervalCategory;
-using IM = IntervalMatch;
-using IO = IntervalOrder;
 
 void test_rs_interval_stepwise_interval_set_construct_insert_erase() {
 
@@ -117,9 +113,9 @@ void test_rs_interval_stepwise_interval_set_operations() {
             for (int k = 0; k < size; ++k) {
                 StepwiseType a = random_int(1, max_value)(rng);
                 StepwiseType b = random_int(1, max_value)(rng);
-                auto l = IB(random_int(0, 3)(rng));
-                auto r = IB(random_int(0, 3)(rng));
-                if ((l == IB::empty) == (r == IB::empty)) {
+                auto l = Bound(random_int(0, 3)(rng));
+                auto r = Bound(random_int(0, 3)(rng));
+                if ((l == Bound::empty) == (r == Bound::empty)) {
                     TRY(in = Itv(a, b, l, r));
                     TRY(set[j].insert(in));
                     vec[j].push_back(in);

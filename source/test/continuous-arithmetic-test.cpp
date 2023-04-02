@@ -10,10 +10,6 @@ using namespace RS::Intervals;
 
 using Itv = Interval<double>;
 using Set = IntervalSet<double>;
-using IB = IntervalBound;
-using IC = IntervalCategory;
-using IM = IntervalMatch;
-using IO = IntervalOrder;
 
 void test_rs_interval_continuous_contains_zero() {
 

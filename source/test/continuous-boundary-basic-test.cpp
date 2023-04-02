@@ -6,7 +6,6 @@ using namespace RS::Intervals;
 using namespace RS::Intervals::Detail;
 
 using Itv = Interval<double>;
-using IB = IntervalBound;
 using B = Boundary<double>;
 using BT = BoundaryType;
 
@@ -27,14 +26,14 @@ void test_rs_interval_continuous_boundary_from_interval() {
     static const Itv none;
     static const Itv all = Itv::all();
     static const Itv eq1(1);
-    static const Itv ge1(1, 1, IB::closed, IB::unbound);
-    static const Itv gt1(1, 1, IB::open, IB::unbound);
-    static const Itv le1(1, 1, IB::unbound, IB::closed);
-    static const Itv lt1(1, 1, IB::unbound, IB::open);
-    static const Itv c12(1, 2, IB::closed, IB::closed);
-    static const Itv o12(1, 2, IB::open, IB::open);
-    static const Itv o1c2(1, 2, IB::open, IB::closed);
-    static const Itv c1o2(1, 2, IB::closed, IB::open);
+    static const Itv ge1(1, 1, Bound::closed, Bound::unbound);
+    static const Itv gt1(1, 1, Bound::open, Bound::unbound);
+    static const Itv le1(1, 1, Bound::unbound, Bound::closed);
+    static const Itv lt1(1, 1, Bound::unbound, Bound::open);
+    static const Itv c12(1, 2, Bound::closed, Bound::closed);
+    static const Itv o12(1, 2, Bound::open, Bound::open);
+    static const Itv o1c2(1, 2, Bound::open, Bound::closed);
+    static const Itv c1o2(1, 2, Bound::closed, Bound::open);
 
     TEST_EQUAL(none.str(), "{}");
     TEST_EQUAL(all.str(), "*");

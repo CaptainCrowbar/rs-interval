@@ -10,10 +10,6 @@ using namespace RS::Intervals;
 
 using Itv = Interval<StepwiseType>;
 using Map = IntervalMap<StepwiseType, std::string>;
-using IB = IntervalBound;
-using IC = IntervalCategory;
-using IM = IntervalMatch;
-using IO = IntervalOrder;
 
 void test_rs_interval_stepwise_interval_map() {
 

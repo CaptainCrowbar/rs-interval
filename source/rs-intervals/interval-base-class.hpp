@@ -28,29 +28,29 @@ namespace RS::Intervals {
 
         const T& min() const noexcept { return min_; }
         const T& max() const noexcept { return max_; }
-        IntervalBound left() const noexcept { return left_; }
-        IntervalBound right() const noexcept { return right_; }
-        bool empty() const noexcept { return left_ == IntervalBound::empty; }
-        bool is_single() const noexcept { return left_ == IntervalBound::closed && right_ == IntervalBound::closed && min_ == max_; }
-        bool is_range() const noexcept { return left_ == IntervalBound::unbound || right_ == IntervalBound::unbound || min_ != max_; }
+        Bound left() const noexcept { return left_; }
+        Bound right() const noexcept { return right_; }
+        bool empty() const noexcept { return left_ == Bound::empty; }
+        bool is_single() const noexcept { return left_ == Bound::closed && right_ == Bound::closed && min_ == max_; }
+        bool is_range() const noexcept { return left_ == Bound::unbound || right_ == Bound::unbound || min_ != max_; }
         bool is_finite() const noexcept { return is_left_bounded() && is_right_bounded(); }
-        bool is_infinite() const noexcept { return left_ == IntervalBound::unbound || right_ == IntervalBound::unbound; }
-        bool is_universal() const noexcept { return left_ == IntervalBound::unbound && right_ == IntervalBound::unbound; }
+        bool is_infinite() const noexcept { return left_ == Bound::unbound || right_ == Bound::unbound; }
+        bool is_universal() const noexcept { return left_ == Bound::unbound && right_ == Bound::unbound; }
         bool is_left_bounded() const noexcept { return is_left_open() || is_left_closed(); }
-        bool is_left_closed() const noexcept { return left_ == IntervalBound::closed; }
-        bool is_left_open() const noexcept { return left_ == IntervalBound::open; }
+        bool is_left_closed() const noexcept { return left_ == Bound::closed; }
+        bool is_left_open() const noexcept { return left_ == Bound::open; }
         bool is_right_bounded() const noexcept { return is_right_open() || is_right_closed(); }
-        bool is_right_closed() const noexcept { return right_ == IntervalBound::closed; }
-        bool is_right_open() const noexcept { return right_ == IntervalBound::open; }
+        bool is_right_closed() const noexcept { return right_ == Bound::closed; }
+        bool is_right_open() const noexcept { return right_ == Bound::open; }
         std::enable_if_t<Detail::Hashable<T>, std::size_t> hash() const noexcept;
-        IntervalMatch match(const T& t) const;
+        Match match(const T& t) const;
 
     protected:
 
         T min_ = T();
         T max_ = T();
-        IntervalBound left_ = IntervalBound::empty;
-        IntervalBound right_ = IntervalBound::empty;
+        Bound left_ = Bound::empty;
+        Bound right_ = Bound::empty;
 
         void adjust_bounds();
         void do_swap(IntervalTypeBase& in) noexcept;
@@ -69,28 +69,28 @@ namespace RS::Intervals {
         }
 
         template <IntervalCompatible T>
-        IntervalMatch IntervalTypeBase<T>::match(const T& t) const {
-            if (empty())                                           return IntervalMatch::empty;
-            else if (is_universal())                               return IntervalMatch::match;
-            else if (left_ == IntervalBound::closed && t < min_)   return IntervalMatch::low;
-            else if (left_ == IntervalBound::open && t <= min_)    return IntervalMatch::low;
-            else if (right_ == IntervalBound::closed && t > max_)  return IntervalMatch::high;
-            else if (right_ == IntervalBound::open && t >= max_)   return IntervalMatch::high;
-            else                                                   return IntervalMatch::match;
+        Match IntervalTypeBase<T>::match(const T& t) const {
+            if (empty())                                           return Match::empty;
+            else if (is_universal())                               return Match::match;
+            else if (left_ == Bound::closed && t < min_)   return Match::low;
+            else if (left_ == Bound::open && t <= min_)    return Match::low;
+            else if (right_ == Bound::closed && t > max_)  return Match::high;
+            else if (right_ == Bound::open && t >= max_)   return Match::high;
+            else                                                   return Match::match;
         }
 
         template <IntervalCompatible T>
         void IntervalTypeBase<T>::adjust_bounds() {
-            if ((left_ == IntervalBound::empty) != (right_ == IntervalBound::empty)) {
+            if ((left_ == Bound::empty) != (right_ == Bound::empty)) {
                 throw std::invalid_argument("Inconsistent interval bounds");
-            } else if (left_ == IntervalBound::empty) {
+            } else if (left_ == Bound::empty) {
                 min_ = max_ = T();
             } else {
                 if (is_finite()) {
                     if (min_ > max_)
-                        left_ = right_ = IntervalBound::empty;
-                    else if (min_ == max_ && (left_ == IntervalBound::open || right_ == IntervalBound::open))
-                        left_ = right_ = IntervalBound::empty;
+                        left_ = right_ = Bound::empty;
+                    else if (min_ == max_ && (left_ == Bound::open || right_ == Bound::open))
+                        left_ = right_ = Bound::empty;
                 }
                 if (! is_left_bounded())
                     min_ = T();

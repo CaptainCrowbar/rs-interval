@@ -27,7 +27,7 @@ Defined for convenience.
 ### Interval bounds
 
 ```c++
-enum class IntervalBound: std::uint8_t {
+enum class Bound: std::uint8_t {
     empty,    // Interval is empty
     closed,   // Interval includes the bound
     open,     // Interval does not include the bound
@@ -42,7 +42,7 @@ one bound is `empty`, the other must also be `empty`.
 ### Value type categories
 
 ```c++
-enum class IntervalCategory: std::uint8_t {
+enum class Category: std::uint8_t {
     none,        // Not usable in an interval               (e.g. bool)
     continuous,  // Models a continuous arithmetic type     (e.g. float)
     integral,    // Supports integer arithmetic operations  (e.g. int)
@@ -50,9 +50,9 @@ enum class IntervalCategory: std::uint8_t {
     stepwise,    // Incrementable and decrementable         (e.g. int*)
 };
 template <typename T> struct IntervalTraits {
-    static constexpr IntervalCategory category;
+    static constexpr Category category;
 };
-template <typename T> constexpr IntervalCategory interval_category
+template <typename T> constexpr Category interval_category
     = IntervalTraits<T>::category;
 ```
 
@@ -96,7 +96,7 @@ template <typename T> concept IntervalCompatible; // any of the above
 ### Relationship between a value and an interval
 
 ```c++
-enum class IntervalMatch: std::int8_t {
+enum class Match: std::int8_t {
     low = -1,  // Value is less than the lower bound
     ok,        // Value is an element of the interval
     high,      // Value is greater than the upper bound
@@ -110,7 +110,7 @@ specific value to the interval.
 ### Relationship between two intervals
 
 ```c++
-enum class IntervalOrder: std::int8_t; // see below for the list of values
+enum class Order: std::int8_t; // see below for the list of values
 ```
 
 The result of the `Interval::order()` method, indicating the relationship of
@@ -127,7 +127,7 @@ In the "picture" layouts here:
 * `***` = Common to both intervals
 * `...` = Gap between the two intervals
 
-| IntervalOrder        | Value  | Picture      | Description                                                      |
+| Order        | Value  | Picture      | Description                                                      |
 | -------------        | -----  | -------      | -----------                                                      |
 | `b_only`             | -7     | `BBB`        | `A` is empty, `B` is not                                         |
 | `a_below_b`          | -6     | `AAA...BBB`  | Upper bound of `A` is less than lower bound of `B`, with a gap   |
@@ -216,7 +216,7 @@ otherwise bidirectional.
 ### Member constants
 
 ```c++
-static constexpr IntervalCategory Interval::category = interval_category<T>;
+static constexpr Category Interval::category = interval_category<T>;
 ```
 
 The interval category of the underlying type.
@@ -226,11 +226,11 @@ The interval category of the underlying type.
 ```c++
 Interval::Interval();
 Interval::Interval(const T& t);
-Interval::Interval(const T& t, IntervalBound l, IntervalBound r);
+Interval::Interval(const T& t, Bound l, Bound r);
 Interval::Interval(const T& min, const T& max,
-    IntervalBound lr = IntervalBound::closed);
+    Bound lr = Bound::closed);
 Interval::Interval(const T& min, const T& max,
-    IntervalBound l, IntervalBound r);
+    Bound l, Bound r);
 Interval::Interval(const T& min, const T& max, std::string_view mode);
 ```
 
@@ -294,22 +294,22 @@ template <IntervalCompatible T>
     Interval<T> make_interval(const T& t);
 template <IntervalCompatible T>
     Interval<T> make_interval(const T& t,
-        IntervalBound l, IntervalBound r);
+        Bound l, Bound r);
 template <IntervalCompatible T>
     Interval<T> make_interval(const T& min, const T& max,
-        IntervalBound lr = IntervalBound::closed);
+        Bound lr = Bound::closed);
 template <IntervalCompatible T>
     Interval<T> make_interval(const T& min, const T& max,
-        IntervalBound l, IntervalBound r);
+        Bound l, Bound r);
 template <IntervalCompatible T>
     Interval<T> make_interval(const T& min, const T& max,
         std::string_view mode);
 template <IntervalCompatible T>
     Interval<T> ordered_interval(const T& a, const T& b,
-        IntervalBound lr = IntervalBound::closed);
+        Bound lr = Bound::closed);
 template <IntervalCompatible T>
     Interval<T> ordered_interval(const T& a, const T& b,
-        IntervalBound l, IntervalBound r);
+        Bound l, Bound r);
 ```
 
 Interval construction functions. These have the same behaviour as the
@@ -353,11 +353,11 @@ Valid string formats are:
 ### Comparison functions
 
 ```c++
-IntervalOrder Interval::order(const Interval& b) const;
+Order Interval::order(const Interval& b) const;
 ```
 
 Determines the relationship between two intervals. See the description of the
-`IntervalOrder` enumeration above for the interpretation of the result.
+`Order` enumeration above for the interpretation of the result.
 
 ```c++
 bool Interval::includes(const Interval& b) const;
@@ -400,12 +400,12 @@ corresponding `begin()` or `end()` function is called.
 
 ```c++
 bool Interval::contains(const T& t) const;
-IntervalMatch Interval::match(const T& t) const;
+Match Interval::match(const T& t) const;
 bool Interval::operator()(const T& t) const;
 ```
 
 These determine the relationship between a specific value and an interval. The
-`match()` function returns a value of the `IntervalMatch` enumeration
+`match()` function returns a value of the `Match` enumeration
 indicating the precise relationship, while `contains()` simply indicates
 whether the value is an element of the interval. The function call operator
 is equivalent to `contains()`.
@@ -413,8 +413,8 @@ is equivalent to `contains()`.
 ```c++
 const T& Interval::min() const noexcept;
 const T& Interval::max() const noexcept;
-IntervalBound Interval::left() const noexcept;
-IntervalBound Interval::right() const noexcept;
+Bound Interval::left() const noexcept;
+Bound Interval::right() const noexcept;
 ```
 
 These return the boundary values and boundary types. If either end of the

@@ -52,8 +52,6 @@ namespace RS::Intervals {
 
     namespace Detail {
 
-        using SO = std::strong_ordering;
-
         template <typename T>
         concept ArithmeticOperators = requires (T t) {
             { t + t } -> std::convertible_to<T>;
@@ -99,16 +97,16 @@ namespace RS::Intervals {
 
     constexpr std::size_t npos = std::string::npos;
 
-    RS_INTERVALS_ENUM_CLASS(IntervalBound, std::uint8_t, 0,
+    RS_INTERVALS_ENUM_CLASS(Bound, std::uint8_t, 0,
         empty,   // The interval is empty
         closed,  // The interval includes the boundary value
         open,    // The interval does not include the boundary value
         unbound  // The interval is unbounded in this direction
     )
 
-    constexpr IntervalBound operator~(IntervalBound b) noexcept { return IntervalBound(3 - int(b)); }
+    constexpr Bound operator~(Bound b) noexcept { return Bound(3 - int(b)); }
 
-    RS_INTERVALS_ENUM_CLASS(IntervalCategory, std::uint8_t, 0,
+    RS_INTERVALS_ENUM_CLASS(Category, std::uint8_t, 0,
         none,        // Not usable in an interval
         continuous,  // Models a continuous arithmetic type (e.g. floating point)
         integral,    // Integer arithmetic operations (e.g. integer)
@@ -116,14 +114,14 @@ namespace RS::Intervals {
         stepwise     // Incrementable and decrementable (e.g. pointer)
     )
 
-    RS_INTERVALS_ENUM_CLASS(IntervalMatch, std::int8_t, -1,
+    RS_INTERVALS_ENUM_CLASS(Match, std::int8_t, -1,
         low,    // The value is less than the interval's lower bound
         match,  // The value is an element of the interval
         high,   // The value is greater than the interval's upper bound
         empty   // The interval is empty
     )
 
-    RS_INTERVALS_ENUM_CLASS(IntervalOrder, std::int8_t, -8,
+    RS_INTERVALS_ENUM_CLASS(Order, std::int8_t, -8,
         // Name             Index  Picture    Description
         b_only,             // -7  BBB        A is empty, B is not
         a_below_b,          // -6  AAA...BBB  Upper bound of A is less than lower bound of B, with a gap
@@ -145,32 +143,32 @@ namespace RS::Intervals {
     template <typename T>
     struct IntervalTraits {
         using type = std::remove_cv_t<T>;
-        static constexpr IntervalCategory category =
+        static constexpr Category category =
             std::same_as<type, bool> || ! std::regular<type> || ! std::totally_ordered<type> ?
-                IntervalCategory::none :
+                Category::none :
             std::floating_point<T> ?
-                IntervalCategory::continuous :
+                Category::continuous :
             std::numeric_limits<type>::is_specialized && ! std::numeric_limits<type>::is_integer ?
-                IntervalCategory::continuous :
+                Category::continuous :
             std::integral<T> ?
-                IntervalCategory::integral :
+                Category::integral :
             std::numeric_limits<type>::is_specialized && std::numeric_limits<type>::is_integer ?
-                IntervalCategory::integral :
+                Category::integral :
             Detail::ArithmeticOperators<type> && Detail::StepwiseOperators<type> ?
-                IntervalCategory::integral :
+                Category::integral :
             Detail::ArithmeticOperators<type> ?
-                IntervalCategory::continuous :
+                Category::continuous :
             Detail::StepwiseOperators<type> ?
-                IntervalCategory::stepwise :
-                IntervalCategory::ordered;
+                Category::stepwise :
+                Category::ordered;
     };
 
     template <typename T> constexpr auto interval_category = IntervalTraits<T>::category;
 
-    template <typename T> concept Continuous = interval_category<T> == IntervalCategory::continuous;
-    template <typename T> concept Integral = interval_category<T> == IntervalCategory::integral;
-    template <typename T> concept Ordered = interval_category<T> == IntervalCategory::ordered;
-    template <typename T> concept Stepwise = interval_category<T> == IntervalCategory::stepwise;
+    template <typename T> concept Continuous = interval_category<T> == Category::continuous;
+    template <typename T> concept Integral = interval_category<T> == Category::integral;
+    template <typename T> concept Ordered = interval_category<T> == Category::ordered;
+    template <typename T> concept Stepwise = interval_category<T> == Category::stepwise;
     template <typename T> concept Arithmetic = Continuous<T> || Integral<T>;
 
     template <typename T>
@@ -234,14 +232,14 @@ namespace RS::Intervals {
             template <IntervalCompatible T>
             bool Boundary<T>::adjacent(const Boundary& b) const noexcept {
                 using BT = BoundaryType;
-                using IC = IntervalCategory;
+                using Category = Category;
                 if (! has_value() || ! b.has_value())
                     return false;
                 if (type == BT::open && b.type == BT::open)
                     return false;
                 if (value == b.value)
                     return type != b.type;
-                if constexpr (interval_category<T> == IC::stepwise || interval_category<T> == IC::integral) {
+                if constexpr (interval_category<T> == Category::stepwise || interval_category<T> == Category::integral) {
                     if (type == BT::closed && b.type == BT::closed) {
                         if (value < b.value) {
                             T t = value;

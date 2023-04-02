@@ -9,10 +9,6 @@ using namespace RS::Intervals;
 
 using Itv = Interval<std::string>;
 using Map = IntervalMap<std::string, std::string>;
-using IB = IntervalBound;
-using IC = IntervalCategory;
-using IM = IntervalMatch;
-using IO = IntervalOrder;
 
 void test_rs_interval_ordered_interval_map() {
 
