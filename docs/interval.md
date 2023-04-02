@@ -127,8 +127,8 @@ In the "picture" layouts here:
 * `***` = Common to both intervals
 * `...` = Gap between the two intervals
 
-| Order        | Value  | Picture      | Description                                                      |
-| -------------        | -----  | -------      | -----------                                                      |
+| Order                | Value  | Picture      | Description                                                      |
+| -----                | -----  | -------      | -----------                                                      |
 | `b_only`             | -7     | `BBB`        | `A` is empty, `B` is not                                         |
 | `a_below_b`          | -6     | `AAA...BBB`  | Upper bound of `A` is less than lower bound of `B`, with a gap   |
 | `a_touches_b`        | -5     | `AAABBB`     | Upper bound of `A` is less than lower bound of `B`, with no gap  |
