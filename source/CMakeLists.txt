@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
 project(IntervalsLibrary
-    VERSION 0.2.2
+    VERSION 0.2.3
     LANGUAGES CXX
 )
 
