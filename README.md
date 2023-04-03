@@ -2,7 +2,7 @@
 
 By Ross Smith
 
-## [Link to main documentation](https://captaincrowbar.github.io/rs-intervals/)
+## [Link to main documentation](https://captaincrowbar.github.io/rs-interval/)
 
 ## Overview
 
@@ -11,11 +11,7 @@ By Ross Smith
 namespace RS::Intervals;
 ```
 
-This library provides classes for the manipulation of intervals within an
-ordered type; for example, a range of integers or floating point values.
-Other ordered but non-arithmetic types, such as strings, are also supported.
-In addition to the basic interval type, it also supports sets of intervals,
-and maps from a series of intervals to a value type.
+This library provides classes for the manipulation of intervals within an ordered type; for example, a range of integers or floating point values. Other ordered but non-arithmetic types, such as strings, are also supported. In addition to the basic interval type, it also supports sets of intervals, and maps from a series of intervals to a value type.
 
 Some simple examples:
 

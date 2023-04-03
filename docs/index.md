@@ -2,7 +2,7 @@
 
 By Ross Smith
 
-_[GitHub repository](https://github.com/CaptainCrowbar/rs-intervals)_
+_[GitHub repository](https://github.com/CaptainCrowbar/rs-interval)_
 
 ## Overview
 
