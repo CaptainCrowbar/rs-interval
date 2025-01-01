@@ -7,8 +7,8 @@ _[GitHub repository](https://github.com/CaptainCrowbar/rs-interval)_
 ## Overview
 
 ```c++
-#include "rs-intervals.hpp"
-namespace RS::Intervals;
+#include "rs-interval.hpp"
+namespace RS::Interval;
 ```
 
 This library provides classes for the manipulation of intervals within an
@@ -31,7 +31,7 @@ Interval<std::string> si("A", "B", Bound::closed, Bound::open);
 The library is header-only; there are no binaries to build or install. A CMake
 file is supplied to build the tests, but this is not required if you only
 want to use the library and not run the tests. Installing it simply requires
-copying the `"rs-intervals"` directory and `"rs-intervals.hpp"` header
+copying the `"rs-interval"` directory and `"rs-interval.hpp"` header
 (these are under `"source"`) to somewhere on your include search path. The
 `install` option in the CMake file will do this (it may not work on Windows
 because of the lack of a standardized search path).
@@ -41,14 +41,14 @@ make sense, it is not intended to be a full interval arithmetic library in
 the sense used in scientific computing, since it does not include the special
 handling of floating point rounding issues required by such a library.
 
-You can include `"rs-intervals.hpp"` to import the whole library, or a
+You can include `"rs-interval.hpp"` to import the whole library, or a
 selection from the following headers if you don't need all of the library's
 features:
 
-* `"rs-intervals/interval.hpp"` -- [Interval class](interval.html)
-* `"rs-intervals/interval-map.hpp"` -- [Interval map class](interval-map.html)
-* `"rs-intervals/interval-set.hpp"` -- [Interval set class](interval-set.html)
-* `"rs-intervals/version.hpp"` -- [Version information](version.html)
+* `"rs-interval/interval.hpp"` -- [Interval class](interval.html)
+* `"rs-interval/interval-map.hpp"` -- [Interval map class](interval-map.html)
+* `"rs-interval/interval-set.hpp"` -- [Interval set class](interval-set.html)
+* `"rs-interval/version.hpp"` -- [Version information](version.html)
 
 The following principal classes are defined (in addition to a number of
 supporting infrastructure types):

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# Increment the patch number in the project version
+
+set -o errexit
+set -o nounset
+set -o pipefail
+shopt -s globasciiranges globstar nullglob
+
+if [[ "${TRACE-}" ]]; then
+    set -o xtrace
+fi
+
+bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+root="$(readlink -f "$bin/..")"
+
+if [ "${root##*/}" != "rs-interval" ]; then
+    echo "*** Project root not found"
+    exit 1
+fi
+
+cd "$root"
+
+cmakefile=src/CMakeLists.txt
+header=src/rs-interval/version.hpp
+temp=__TEMP__
+
+version=$(grep -E '    VERSION \d+\.\d+\.\d+' "$cmakefile" \
+    | head -n 1 \
+    | grep -Eo '[0-9.]+')
+
+if ! [[ "$version" ]]; then
+    echo "*** Version number not found"
+    exit 1
+fi
+
+v1=${version%%.*}
+v2=${version#*.}
+v2=${v2%.*}
+v3=${version##*.}
+(( ++v3 ))
+
+sed -E 's/(VERSION) [0-9]+\.[0-9]+\.[0-9]+/\1 '"$v1.$v2.$v3/" \
+    "$cmakefile" > "$temp"
+mv "$temp" "$cmakefile"
+sed -E 's/(return) ([{"]+ ?)[0-9]+([ .,]+)[0-9]+([ .,])[0-9]+( ?[}"]+);/\1 \2'"$v1"'\3'"$v2"'\4'"$v3"'\5;/' \
+    "$header" > "$temp"
+mv "$temp" "$header"

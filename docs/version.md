@@ -3,8 +3,8 @@
 _[Interval Library by Ross Smith](index.html)_
 
 ```c++
-#include "rs-intervals/version.hpp"
-namespace RS::Intervals;
+#include "rs-interval/version.hpp"
+namespace RS::Interval;
 ```
 
 This header supplies library version information.

@@ -3,8 +3,8 @@
 _[Interval Library by Ross Smith](index.html)_
 
 ```c++
-#include "rs-intervals/interval.hpp"
-namespace RS::Intervals;
+#include "rs-interval/interval.hpp"
+namespace RS::Interval;
 ```
 
 This header defines the basic `Interval` class at the core of the library.

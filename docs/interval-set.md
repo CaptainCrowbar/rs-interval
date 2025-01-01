@@ -3,8 +3,8 @@
 _[Interval Library by Ross Smith](index.html)_
 
 ```c++
-#include "rs-intervals/interval-set.hpp"
-namespace RS::Intervals;
+#include "rs-interval/interval-set.hpp"
+namespace RS::Interval;
 ```
 
 This header defines a class representing a set of disjoint intervals.

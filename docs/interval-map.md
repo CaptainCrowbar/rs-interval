@@ -3,8 +3,8 @@
 _[Interval Library by Ross Smith](index.html)_
 
 ```c++
-#include "rs-intervals/interval-map.hpp"
-namespace RS::Intervals;
+#include "rs-interval/interval-map.hpp"
+namespace RS::Interval;
 ```
 
 This header defines a class representing a map from a set of disjoint
