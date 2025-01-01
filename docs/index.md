@@ -32,7 +32,7 @@ The library is header-only; there are no binaries to build or install. A CMake
 file is supplied to build the tests, but this is not required if you only
 want to use the library and not run the tests. Installing it simply requires
 copying the `"rs-interval"` directory and `"rs-interval.hpp"` header
-(these are under `"source"`) to somewhere on your include search path. The
+(these are under `"src"`) to somewhere on your include search path. The
 `install` option in the CMake file will do this (it may not work on Windows
 because of the lack of a standardized search path).
 

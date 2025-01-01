@@ -116,17 +116,6 @@ std::size_t IntervalSet::size() const noexcept;
 Returns the number of intervals in the set.
 
 ```c++
-std::string IntervalSet::str() const;
-template <Formatter<T> F>
-    std::string IntervalSet::str(const F& f) const;
-std::ostream& operator<<(std::ostream& out, const IntervalSet& set);
-```
-
-Format an interval set as a string. The format is `"{A,B,C...}"`, where `A`,
-`B`, `C`, etc are intervals or values of `T`, formatted as described for
-`Interval::str()`.
-
-```c++
 std::size_t IntervalSet::hash() const noexcept;
 struct std::hash<IntervalSet>;
 ```
@@ -201,9 +190,7 @@ IntervalSet operator^(const IntervalSet& a, const T& b);
 IntervalSet operator^(const T& a, const IntervalSet& b);
 ```
 
-Set operations.
-
-### Transformation functions
+Set theoretic operations.
 
 ```c++
 IntervalSet IntervalSet::complement() const;
@@ -212,3 +199,16 @@ IntervalSet IntervalSet::operator~() const;
 
 Returns the complement of the set, i.e. a new set whose member intervals
 contain every value of `T` that is not in this set.
+
+### Formatters
+
+```c++
+template <IntervalCompatible T>
+    requires (std::formattable<T, char>)
+    struct std::formatter<IntervalSet<T>>;
+```
+
+Standard formatter for interval sets. This accepts the same format
+specification as `std::formatter<T>.` The format is `"{A,B,C...}",` where `A,
+B, C`, etc are intervals or values of `T,` formatted using the `Interval`
+formatter.

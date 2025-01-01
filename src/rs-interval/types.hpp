@@ -93,9 +93,9 @@ namespace RS::Interval {
 
     }
 
-    constexpr auto npos = std::string::npos;
+    constexpr auto npos = static_cast<std::size_t>(-1);
 
-    RS_INTERVAL_ENUM(Bound, std::uint8_t, 0,
+    RS_INTERVAL_ENUM(Bound, unsigned char, 0,
         empty,   // The interval is empty
         closed,  // The interval includes the boundary value
         open,    // The interval does not include the boundary value
@@ -104,7 +104,7 @@ namespace RS::Interval {
 
     constexpr Bound operator~(Bound b) noexcept { return Bound(3 - int(b)); }
 
-    RS_INTERVAL_ENUM(Category, std::uint8_t, 0,
+    RS_INTERVAL_ENUM(Category, unsigned char, 0,
         none,        // Not usable in an interval
         continuous,  // Models a continuous arithmetic type (e.g. floating point)
         integral,    // Integer arithmetic operations (e.g. integer)
@@ -112,14 +112,14 @@ namespace RS::Interval {
         stepwise     // Incrementable and decrementable (e.g. pointer)
     )
 
-    RS_INTERVAL_ENUM(Match, std::int8_t, -1,
+    RS_INTERVAL_ENUM(Match, signed char, -1,
         low,    // The value is less than the interval's lower bound
         match,  // The value is an element of the interval
         high,   // The value is greater than the interval's upper bound
         empty   // The interval is empty
     )
 
-    RS_INTERVAL_ENUM(Order, std::int8_t, -8,
+    RS_INTERVAL_ENUM(Order, signed char, -8,
         // Name             Index  Picture    Description
         b_only,             // -7  BBB        A is empty, B is not
         a_below_b,          // -6  AAA...BBB  Upper bound of A is less than lower bound of B, with a gap

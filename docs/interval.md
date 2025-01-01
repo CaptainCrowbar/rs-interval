@@ -17,7 +17,7 @@ This header defines the basic `Interval` class at the core of the library.
 ## Constants
 
 ```c++
-constexpr std::size_t npos = std::string::npos;
+constexpr std::size_t npos = static_cast<std::size_t>(-1);
 ```
 
 Defined for convenience.
@@ -27,7 +27,7 @@ Defined for convenience.
 ### Interval bounds
 
 ```c++
-enum class Bound: std::uint8_t {
+enum class Bound: unsigned char {
     empty,    // Interval is empty
     closed,   // Interval includes the bound
     open,     // Interval does not include the bound
@@ -42,11 +42,11 @@ one bound is `empty`, the other must also be `empty`.
 ### Value type categories
 
 ```c++
-enum class Category: std::uint8_t {
+enum class Category: unsigned char {
     none,        // Not usable in an interval               (e.g. bool)
     continuous,  // Models a continuous arithmetic type     (e.g. float)
     integral,    // Supports integer arithmetic operations  (e.g. int)
-    ordered,     // Ordered but not an arithmetic type      (e.g. std::string)
+    ordered,     // Ordered but not an arithmetic type      (e.g. string)
     stepwise,    // Incrementable and decrementable         (e.g. int*)
 };
 template <typename T> struct IntervalTraits {
@@ -96,7 +96,7 @@ template <typename T> concept IntervalCompatible; // any of the above
 ### Relationship between a value and an interval
 
 ```c++
-enum class Match: std::int8_t {
+enum class Match: signed char {
     low = -1,  // Value is less than the lower bound
     ok,        // Value is an element of the interval
     high,      // Value is greater than the upper bound
@@ -110,7 +110,7 @@ specific value to the interval.
 ### Relationship between two intervals
 
 ```c++
-enum class Order: std::int8_t; // see below for the list of values
+enum class Order: signed char; // see below for the list of values
 ```
 
 The result of the `Interval::order()` method, indicating the relationship of
@@ -144,37 +144,6 @@ In the "picture" layouts here:
 | `b_touches_a`        | 5      | `BBBAAA`     | Upper bound of `B` is less than lower bound of `A`, with no gap  |
 | `b_below_a`          | 6      | `BBB...AAA`  | Upper bound of `B` is less than lower bound of `A`, with a gap   |
 | `a_only`             | 7      | `AAA`        | `B` is empty, `A` is not                                         |
-
-(The `equal` result includes the case where both intervals are empty.)
-
-### Formatting helpers
-
-```c++
-template <typename F, typename T>
-    concept Formatter = requires (const F& f, const T& t) {
-        { f(t) } -> std::convertible_to<std::string>;
-    };
-```
-
-Formatters can be passed to the string formatting functions of `Interval` and
-related types, to format the interval bounds in a user defined way.
-
-```c++
-struct DefaultFormatter {
-    template <typename T> std::string operator()(const T& t) const;
-};
-```
-
-The default formatter that will be used if no custom formatter is supplied. It
-uses the following simple rules:
-
-* If `T` is an integer type, call `std::to_string()`.
-* If `T` is explicitly or implicitly convertible to `std::string`, use that conversion.
-* If a suitable output operator exists, format `T` using an `ostringstream`.
-* Otherwise, `DefaultFormatter<T>` is not defined.
-
-(Floating point types do not use `std::to_string()` because its output format
-is poorly defined and likely to not be what the user expected.)
 
 ## Interval class
 
@@ -331,9 +300,10 @@ static Interval Interval::from_string(const std::string& str);
 ```
 
 Interprets a string as an interval. The value type `T` must have either a
-constructor that takes a string or an input operator. This will not be
-reliable for all value types because the characters that form part of the
-interval syntax may also appear in the value type's string format.
+constructor that takes a string or an input operator from a `std::istream.`
+This will not be reliable for all value types because the characters that
+form part of the interval syntax may also appear in the value type's string
+format.
 
 Valid string formats are:
 
@@ -381,7 +351,7 @@ bool operator<=(const Interval& a, const Interval& b) noexcept;
 bool operator>=(const Interval& a, const Interval& b) noexcept;
 ```
 
-Lexicographical comparison operators. These call `T`'s comparison operators.
+Lexicographical comparison operators. These call the `T` comparison operators.
 An empty interval compares less than any non-empty interval.
 
 ### Iterator functions
@@ -457,39 +427,16 @@ Interval properties.
 ```
 
 Returns the length of the interval. For integral types, the return type is
-`size_t`, and `size()` returns the number of values in the interval, or
-`npos` if one or both bounds is `unbound`.
+`std::size_t`, and `size()` returns the number of values in the interval, or
+`npos` if one or both bounds is unbound.
 
 For continuous types, the return type is `T`, and `size()` returns the
 difference between the upper and lower bounds, without regard to whether they
-are open or closed bounds. If one or both of the bounds is `unbound`, `size()`
-will return infinity if the type has a value for infinity; otherwise,
+are open or closed bounds. If one or both of the bounds is unbound, `size
+()` will return infinity if the type has a value for infinity; otherwise,
 behaviour is undefined.
 
 For ordered and stepwise types, the `size()` function is not defined.
-
-```c++
-std::string Interval::str() const;
-template <Formatter<T> F> std::string Interval::str(const F& f) const;
-std::ostream& operator<<(std::ostream& out, const Interval& in);
-```
-
-Format an interval as a string. The table below shows how intervals are
-formatted (`A` and `B` represent formatted values of `T`).
-
-| Format   | Description                                |
-| ------   | -----------                                |
-| `{}`     | Empty interval                             |
-| `*`      | Universal interval (contains every value)  |
-| `A`      | Single value                               |
-| `(A,B)`  | Open interval                              |
-| `(A,B]`  | Half-open interval, closed on the right    |
-| `[A,B)`  | Half-open interval, closed on the left     |
-| `[A,B]`  | Closed interval                            |
-| `<A`     | Open interval, bounded above               |
-| `<=A`    | Closed interval, bounded above             |
-| `>A`     | Open interval, bounded below               |
-| `>=A`    | Closed interval, bounded below             |
 
 ```c++
 std::size_t Interval::hash() const noexcept;
@@ -566,25 +513,47 @@ Interval& operator*=(Interval& a, const T& b);
 IntervalSet operator/(const Interval& a, const Interval& b);
 IntervalSet operator/(const Interval& a, const T& b);
 IntervalSet operator/(const T& a, const Interval& b);
-
 ```
 
 These return the interval containing all possible results of applying the
 given operation to elements of the argument intervals. The result will always
 be empty if any argument is empty. Most of these are defined only for
-integral and continuous interval categories (division is a special case).
+integral and continuous interval categories, except for the division
+operators, which are only defined for continuous intervals.
 
 The unary plus operator simply returns its argument and is included only for
 equivalence with the ordinary arithmetic operators.
 
-The division operators are only defined for continuous intervals, because the
-discontinuous nature of integer division in C++ makes it hard to define
-integer interval division unambiguously.
-
 The division operators return a set rather than an interval because division
 may result in two disjoint intervals if the divisor includes values on both
-sides of zero. The set will be empty if either argument is empty.
+sides of zero.
 
-Division by zero is assumed never to happen (i.e. zero is excluded from the
-divisor interval if it is present). The result will be an empty set if the
-divisor contains only the single value zero.
+Division by zero is assumed never to happen; zero is excluded from the divisor
+interval if it is present. The result will be an empty set if the divisor
+contains only the single value zero.
+
+### Formatters
+
+```c++
+template <IntervalCompatible T>
+    requires (std::formattable<T, char>)
+    struct std::formatter<Interval<T>>;
+```
+
+Standard formatter for intervals. This accepts the same format specification
+as `std::formatter<T>.` The table below shows how intervals are formatted;
+`T` represents the formatted value type.
+
+| Format   | Description                                |
+| ------   | -----------                                |
+| `{}`     | Empty interval                             |
+| `*`      | Universal interval (contains every value)  |
+| `T`      | Single value                               |
+| `(T,T)`  | Open interval                              |
+| `(T,T]`  | Half-open interval, closed on the right    |
+| `[T,T)`  | Half-open interval, closed on the left     |
+| `[T,T]`  | Closed interval                            |
+| `<T`     | Open interval, bounded above               |
+| `<=T`    | Closed interval, bounded above             |
+| `>T`     | Open interval, bounded below               |
+| `>=T`    | Closed interval, bounded below             |

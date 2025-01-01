@@ -52,8 +52,7 @@ dereferencing to an `Interval<T>`.
 ### Member constants
 
 ```c++
-static constexpr Category IntervalMap::category
-    = interval_category<K>;
+static constexpr Category IntervalMap::category = interval_category<K>;
 ```
 
 The underlying key type's interval category.
@@ -92,7 +91,7 @@ bool operator>=(const IntervalMap& a, const IntervalMap& b) noexcept;
 ```
 
 Lexicographical comparison operators. These call `T`'s equality and less-than
-operators.
+operators. The default value does not participate in comparisons.
 
 ### Element access functions
 
@@ -154,22 +153,6 @@ std::size_t IntervalMap::size() const noexcept;
 Returns the number of intervals in the map.
 
 ```c++
-std::string IntervalMap::str() const;
-template <typename F>
-    requires Formatter<F, K> && Formatter<F, T>
-    std::string IntervalMap::str(const F& f) const;
-template <Formatter<K> FK, Formatter<T> FT>
-    std::string IntervalMap::str(const FK& fk, const FT& ft) const;
-std::ostream& operator<<(std::ostream& out, const IntervalMap& set);
-```
-
-Format an interval map as a string. The format is `"{A:X,B:Y,C:Z,...}"`, where
-`A`, `B`, `C`, etc are intervals or values of `K` (formatted as described for
-`Interval::str()`), and `X`, `Y`, `Z`, etc are values of `T`. The two
-formatter parameters (`fk` and `ft`) are used for the keys and values
-respectively. The default value is not reported.
-
-```c++
 std::size_t IntervalMap::hash() const noexcept;
 struct std::hash<IntervalMap>;
 ```
@@ -215,3 +198,16 @@ void swap(IntervalMap& a, IntervalMap& b) noexcept;
 ```
 
 Swap two interval maps.
+
+### Formatters
+
+```c++
+template <IntervalCompatible K, std::regular T>
+    requires (std::formattable<K, char> && std::formattable<T, char>)
+    struct std::formatter<IntervalMap<K, T>>;
+```
+
+Standard formatter for interval maps. This does not implement any format
+specifiers; it will always use the default format for the key and value
+types. The format is `"{A:X,B:Y,C:Z,...}",` where `A, B, C,` etc are
+intervals or values of `K,` and `X, Y, Z,` etc are values of `T.`
