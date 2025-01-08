@@ -23,16 +23,16 @@ namespace RS::Interval {
             }
 
             bool right_zero = i.right() == Bound::unbound
-                || (i.right() == Bound::closed && i.max() >= T())
-                || (i.right() == Bound::open && i.max() > T());
+                || (i.right() == Bound::closed && i.max() >= T{})
+                || (i.right() == Bound::open && i.max() > T{});
 
             if (! right_zero) {
                 return false;
             }
 
             bool left_zero = i.left() == Bound::unbound
-                || (i.left() == Bound::closed && i.min() <= T())
-                || (i.left() == Bound::open && i.min() < T());
+                || (i.left() == Bound::closed && i.min() <= T{})
+                || (i.left() == Bound::open && i.min() < T{});
 
             return left_zero;
 
@@ -100,19 +100,19 @@ namespace RS::Interval {
 
             if (i.left() == Bound::unbound) {
                 rbound = Bound::open;
-            } else if (i.min() == T()) {
+            } else if (i.min() == T{}) {
                 rbound = Bound::unbound;
             } else {
-                rvalue = T(1) / i.min();
+                rvalue = static_cast<T>(1) / i.min();
                 rbound = i.left();
             }
 
             if (i.right() == Bound::unbound) {
                 lbound = Bound::open;
-            } else if (i.max() == T()) {
+            } else if (i.max() == T{}) {
                 lbound = Bound::unbound;
             } else {
-                lvalue = T(1) / i.max();
+                lvalue = static_cast<T>(1) / i.max();
                 lbound = i.right();
             }
 
@@ -125,8 +125,8 @@ namespace RS::Interval {
             if (i.empty()) {
                 return {};
             } else if (contains_zero(i)) {
-                Interval<T> negative_part(i.min(), T(), i.left(), Bound::open);
-                Interval<T> positive_part(T(), i.max(), Bound::open, i.right());
+                Interval<T> negative_part(i.min(), {}, i.left(), Bound::open);
+                Interval<T> positive_part({}, i.max(), Bound::open, i.right());
                 auto negative_reciprocal = reciprocal_interval(negative_part);
                 auto positive_reciprocal = reciprocal_interval(positive_part);
                 return {negative_reciprocal, positive_reciprocal};

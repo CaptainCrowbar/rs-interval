@@ -55,7 +55,7 @@ namespace RS::Interval {
     private:
 
         std::map<Interval<K>, T> map_;
-        T def_ = T();
+        T def_ {};
 
         std::pair<iterator, bool> do_find(const K& key) const;
 

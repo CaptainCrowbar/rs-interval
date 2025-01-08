@@ -47,8 +47,8 @@ namespace RS::Interval {
 
     protected:
 
-        T min_ = T();
-        T max_ = T();
+        T min_ {};
+        T max_ {};
         Bound left_ = Bound::empty;
         Bound right_ = Bound::empty;
 
@@ -88,7 +88,7 @@ namespace RS::Interval {
 
             } else if (left_ == Bound::empty) {
 
-                min_ = max_ = T();
+                min_ = max_ = T{};
 
             } else {
 
@@ -101,11 +101,11 @@ namespace RS::Interval {
                 }
 
                 if (! is_left_bounded()) {
-                    min_ = T();
+                    min_ = T{};
                 }
 
                 if (! is_right_bounded()) {
-                    max_ = T();
+                    max_ = T{};
                 }
 
             }

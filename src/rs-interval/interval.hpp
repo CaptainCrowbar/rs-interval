@@ -86,7 +86,7 @@ namespace RS::Interval {
         IntervalSet<T> set_symmetric_difference(const Interval& b) const;
         void swap(Interval& in) noexcept { this->do_swap(in); }
 
-        static Interval all() { return Interval(T(), Bound::unbound, Bound::unbound); }
+        static Interval all() { return Interval({}, Bound::unbound, Bound::unbound); }
         static Interval from_string(const std::string& str);
 
         friend bool operator==(const Interval& a, const Interval& b) noexcept { return a.compare(b) == 0; }

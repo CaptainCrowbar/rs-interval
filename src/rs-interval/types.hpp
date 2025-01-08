@@ -102,7 +102,7 @@ namespace RS::Interval {
         unbound  // The interval is unbounded in this direction
     )
 
-    constexpr Bound operator~(Bound b) noexcept { return Bound(3 - int(b)); }
+    constexpr Bound operator~(Bound b) noexcept { return static_cast<Bound>(3 - static_cast<int>(b)); }
 
     RS_INTERVAL_ENUM(Category, unsigned char, 0,
         none,        // Not usable in an interval
@@ -187,7 +187,7 @@ namespace RS::Interval {
 
             using BT = BoundaryType;
 
-            T value = T();
+            T value {};
             BT type = BT::empty;
 
             bool adjacent(const Boundary& b) const noexcept;
@@ -316,8 +316,8 @@ namespace RS::Interval {
                 }
 
                 // Use symmetry to handle negative arguments
-                bool a_minus = type == BT::minus_infinity || (has_value() && value < T());
-                bool b_minus = b.type == BT::minus_infinity || (b.has_value() && b.value < T());
+                bool a_minus = type == BT::minus_infinity || (has_value() && value < T{});
+                bool b_minus = b.type == BT::minus_infinity || (b.has_value() && b.value < T{});
                 if (a_minus && b_minus) {
                     return - *this * - b;
                 } else if (a_minus) {
@@ -334,14 +334,14 @@ namespace RS::Interval {
                 }
 
                 // If either argument is a closed zero, the result is a closed zero
-                if ((type == BT::closed && value == T())
-                        || (b.type == BT::closed && b.value == T())) {
+                if ((type == BT::closed && value == T{})
+                        || (b.type == BT::closed && b.value == T{})) {
                     return {{}, BT::closed};
                 }
 
                 // If either argument is an open zero, the result is an open zero
-                if ((type == BT::open && value == T())
-                        || (b.type == BT::open && b.value == T())) {
+                if ((type == BT::open && value == T{})
+                        || (b.type == BT::open && b.value == T{})) {
                     return {{}, BT::open};
                 }
 
