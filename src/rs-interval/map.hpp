@@ -179,7 +179,7 @@ namespace RS::Interval {
             for (; it != map_.end(); ++it) {
                 auto m = it->first.match(key);
                 if (m != Match::high) {
-                    return {it, m == Match::match};
+                    return {it, m == Match::ok};
                 }
             }
 

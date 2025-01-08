@@ -96,10 +96,10 @@ namespace RS::Interval {
     constexpr auto npos = static_cast<std::size_t>(-1);
 
     RS_INTERVAL_ENUM(Bound, unsigned char, 0,
-        empty,   // The interval is empty
-        closed,  // The interval includes the boundary value
-        open,    // The interval does not include the boundary value
-        unbound  // The interval is unbounded in this direction
+        empty,    // The interval is empty
+        closed,   // The interval includes the boundary value
+        open,     // The interval does not include the boundary value
+        unbound,  // The interval is unbounded in this direction
     )
 
     constexpr Bound operator~(Bound b) noexcept { return static_cast<Bound>(3 - static_cast<int>(b)); }
@@ -109,14 +109,14 @@ namespace RS::Interval {
         continuous,  // Models a continuous arithmetic type (e.g. floating point)
         integral,    // Integer arithmetic operations (e.g. integer)
         ordered,     // Ordered but not an arithmetic type (e.g. string)
-        stepwise     // Incrementable and decrementable (e.g. pointer)
+        stepwise,    // Incrementable and decrementable (e.g. pointer)
     )
 
     RS_INTERVAL_ENUM(Match, signed char, -1,
         low,    // The value is less than the interval's lower bound
-        match,  // The value is an element of the interval
+        ok,     // The value is an element of the interval
         high,   // The value is greater than the interval's upper bound
-        empty   // The interval is empty
+        empty,  // The interval is empty
     )
 
     RS_INTERVAL_ENUM(Order, signed char, -8,
@@ -135,7 +135,7 @@ namespace RS::Interval {
         b_overlaps_a,       // 4   BBB***AAA  Upper bound of B overlaps lower bound of A
         b_touches_a,        // 5   BBBAAA     Upper bound of B is less than lower bound of A, with no gap
         b_below_a,          // 6   BBB...AAA  Upper bound of B is less than lower bound of A, with a gap
-        a_only              // 7   AAA        B is empty, A is not
+        a_only,             // 7   AAA        B is empty, A is not
     )
 
     template <typename T>
@@ -179,7 +179,7 @@ namespace RS::Interval {
             minus_infinity,
             closed,
             open,
-            plus_infinity
+            plus_infinity,
         )
 
         template <IntervalCompatible T>

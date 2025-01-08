@@ -72,7 +72,7 @@ namespace RS::Interval {
         explicit operator bool() const noexcept { return ! this->empty(); }
         bool operator()(const T& t) const { return contains(t); }
 
-        bool contains(const T& t) const { return this->match(t) == Match::match; }
+        bool contains(const T& t) const { return this->match(t) == Match::ok; }
         IntervalSet<T> complement() const;
         IntervalSet<T> operator~() const { return complement(); }
         Order order(const Interval& b) const;

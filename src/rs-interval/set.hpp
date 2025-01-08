@@ -78,7 +78,7 @@ namespace RS::Interval {
 
             for (; i != set_.end(); ++i) {
                 auto m = i->match(t);
-                if (m == Match::match) {
+                if (m == Match::ok) {
                     return true;
                 } else if (m == Match::low) {
                     return false;

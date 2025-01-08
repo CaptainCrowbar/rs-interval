@@ -71,12 +71,12 @@ namespace RS::Interval {
         template <IntervalCompatible T>
         Match IntervalTypeBase<T>::match(const T& t) const {
             if (empty())                                   return Match::empty;
-            else if (is_universal())                       return Match::match;
+            else if (is_universal())                       return Match::ok;
             else if (left_ == Bound::closed && t < min_)   return Match::low;
             else if (left_ == Bound::open && t <= min_)    return Match::low;
             else if (right_ == Bound::closed && t > max_)  return Match::high;
             else if (right_ == Bound::open && t >= max_)   return Match::high;
-            else                                           return Match::match;
+            else                                           return Match::ok;
         }
 
         template <IntervalCompatible T>
