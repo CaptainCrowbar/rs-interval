@@ -119,7 +119,7 @@ namespace RS::Interval {
         empty,  // The interval is empty
     )
 
-    RS_INTERVAL_ENUM(Order, signed char, -8,
+    RS_INTERVAL_ENUM(Order, signed char, -7,
         // Name             Index  Picture    Description
         b_only,             // -7  BBB        A is empty, B is not
         a_below_b,          // -6  AAA...BBB  Upper bound of A is less than lower bound of B, with a gap
