@@ -171,6 +171,7 @@ namespace RS::Interval {
     template <typename T> concept Stepwise = interval_category<T> == Category::stepwise;
     template <typename T> concept Arithmetic = Continuous<T> || Integral<T>;
     template <typename T> concept IntervalCompatible = Continuous<T> || Integral<T> || Ordered<T> || Stepwise<T>;
+    template <typename T> concept Scalar = Continuous<T> && std::constructible_from<T, int>;
 
     namespace Detail {
 

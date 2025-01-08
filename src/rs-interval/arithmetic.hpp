@@ -83,7 +83,7 @@ namespace RS::Interval {
 
         }
 
-        template <Continuous T>
+        template <Scalar T>
         Interval<T> reciprocal_interval(const Interval<T>& i) {
 
             if (i.empty()) {
@@ -116,7 +116,7 @@ namespace RS::Interval {
 
         }
 
-        template <Continuous T>
+        template <Scalar T>
         IntervalSet<T> reciprocal_set(const Interval<T>& i) {
 
             if (i.empty()) {
@@ -205,7 +205,7 @@ namespace RS::Interval {
 
     }
 
-    template <Continuous T>
+    template <Scalar T>
     IntervalSet<T> operator/(const Interval<T>& a, const Interval<T>& b) {
 
         using namespace Detail;
@@ -240,7 +240,7 @@ namespace RS::Interval {
         return a * Interval<T>(b);
     }
 
-    template <Continuous T>
+    template <Scalar T>
     IntervalSet<T> operator/(const Interval<T>& a, const T& b) {
         return a / Interval<T>(b);
     }
@@ -260,7 +260,7 @@ namespace RS::Interval {
         return Interval<T>(a) * b;
     }
 
-    template <Continuous T>
+    template <Scalar T>
     IntervalSet<T> operator/(const T& a, const Interval<T>& b) {
         return Interval<T>(a) / b;
     }

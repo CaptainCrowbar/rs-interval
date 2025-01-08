@@ -91,7 +91,13 @@ template <typename T> concept Ordered;
 template <typename T> concept Stepwise;
 template <typename T> concept Arithmetic; // continuous or integral
 template <typename T> concept IntervalCompatible; // any of the above
+template <typename T> concept Scalar; // see below
 ```
+
+The `Scalar` concept is intended to select continuous types that model real
+numbers. The only requirement beyond `Continuous` is an explicit or implicit
+conversion from `int` to the type. In practise you are unlikely to encounter
+types that match `Continuous` but not `Scalar.`
 
 ### Relationship between a value and an interval
 
@@ -519,18 +525,16 @@ These return the interval containing all possible results of applying the
 given operation to elements of the argument intervals. The result will always
 be empty if any argument is empty. Most of these are defined only for
 integral and continuous interval categories, except for the division
-operators, which are only defined for continuous intervals.
+operators, which are only defined for `Scalar` types.
 
 The unary plus operator simply returns its argument and is included only for
-equivalence with the ordinary arithmetic operators.
+symmetry with the ordinary arithmetic operators.
 
 The division operators return a set rather than an interval because division
 may result in two disjoint intervals if the divisor includes values on both
-sides of zero.
-
-Division by zero is assumed never to happen; zero is excluded from the divisor
-interval if it is present. The result will be an empty set if the divisor
-contains only the single value zero.
+sides of zero. Division by zero is assumed never to happen; zero is excluded
+from the divisor interval if it is present. The result will be an empty set
+if the divisor contains only the single value zero.
 
 ### Formatters
 

@@ -5,6 +5,7 @@
 using namespace RS::UnitTest;
 
 void test_rs_interval_types_traits();
+void test_rs_interval_types_concepts();
 void test_rs_interval_types_boundary();
 void test_rs_interval_types_from_string();
 void test_rs_interval_continuous_contains_zero();
@@ -97,6 +98,7 @@ int main(int argc, char** argv) {
     std::println("{}{}{}", xrule, rule, xreset);
 
     call_me_maybe(test_rs_interval_types_traits, "test_rs_interval_types_traits");
+    call_me_maybe(test_rs_interval_types_concepts, "test_rs_interval_types_concepts");
     call_me_maybe(test_rs_interval_types_boundary, "test_rs_interval_types_boundary");
     call_me_maybe(test_rs_interval_types_from_string, "test_rs_interval_types_from_string");
     call_me_maybe(test_rs_interval_continuous_contains_zero, "test_rs_interval_continuous_contains_zero");
