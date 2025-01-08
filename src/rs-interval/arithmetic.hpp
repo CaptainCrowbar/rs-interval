@@ -40,43 +40,39 @@ namespace RS::Interval {
 
         template <IntervalCompatible T>
         Boundary<T> left_boundary_of(const Interval<T>& i) {
-            using BT = BoundaryType;
             if (i.empty()) {
                 return {};
             } else if (i.is_left_closed()) {
-                return {i.min(), BT::closed};
+                return {i.min(), BoundaryType::closed};
             } else if (i.is_left_open()) {
-                return {i.min(), BT::open};
+                return {i.min(), BoundaryType::open};
             } else {
-                return {{}, BT::minus_infinity};
+                return {{}, BoundaryType::minus_infinity};
             }
         }
 
         template <IntervalCompatible T>
         Boundary<T> right_boundary_of(const Interval<T>& i) {
-            using BT = BoundaryType;
             if (i.empty()) {
                 return {};
             } else if (i.is_right_closed()) {
-                return {i.max(), BT::closed};
+                return {i.max(), BoundaryType::closed};
             } else if (i.is_right_open()) {
-                return {i.max(), BT::open};
+                return {i.max(), BoundaryType::open};
             } else {
-                return {{}, BT::plus_infinity};
+                return {{}, BoundaryType::plus_infinity};
             }
         }
 
         template <Arithmetic T>
         Interval<T> interval_from_boundaries(const Boundary<T>& l, const Boundary<T>& r) {
 
-            using BT = BoundaryType;
-
-            static constexpr auto convert_bound = [] (BT t) constexpr {
+            static constexpr auto convert_bound = [] (BoundaryType t) constexpr {
                 switch (t) {
-                    case BT::empty:   return Bound::empty;
-                    case BT::open:    return Bound::open;
-                    case BT::closed:  return Bound::closed;
-                    default:          return Bound::unbound;
+                    case BoundaryType::empty:   return Bound::empty;
+                    case BoundaryType::open:    return Bound::open;
+                    case BoundaryType::closed:  return Bound::closed;
+                    default:                    return Bound::unbound;
                 }
             };
 
@@ -94,8 +90,8 @@ namespace RS::Interval {
                 return {};
             }
 
-            T lvalue = {};
-            T rvalue = {};
+            T lvalue {};
+            T rvalue {};
             Bound lbound, rbound;
 
             if (i.left() == Bound::unbound) {
@@ -122,17 +118,26 @@ namespace RS::Interval {
 
         template <Continuous T>
         IntervalSet<T> reciprocal_set(const Interval<T>& i) {
+
             if (i.empty()) {
+
                 return {};
+
             } else if (contains_zero(i)) {
+
                 Interval<T> negative_part(i.min(), {}, i.left(), Bound::open);
                 Interval<T> positive_part({}, i.max(), Bound::open, i.right());
                 auto negative_reciprocal = reciprocal_interval(negative_part);
                 auto positive_reciprocal = reciprocal_interval(positive_part);
+
                 return {negative_reciprocal, positive_reciprocal};
+
             } else {
+
                 return reciprocal_interval(i);
+
             }
+
         }
 
     }
@@ -151,13 +156,18 @@ namespace RS::Interval {
 
     template <Arithmetic T>
     Interval<T> operator+(const Interval<T>& a, const Interval<T>& b) {
+
         using namespace Detail;
+
         if (a.empty() || b.empty()) {
             return {};
         }
+
         auto l = left_boundary_of(a) + left_boundary_of(b);
         auto r = right_boundary_of(a) + right_boundary_of(b);
+
         return interval_from_boundaries(l, r);
+
     }
 
     template <Arithmetic T>
@@ -170,27 +180,25 @@ namespace RS::Interval {
 
         using namespace Detail;
 
-        using B = Boundary<T>;
-
         if (a.empty() || b.empty()) {
             return {};
         }
 
-        B al = left_boundary_of(a);
-        B ar = right_boundary_of(a);
-        B bl = left_boundary_of(b);
-        B br = right_boundary_of(b);
+        auto al = left_boundary_of(a);
+        auto ar = right_boundary_of(a);
+        auto bl = left_boundary_of(b);
+        auto br = right_boundary_of(b);
 
-        std::array<B, 4> boundaries = {{
+        std::array<Boundary<T>, 4> bounds {
             al * bl,
             al * br,
             ar * bl,
             ar * br,
-        }};
+        };
 
-        auto i = std::min_element(boundaries.begin(), boundaries.end(),
+        auto i = std::min_element(bounds.begin(), bounds.end(),
             [] (auto& a, auto& b) { return a.compare_ll(b); });
-        auto j = std::max_element(boundaries.begin(), boundaries.end(),
+        auto j = std::max_element(bounds.begin(), bounds.end(),
             [] (auto& a, auto& b) { return a.compare_rr(b); });
 
         return interval_from_boundaries(*i, *j);
@@ -199,16 +207,22 @@ namespace RS::Interval {
 
     template <Continuous T>
     IntervalSet<T> operator/(const Interval<T>& a, const Interval<T>& b) {
+
         using namespace Detail;
+
         if (a.empty() || b.empty()) {
             return {};
         }
+
         auto b_reciprocals = reciprocal_set(b);
         IntervalSet<T> set;
+
         for (const auto& br: b_reciprocals) {
             set.insert(a * br);
         }
+
         return set;
+
     }
 
     template <Arithmetic T>

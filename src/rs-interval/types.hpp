@@ -146,11 +146,11 @@ namespace RS::Interval {
         static constexpr Category category =
             std::same_as<U, bool> || ! std::regular<U> || ! std::totally_ordered<U> ?
                 Category::none :
-            std::floating_point<T> ?
+            std::floating_point<U> ?
                 Category::continuous :
             std::numeric_limits<U>::is_specialized && ! std::numeric_limits<U>::is_integer ?
                 Category::continuous :
-            std::integral<T> ?
+            std::integral<U> ?
                 Category::integral :
             std::numeric_limits<U>::is_specialized && std::numeric_limits<U>::is_integer ?
                 Category::integral :
@@ -185,17 +185,18 @@ namespace RS::Interval {
         template <IntervalCompatible T>
         struct Boundary {
 
-            using BT = BoundaryType;
-
             T value {};
-            BT type = BT::empty;
+            BoundaryType type = BoundaryType::empty;
 
             bool adjacent(const Boundary& b) const noexcept;
             bool compare_ll(const Boundary& b) const noexcept;  // Compare left bounds (closed<open)
             bool compare_rr(const Boundary& b) const noexcept;  // Compare right bounds (open<closed)
             bool compare_lr(const Boundary& b) const noexcept;  // Compare left bound with right
             bool compare_rl(const Boundary& b) const noexcept;  // Compare right bound with left
-            bool has_value() const noexcept { return type == BT::closed || type == BT::open; }
+
+            bool has_value() const noexcept {
+                return type == BoundaryType::closed || type == BoundaryType::open;
+            }
 
             Boundary<T> operator-() const;
             Boundary<T> operator+(const Boundary<T>& b) const;
@@ -211,14 +212,15 @@ namespace RS::Interval {
 
                 if (! has_value() || ! b.has_value()) {
                     return false;
-                } else if (type == BT::open && b.type == BT::open) {
+                } else if (type == BoundaryType::open && b.type == BoundaryType::open) {
                     return false;
                 } else if (value == b.value) {
                     return type != b.type;
                 }
 
-                if constexpr (interval_category<T> == Category::stepwise || interval_category<T> == Category::integral) {
-                    if (type == BT::closed && b.type == BT::closed) {
+                if constexpr (interval_category<T> == Category::stepwise
+                        || interval_category<T> == Category::integral) {
+                    if (type == BoundaryType::closed && b.type == BoundaryType::closed) {
                         if (value < b.value) {
                             T t = value;
                             return ++t == b.value;
@@ -271,53 +273,64 @@ namespace RS::Interval {
                 } else if (value != b.value) {
                     return value < b.value;
                 } else {
-                    return type == BT::open || b.type == BT::open;
+                    return type == BoundaryType::open || b.type == BoundaryType::open;
                 }
             }
 
             template <IntervalCompatible T>
             Boundary<T> Boundary<T>::operator-() const {
+
                 auto b = *this;
+
                 if (has_value()) {
                     b.value = - b.value;
                 }
-                if (type == BT::minus_infinity) {
-                    b.type = BT::plus_infinity;
-                } else if (type == BT::plus_infinity) {
-                    b.type = BT::minus_infinity;
+
+                if (type == BoundaryType::minus_infinity) {
+                    b.type = BoundaryType::plus_infinity;
+                } else if (type == BoundaryType::plus_infinity) {
+                    b.type = BoundaryType::minus_infinity;
                 }
+
                 return b;
+
             }
 
             template <IntervalCompatible T>
             Boundary<T> Boundary<T>::operator+(const Boundary<T>& b) const {
+
                 // We will only be adding like to like (lower or upper bounds),
                 // so minus_infinity+plus_infinity will never happen.
-                if (type == BT::empty || b.type == BT::empty) {
+
+                if (type == BoundaryType::empty || b.type == BoundaryType::empty) {
                     return {};
                 } else if (! has_value()) {
                     return *this;
                 } else if (! b.has_value()) {
                     return b;
                 }
-                Boundary<T> c = {value + b.value, BT::open};
-                if (type == BT::closed && b.type == BT::closed) {
-                    c.type = BT::closed;
+
+                Boundary<T> c {value + b.value, BoundaryType::open};
+
+                if (type == BoundaryType::closed && b.type == BoundaryType::closed) {
+                    c.type = BoundaryType::closed;
                 }
+
                 return c;
+
             }
 
             template <IntervalCompatible T>
             Boundary<T> Boundary<T>::operator*(const Boundary& b) const {
 
                 // If either argument is empty, the result is empty
-                if (type == BT::empty || b.type == BT::empty) {
+                if (type == BoundaryType::empty || b.type == BoundaryType::empty) {
                     return {};
                 }
 
                 // Use symmetry to handle negative arguments
-                bool a_minus = type == BT::minus_infinity || (has_value() && value < T{});
-                bool b_minus = b.type == BT::minus_infinity || (b.has_value() && b.value < T{});
+                bool a_minus = type == BoundaryType::minus_infinity || (has_value() && value < T{});
+                bool b_minus = b.type == BoundaryType::minus_infinity || (b.has_value() && b.value < T{});
                 if (a_minus && b_minus) {
                     return - *this * - b;
                 } else if (a_minus) {
@@ -327,31 +340,32 @@ namespace RS::Interval {
                 }
 
                 // Use symmetry to ensure a>=b
-                if ((type == BT::minus_infinity && b.type != BT::minus_infinity)
-                        || (b.type == BT::plus_infinity && type != BT::plus_infinity)
+                if ((type == BoundaryType::minus_infinity && b.type != BoundaryType::minus_infinity)
+                        || (b.type == BoundaryType::plus_infinity && type != BoundaryType::plus_infinity)
                         || (has_value() && b.has_value() && value < b.value)) {
                     return b * *this;
                 }
 
                 // If either argument is a closed zero, the result is a closed zero
-                if ((type == BT::closed && value == T{})
-                        || (b.type == BT::closed && b.value == T{})) {
-                    return {{}, BT::closed};
+                if ((type == BoundaryType::closed && value == T{})
+                        || (b.type == BoundaryType::closed && b.value == T{})) {
+                    return {{}, BoundaryType::closed};
                 }
 
                 // If either argument is an open zero, the result is an open zero
-                if ((type == BT::open && value == T{})
-                        || (b.type == BT::open && b.value == T{})) {
-                    return {{}, BT::open};
+                if ((type == BoundaryType::open && value == T{})
+                        || (b.type == BoundaryType::open && b.value == T{})) {
+                    return {{}, BoundaryType::open};
                 }
 
                 // If either argument is positive infinity, the result is positive infinity
-                if (type == BT::plus_infinity) {
+                if (type == BoundaryType::plus_infinity) {
                     return *this;
                 }
 
                 // If both arguments are closed, the result is closed; otherwise, the result is open
-                BT t = type == BT::closed && b.type == BT::closed ? BT::closed : BT::open;
+                BoundaryType t = type == BoundaryType::closed && b.type == BoundaryType::closed ?
+                    BoundaryType::closed : BoundaryType::open;
                 return {value * b.value, t};
 
             }

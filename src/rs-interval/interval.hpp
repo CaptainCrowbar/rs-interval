@@ -28,7 +28,7 @@ namespace RS::Interval {
 
         inline std::pair<Bound, Bound> decode_interval_bounds(std::string_view mode) {
 
-            static const std::unordered_map<std::string_view, std::pair<Bound, Bound>> map = {
+            static const std::unordered_map<std::string_view, std::pair<Bound, Bound>> map {
                 { "()",  { Bound::open,     Bound::open     }},
                 { "(]",  { Bound::open,     Bound::closed   }},
                 { "[)",  { Bound::closed,   Bound::open     }},
@@ -458,7 +458,7 @@ namespace RS::Interval {
 
             } else {
 
-                static const std::vector<std::string> delimiters = { "..<", "...", "..", "-" };
+                static const std::vector<std::string> delimiters { "..<", "...", "..", "-" };
 
                 mode = "[]";
                 auto i = str.find('-');

@@ -10,7 +10,7 @@ namespace RS::Interval {
     }
 
     inline std::string version_string() {
-        return "0.3.2";
+        return "0.3.4";
     }
 
 }
