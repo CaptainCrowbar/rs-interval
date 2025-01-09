@@ -73,7 +73,8 @@ touch or overlap.
 ### Comparison operators
 
 ```c++
-std::strong_ordering operator<=>(const IntervalSet& a, const IntervalSet& b) noexcept;
+std::strong_ordering
+    operator<=>(const IntervalSet& a, const IntervalSet& b) noexcept;
 bool operator==(const IntervalSet& a, const IntervalSet& b) noexcept;
 bool operator!=(const IntervalSet& a, const IntervalSet& b) noexcept;
 bool operator<(const IntervalSet& a, const IntervalSet& b) noexcept;
@@ -82,8 +83,7 @@ bool operator<=(const IntervalSet& a, const IntervalSet& b) noexcept;
 bool operator>=(const IntervalSet& a, const IntervalSet& b) noexcept;
 ```
 
-Lexicographical comparison operators. These call `T`'s equality and less-than
-operators.
+Lexicographical comparison operators. These call `T`'s comparison operators.
 
 ### Iterator functions
 
@@ -98,7 +98,6 @@ Iterators over the intervals in the set.
 
 ```c++
 bool IntervalSet::contains(const T& t) const;
-bool IntervalSet::operator()(const T& t) const;
 ```
 
 True if the value is an element of any of the intervals in the set.
@@ -156,49 +155,88 @@ Swap two interval sets.
 ### Set operations
 
 ```c++
-// Set intersection
-IntervalSet IntervalSet::set_intersection(const IntervalSet& b) const;
-IntervalSet& IntervalSet::operator&=(const IntervalSet& b);
-IntervalSet operator&(const IntervalSet& a, const IntervalSet& b);
-IntervalSet operator&(const IntervalSet& a, const Interval& b);
-IntervalSet operator&(const Interval& a, const IntervalSet& b);
-IntervalSet operator&(const IntervalSet& a, const T& b);
-IntervalSet operator&(const T& a, const IntervalSet& b);
-// Set union
-IntervalSet IntervalSet::set_union(const IntervalSet& b) const;
-IntervalSet& IntervalSet::operator|=(const IntervalSet& b);
-IntervalSet operator|(const IntervalSet& a, const IntervalSet& b);
-IntervalSet operator|(const IntervalSet& a, const Interval& b);
-IntervalSet operator|(const Interval& a, const IntervalSet& b);
-IntervalSet operator|(const IntervalSet& a, const T& b);
-IntervalSet operator|(const T& a, const IntervalSet& b);
-// Set difference
-IntervalSet IntervalSet::set_difference(const IntervalSet& b) const;
-IntervalSet& IntervalSet::operator-=(const IntervalSet& b);
-IntervalSet operator-(const IntervalSet& a, const IntervalSet& b);
-IntervalSet operator-(const IntervalSet& a, const Interval& b);
-IntervalSet operator-(const Interval& a, const IntervalSet& b);
-IntervalSet operator-(const IntervalSet& a, const T& b);
-IntervalSet operator-(const T& a, const IntervalSet& b);
-// Set symmetric difference
-IntervalSet IntervalSet::set_symmetric_difference(const IntervalSet& b) const;
-IntervalSet& IntervalSet::operator^=(const IntervalSet& b);
-IntervalSet operator^(const IntervalSet& a, const IntervalSet& b);
-IntervalSet operator^(const IntervalSet& a, const Interval& b);
-IntervalSet operator^(const Interval& a, const IntervalSet& b);
-IntervalSet operator^(const IntervalSet& a, const T& b);
-IntervalSet operator^(const T& a, const IntervalSet& b);
+IntervalSet IntervalSet::complement() const;
+IntervalSet& IntervalSet::apply_complement();
 ```
 
-Set theoretic operations.
+Returns the complement of the set, i.e. a set whose member intervals contain
+every value of `T` that is not in this set. The `apply_complement()` function
+modifies the set in place.
 
 ```c++
-IntervalSet IntervalSet::complement() const;
-IntervalSet IntervalSet::operator~() const;
+IntervalSet IntervalSet::set_intersection(const IntervalSet& b) const;
+IntervalSet IntervalSet::set_intersection(const Interval<T>& b) const;
+IntervalSet IntervalSet::set_intersection(const T& b) const;
+IntervalSet IntervalSet::set_union(const IntervalSet& b) const;
+IntervalSet IntervalSet::set_union(const Interval<T>& b) const;
+IntervalSet IntervalSet::set_union(const T& b) const;
+IntervalSet IntervalSet::set_difference(const IntervalSet& b) const;
+IntervalSet IntervalSet::set_difference(const Interval<T>& b) const;
+IntervalSet IntervalSet::set_difference(const T& b) const;
+IntervalSet IntervalSet::set_symmetric_difference(const IntervalSet& b) const;
+IntervalSet IntervalSet::set_symmetric_difference(const Interval<T>& b) const;
+IntervalSet IntervalSet::set_symmetric_difference(const T& b) const;
 ```
 
-Returns the complement of the set, i.e. a new set whose member intervals
-contain every value of `T` that is not in this set.
+Binary set theoretic operations.
+
+```c++
+IntervalSet& IntervalSet::apply_intersection(const IntervalSet& b);
+IntervalSet& IntervalSet::apply_intersection(const Interval<T>& b);
+IntervalSet& IntervalSet::apply_intersection(const T& b);
+IntervalSet& IntervalSet::apply_union(const IntervalSet& b);
+IntervalSet& IntervalSet::apply_union(const Interval<T>& b);
+IntervalSet& IntervalSet::apply_union(const T& b);
+IntervalSet& IntervalSet::apply_difference(const IntervalSet& b);
+IntervalSet& IntervalSet::apply_difference(const Interval<T>& b);
+IntervalSet& IntervalSet::apply_difference(const T& b);
+IntervalSet& IntervalSet::apply_symmetric_difference(const IntervalSet& b);
+IntervalSet& IntervalSet::apply_symmetric_difference(const Interval<T>& b);
+IntervalSet& IntervalSet::apply_symmetric_difference(const T& b);
+```
+
+In-place versions of the set theoretic operations.
+
+```c++
+IntervalSet set_intersection(const IntervalSet<T>& a, const IntervalSet<T>& b);
+IntervalSet set_intersection(const IntervalSet<T>& a, const Interval<T>& b);
+IntervalSet set_intersection(const Interval<T>& a, const IntervalSet<T>& b);
+IntervalSet set_intersection(const IntervalSet<T>& a, const T& b);
+IntervalSet set_intersection(const T& a, const IntervalSet<T>& b);
+IntervalSet set_intersection(const Interval<T>& a, const Interval<T>& b);
+IntervalSet set_intersection(const Interval<T>& a, const T& b);
+IntervalSet set_intersection(const T& a, const Interval<T>& b);
+IntervalSet set_intersection(const T& a, const T& b);
+IntervalSet set_union(const IntervalSet<T>& a, const IntervalSet<T>& b);
+IntervalSet set_union(const IntervalSet<T>& a, const Interval<T>& b);
+IntervalSet set_union(const Interval<T>& a, const IntervalSet<T>& b);
+IntervalSet set_union(const IntervalSet<T>& a, const T& b);
+IntervalSet set_union(const T& a, const IntervalSet<T>& b);
+IntervalSet set_union(const Interval<T>& a, const Interval<T>& b);
+IntervalSet set_union(const Interval<T>& a, const T& b);
+IntervalSet set_union(const T& a, const Interval<T>& b);
+IntervalSet set_union(const T& a, const T& b);
+IntervalSet set_difference(const IntervalSet<T>& a, const IntervalSet<T>& b);
+IntervalSet set_difference(const IntervalSet<T>& a, const Interval<T>& b);
+IntervalSet set_difference(const Interval<T>& a, const IntervalSet<T>& b);
+IntervalSet set_difference(const IntervalSet<T>& a, const T& b);
+IntervalSet set_difference(const T& a, const IntervalSet<T>& b);
+IntervalSet set_difference(const Interval<T>& a, const Interval<T>& b);
+IntervalSet set_difference(const Interval<T>& a, const T& b);
+IntervalSet set_difference(const T& a, const Interval<T>& b);
+IntervalSet set_difference(const T& a, const T& b);
+IntervalSet set_symmetric_difference(const IntervalSet<T>& a, const IntervalSet<T>& b);
+IntervalSet set_symmetric_difference(const IntervalSet<T>& a, const Interval<T>& b);
+IntervalSet set_symmetric_difference(const Interval<T>& a, const IntervalSet<T>& b);
+IntervalSet set_symmetric_difference(const IntervalSet<T>& a, const T& b);
+IntervalSet set_symmetric_difference(const T& a, const IntervalSet<T>& b);
+IntervalSet set_symmetric_difference(const Interval<T>& a, const Interval<T>& b);
+IntervalSet set_symmetric_difference(const Interval<T>& a, const T& b);
+IntervalSet set_symmetric_difference(const T& a, const Interval<T>& b);
+IntervalSet set_symmetric_difference(const T& a, const T& b);
+```
+
+Free function versions of the set theoretic operations.
 
 ### Formatters
 

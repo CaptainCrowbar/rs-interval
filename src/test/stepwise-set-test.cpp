@@ -108,54 +108,118 @@ void test_rs_interval_stepwise_set_operations() {
     for (int i = 0; i < iterations; ++i) {
 
         for (int j = 0; j < 2; ++j) {
+
             TRY(set[j].clear());
             vec[j].clear();
             int size = random_int(1, max_size)(rng);
+
             for (int k = 0; k < size; ++k) {
+
                 StepwiseType a = random_int(1, max_value)(rng);
                 StepwiseType b = random_int(1, max_value)(rng);
                 auto l = Bound(random_int(0, 3)(rng));
                 auto r = Bound(random_int(0, 3)(rng));
+
                 if ((l == Bound::empty) == (r == Bound::empty)) {
                     TRY(in = Itv(a, b, l, r));
                     TRY(set[j].insert(in));
                     vec[j].push_back(in);
                 }
+
             }
+
         }
 
-        TRY(i_set = set[0] & set[1]);
-        TRY(u_set = set[0] | set[1]);
-        TRY(d_set = set[0] - set[1]);
-        TRY(sd_set = set[0] ^ set[1]);
+        TRY(i_set = set_intersection(set[0], set[1]));
+        TRY(u_set = set_union(set[0], set[1]));
+        TRY(d_set = set_difference(set[0], set[1]));
+        TRY(sd_set = set_symmetric_difference(set[0], set[1]));
 
         for (int x = 0; x <= max_value + 1; ++x) {
+
             bool member[2];
+
             for (int j = 0; j < 2; ++j) {
                 member[j] = false;
                 for (const auto& item: vec[j]) {
                     member[j] |= item(x);
                 }
             }
-            bool i_expect = member[0] && member[1], i_test = false;
-            bool u_expect = member[0] || member[1], u_test = false;
-            bool d_expect = member[0] && ! member[1], d_test = false;
-            bool sd_expect = member[0] != member[1], sd_test = false;
-            StepwiseType sx = x;
-            TRY(i_test = i_set(sx));
-            TRY(u_test = u_set(sx));
-            TRY(d_test = d_set(sx));
-            TRY(sd_test = sd_set(sx));
+
+            auto i_expect = member[0] && member[1];
+            auto u_expect = member[0] || member[1];
+            auto d_expect = member[0] && ! member[1];
+            auto sd_expect = member[0] != member[1];
+            auto i_test = false;
+            auto u_test = false;
+            auto d_test = false;
+            auto sd_test = false;
+            StepwiseType sx {x};
+
+            TRY(i_test = i_set[sx]);
+            TRY(u_test = u_set[sx]);
+            TRY(d_test = d_set[sx]);
+            TRY(sd_test = sd_set[sx]);
             TEST_EQUAL(i_test, i_expect);
             TEST_EQUAL(u_test, u_expect);
             TEST_EQUAL(d_test, d_expect);
             TEST_EQUAL(sd_test, sd_expect);
+
             if ((i_test != i_expect) || (u_test != u_expect) || (d_test != d_expect) || (sd_test != sd_expect)) {
                 for (int j = 0; j < 2; ++j) {
                     std::println("... {} => {}", vec[j], set[j]);
                 }
                 std::println("... x={}", x);
             }
+
+        }
+
+        TRY(i_set = set[0]);
+        TRY(u_set = set[0]);
+        TRY(d_set = set[0]);
+        TRY(sd_set = set[0]);
+        TRY(i_set.apply_intersection(set[1]));
+        TRY(u_set.apply_union(set[1]));
+        TRY(d_set.apply_difference(set[1]));
+        TRY(sd_set.apply_symmetric_difference(set[1]));
+
+        for (int x = 0; x <= max_value + 1; ++x) {
+
+            bool member[2];
+
+            for (int j = 0; j < 2; ++j) {
+                member[j] = false;
+                for (const auto& item: vec[j]) {
+                    member[j] |= item(x);
+                }
+            }
+
+            auto i_expect = member[0] && member[1];
+            auto u_expect = member[0] || member[1];
+            auto d_expect = member[0] && ! member[1];
+            auto sd_expect = member[0] != member[1];
+            auto i_test = false;
+            auto u_test = false;
+            auto d_test = false;
+            auto sd_test = false;
+            StepwiseType sx {x};
+
+            TRY(i_test = i_set[sx]);
+            TRY(u_test = u_set[sx]);
+            TRY(d_test = d_set[sx]);
+            TRY(sd_test = sd_set[sx]);
+            TEST_EQUAL(i_test, i_expect);
+            TEST_EQUAL(u_test, u_expect);
+            TEST_EQUAL(d_test, d_expect);
+            TEST_EQUAL(sd_test, sd_expect);
+
+            if ((i_test != i_expect) || (u_test != u_expect) || (d_test != d_expect) || (sd_test != sd_expect)) {
+                for (int j = 0; j < 2; ++j) {
+                    std::println("... {} => {}", vec[j], set[j]);
+                }
+                std::println("... x={}", x);
+            }
+
         }
 
     }

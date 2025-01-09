@@ -264,17 +264,17 @@ void test_rs_interval_ordered_interval_complement() {
     Set set;
     std::string str;
 
-    TRY((in = {}));                      TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{*}");
-    TRY((in = Itv::all()));              TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{}");
-    TRY((in = {"hello"}));               TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<hello,>hello}");
-    TRY((in = {"hello","hello","<"}));   TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{>=hello}");
-    TRY((in = {"hello","hello","<="}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{>hello}");
-    TRY((in = {"hello","hello",">"}));   TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=hello}");
-    TRY((in = {"hello","hello",">="}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<hello}");
-    TRY((in = {"hello","world","()"}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=hello,>=world}");
-    TRY((in = {"hello","world","(]"}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=hello,>world}");
-    TRY((in = {"hello","world","[)"}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<hello,>=world}");
-    TRY((in = {"hello","world","[]"}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<hello,>world}");
+    TRY((in = {}));                      TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{*}");
+    TRY((in = Itv::all()));              TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{}");
+    TRY((in = {"hello"}));               TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<hello,>hello}");
+    TRY((in = {"hello","hello","<"}));   TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{>=hello}");
+    TRY((in = {"hello","hello","<="}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{>hello}");
+    TRY((in = {"hello","hello",">"}));   TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=hello}");
+    TRY((in = {"hello","hello",">="}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<hello}");
+    TRY((in = {"hello","world","()"}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=hello,>=world}");
+    TRY((in = {"hello","world","(]"}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=hello,>world}");
+    TRY((in = {"hello","world","[)"}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<hello,>=world}");
+    TRY((in = {"hello","world","[]"}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<hello,>world}");
 
 }
 

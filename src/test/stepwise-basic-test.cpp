@@ -261,17 +261,17 @@ void test_rs_interval_stepwise_interval_complement() {
     Set set;
     std::string str;
 
-    TRY((in = {}));                  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{*}");
-    TRY((in = Itv::all()));          TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{}");
-    TRY((in = 42_sw));               TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=41,>=43}");
-    TRY((in = {42_sw,42_sw,"<"}));   TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{>=42}");
-    TRY((in = {42_sw,42_sw,"<="}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{>=43}");
-    TRY((in = {42_sw,42_sw,">"}));   TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=42}");
-    TRY((in = {42_sw,42_sw,">="}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=41}");
-    TRY((in = {86_sw,99_sw,"()"}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=86,>=99}");
-    TRY((in = {86_sw,99_sw,"(]"}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=86,>=100}");
-    TRY((in = {86_sw,99_sw,"[)"}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=85,>=99}");
-    TRY((in = {86_sw,99_sw,"[]"}));  TRY(set = ~ in);  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=85,>=100}");
+    TRY((in = {}));                  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{*}");
+    TRY((in = Itv::all()));          TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{}");
+    TRY((in = 42_sw));               TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=41,>=43}");
+    TRY((in = {42_sw,42_sw,"<"}));   TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{>=42}");
+    TRY((in = {42_sw,42_sw,"<="}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{>=43}");
+    TRY((in = {42_sw,42_sw,">"}));   TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=42}");
+    TRY((in = {42_sw,42_sw,">="}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=41}");
+    TRY((in = {86_sw,99_sw,"()"}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=86,>=99}");
+    TRY((in = {86_sw,99_sw,"(]"}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=86,>=100}");
+    TRY((in = {86_sw,99_sw,"[)"}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=85,>=99}");
+    TRY((in = {86_sw,99_sw,"[]"}));  TRY(set = in.complement());  TRY(str = std::format("{}", set));  TEST_EQUAL(str, "{<=85,>=100}");
 
 }
 

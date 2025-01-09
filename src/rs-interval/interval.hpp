@@ -74,7 +74,6 @@ namespace RS::Interval {
 
         bool contains(const T& t) const { return this->match(t) == Match::ok; }
         IntervalSet<T> complement() const;
-        IntervalSet<T> operator~() const { return complement(); }
         Order order(const Interval& b) const;
         bool includes(const Interval& b) const;      // True if b is a subset of this
         bool overlaps(const Interval& b) const;      // True if the intersection is not empty

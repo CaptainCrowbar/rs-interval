@@ -90,8 +90,8 @@ bool operator<=(const IntervalMap& a, const IntervalMap& b) noexcept;
 bool operator>=(const IntervalMap& a, const IntervalMap& b) noexcept;
 ```
 
-Lexicographical comparison operators. These call `T`'s equality and less-than
-operators. The default value does not participate in comparisons.
+Lexicographical comparison operators. These call `T`'s comparison operators.
+The default value does not participate in comparisons.
 
 ### Element access functions
 

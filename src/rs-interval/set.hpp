@@ -31,12 +31,7 @@ namespace RS::Interval {
         IntervalSet(const interval_type& in) { insert(in); }
         IntervalSet(std::initializer_list<interval_type> list);
 
-        bool operator()(const T& t) const { return contains(t); }
-        IntervalSet operator~() const { return complement(); }
-        IntervalSet& operator&=(const IntervalSet<T>& b) { *this = set_intersection(b); return *this; }
-        IntervalSet& operator|=(const IntervalSet<T>& b) { *this = set_union(b); return *this; }
-        IntervalSet& operator-=(const IntervalSet<T>& b) { *this = set_difference(b); return *this; }
-        IntervalSet& operator^=(const IntervalSet<T>& b) { *this = set_symmetric_difference(b); return *this; }
+        bool operator[](const T& t) const { return contains(t); }
 
         auto begin() const noexcept { return set_.begin(); }
         auto end() const noexcept { return set_.end(); }
@@ -46,12 +41,35 @@ namespace RS::Interval {
         void clear() noexcept { set_.clear(); }
         void insert(const interval_type& in);
         void erase(const interval_type& in);
+        void swap(IntervalSet& set) noexcept { set_.swap(set.set_); }
+
         IntervalSet complement() const;
         IntervalSet set_intersection(const IntervalSet& b) const;
+        IntervalSet set_intersection(const interval_type& b) const;
+        IntervalSet set_intersection(const T& b) const;
         IntervalSet set_union(const IntervalSet& b) const;
+        IntervalSet set_union(const interval_type& b) const;
+        IntervalSet set_union(const T& b) const;
         IntervalSet set_difference(const IntervalSet& b) const;
+        IntervalSet set_difference(const interval_type& b) const;
+        IntervalSet set_difference(const T& b) const;
         IntervalSet set_symmetric_difference(const IntervalSet& b) const;
-        void swap(IntervalSet& set) noexcept { set_.swap(set.set_); }
+        IntervalSet set_symmetric_difference(const interval_type& b) const;
+        IntervalSet set_symmetric_difference(const T& b) const;
+
+        IntervalSet& apply_complement();
+        IntervalSet& apply_intersection(const IntervalSet& b);
+        IntervalSet& apply_intersection(const interval_type& b);
+        IntervalSet& apply_intersection(const T& b);
+        IntervalSet& apply_union(const IntervalSet& b);
+        IntervalSet& apply_union(const interval_type& b);
+        IntervalSet& apply_union(const T& b);
+        IntervalSet& apply_difference(const IntervalSet& b);
+        IntervalSet& apply_difference(const interval_type& b);
+        IntervalSet& apply_difference(const T& b);
+        IntervalSet& apply_symmetric_difference(const IntervalSet& b);
+        IntervalSet& apply_symmetric_difference(const interval_type& b);
+        IntervalSet& apply_symmetric_difference(const T& b);
 
     private:
 
@@ -185,12 +203,32 @@ namespace RS::Interval {
         }
 
         template <IntervalCompatible T>
+        IntervalSet<T> IntervalSet<T>::set_intersection(const interval_type& b) const {
+            return set_intersection(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T> IntervalSet<T>::set_intersection(const T& b) const {
+            return set_intersection(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
         IntervalSet<T> IntervalSet<T>::set_union(const IntervalSet& b) const {
             auto result = *this;
             for (const auto& in: b) {
                 result.insert(in);
             }
             return result;
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T> IntervalSet<T>::set_union(const interval_type& b) const {
+            return set_union(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T> IntervalSet<T>::set_union(const T& b) const {
+            return set_union(IntervalSet{b});
         }
 
         template <IntervalCompatible T>
@@ -203,10 +241,109 @@ namespace RS::Interval {
         }
 
         template <IntervalCompatible T>
+        IntervalSet<T> IntervalSet<T>::set_difference(const interval_type& b) const {
+            return set_difference(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T> IntervalSet<T>::set_difference(const T& b) const {
+            return set_difference(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
         IntervalSet<T> IntervalSet<T>::set_symmetric_difference(const IntervalSet& b) const {
             auto set1 = set_difference(b);
             auto set2 = b.set_difference(*this);
             return set1.set_union(set2);
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T> IntervalSet<T>::set_symmetric_difference(const interval_type& b) const {
+            return set_symmetric_difference(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T> IntervalSet<T>::set_symmetric_difference(const T& b) const {
+            return set_symmetric_difference(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_complement() {
+            auto set = complement();
+            swap(set);
+            return *this;
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_intersection(const IntervalSet& b) {
+            auto set = set_intersection(b);
+            swap(set);
+            return *this;
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_intersection(const interval_type& b) {
+            return apply_intersection(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_intersection(const T& b) {
+            return apply_intersection(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_union(const IntervalSet& b) {
+            for (const auto& in: b) {
+                insert(in);
+            }
+            return *this;
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_union(const interval_type& b) {
+            return apply_union(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_union(const T& b) {
+            return apply_union(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_difference(const IntervalSet& b) {
+            for (const auto& in: b) {
+                erase(in);
+            }
+            return *this;
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_difference(const interval_type& b) {
+            return apply_difference(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_difference(const T& b) {
+            return apply_difference(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_symmetric_difference(const IntervalSet& b) {
+            auto set1 = set_difference(b);
+            auto set2 = b.set_difference(*this);
+            auto set3 = set1.set_union(set2);
+            swap(set3);
+            return *this;
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_symmetric_difference(const interval_type& b) {
+            return apply_symmetric_difference(IntervalSet{b});
+        }
+
+        template <IntervalCompatible T>
+        IntervalSet<T>& IntervalSet<T>::apply_symmetric_difference(const T& b) {
+            return apply_symmetric_difference(IntervalSet{b});
         }
 
     template <IntervalCompatible T>
@@ -244,26 +381,45 @@ namespace RS::Interval {
         a.swap(b);
     }
 
-    template <IntervalCompatible T> IntervalSet<T> operator&(const IntervalSet<T>& a, const IntervalSet<T>& b) { return a.set_intersection(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator&(const IntervalSet<T>& a, const Interval<T>& b) { return a.set_intersection(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator&(const Interval<T>& a, const IntervalSet<T>& b) { return a.set_intersection(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator&(const IntervalSet<T>& a, const T& b) { return IntervalSet<T>(a).set_intersection(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator&(const T& a, const IntervalSet<T>& b) { return IntervalSet<T>(a).set_intersection(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator|(const IntervalSet<T>& a, const IntervalSet<T>& b) { return a.set_union(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator|(const IntervalSet<T>& a, const Interval<T>& b) { return a.set_union(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator|(const Interval<T>& a, const IntervalSet<T>& b) { return a.set_union(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator|(const IntervalSet<T>& a, const T& b) { return IntervalSet<T>(a).set_union(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator|(const T& a, const IntervalSet<T>& b) { return IntervalSet<T>(a).set_union(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator-(const IntervalSet<T>& a, const IntervalSet<T>& b) { return a.set_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator-(const IntervalSet<T>& a, const Interval<T>& b) { return a.set_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator-(const Interval<T>& a, const IntervalSet<T>& b) { return a.set_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator-(const IntervalSet<T>& a, const T& b) { return IntervalSet<T>(a).set_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator-(const T& a, const IntervalSet<T>& b) { return IntervalSet<T>(a).set_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator^(const IntervalSet<T>& a, const IntervalSet<T>& b) { return a.set_symmetric_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator^(const IntervalSet<T>& a, const Interval<T>& b) { return a.set_symmetric_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator^(const Interval<T>& a, const IntervalSet<T>& b) { return a.set_symmetric_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator^(const IntervalSet<T>& a, const T& b) { return IntervalSet<T>(a).set_symmetric_difference(b); }
-    template <IntervalCompatible T> IntervalSet<T> operator^(const T& a, const IntervalSet<T>& b) { return IntervalSet<T>(a).set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_intersection(const IntervalSet<T>& a, const IntervalSet<T>& b) { return a.set_intersection(b); }
+    template <IntervalCompatible T> auto set_intersection(const IntervalSet<T>& a, const Interval<T>& b) { return a.set_intersection(b); }
+    template <IntervalCompatible T> auto set_intersection(const Interval<T>& a, const IntervalSet<T>& b) { return a.set_intersection(b); }
+    template <IntervalCompatible T> auto set_intersection(const IntervalSet<T>& a, const T& b) { return IntervalSet<T>(a).set_intersection(b); }
+    template <IntervalCompatible T> auto set_intersection(const T& a, const IntervalSet<T>& b) { return IntervalSet<T>(a).set_intersection(b); }
+    template <IntervalCompatible T> auto set_intersection(const Interval<T>& a, const Interval<T>& b) { return IntervalSet<T>(a).set_intersection(b); }
+    template <IntervalCompatible T> auto set_intersection(const Interval<T>& a, const T& b) { return IntervalSet<T>(a).set_intersection(b); }
+    template <IntervalCompatible T> auto set_intersection(const T& a, const Interval<T>& b) { return IntervalSet<T>(a).set_intersection(b); }
+    template <IntervalCompatible T> auto set_intersection(const T& a, const T& b) { return IntervalSet<T>(a).set_intersection(b); }
+
+    template <IntervalCompatible T> auto set_union(const IntervalSet<T>& a, const IntervalSet<T>& b) { return a.set_union(b); }
+    template <IntervalCompatible T> auto set_union(const IntervalSet<T>& a, const Interval<T>& b) { return a.set_union(b); }
+    template <IntervalCompatible T> auto set_union(const Interval<T>& a, const IntervalSet<T>& b) { return a.set_union(b); }
+    template <IntervalCompatible T> auto set_union(const IntervalSet<T>& a, const T& b) { return IntervalSet<T>(a).set_union(b); }
+    template <IntervalCompatible T> auto set_union(const T& a, const IntervalSet<T>& b) { return IntervalSet<T>(a).set_union(b); }
+    template <IntervalCompatible T> auto set_union(const Interval<T>& a, const Interval<T>& b) { return IntervalSet<T>(a).set_union(b); }
+    template <IntervalCompatible T> auto set_union(const Interval<T>& a, const T& b) { return IntervalSet<T>(a).set_union(b); }
+    template <IntervalCompatible T> auto set_union(const T& a, const Interval<T>& b) { return IntervalSet<T>(a).set_union(b); }
+    template <IntervalCompatible T> auto set_union(const T& a, const T& b) { return IntervalSet<T>(a).set_union(b); }
+
+    template <IntervalCompatible T> auto set_difference(const IntervalSet<T>& a, const IntervalSet<T>& b) { return a.set_difference(b); }
+    template <IntervalCompatible T> auto set_difference(const IntervalSet<T>& a, const Interval<T>& b) { return a.set_difference(b); }
+    template <IntervalCompatible T> auto set_difference(const Interval<T>& a, const IntervalSet<T>& b) { return a.set_difference(b); }
+    template <IntervalCompatible T> auto set_difference(const IntervalSet<T>& a, const T& b) { return IntervalSet<T>(a).set_difference(b); }
+    template <IntervalCompatible T> auto set_difference(const T& a, const IntervalSet<T>& b) { return IntervalSet<T>(a).set_difference(b); }
+    template <IntervalCompatible T> auto set_difference(const Interval<T>& a, const Interval<T>& b) { return IntervalSet<T>(a).set_difference(b); }
+    template <IntervalCompatible T> auto set_difference(const Interval<T>& a, const T& b) { return IntervalSet<T>(a).set_difference(b); }
+    template <IntervalCompatible T> auto set_difference(const T& a, const Interval<T>& b) { return IntervalSet<T>(a).set_difference(b); }
+    template <IntervalCompatible T> auto set_difference(const T& a, const T& b) { return IntervalSet<T>(a).set_difference(b); }
+
+    template <IntervalCompatible T> auto set_symmetric_difference(const IntervalSet<T>& a, const IntervalSet<T>& b) { return a.set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_symmetric_difference(const IntervalSet<T>& a, const Interval<T>& b) { return a.set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_symmetric_difference(const Interval<T>& a, const IntervalSet<T>& b) { return a.set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_symmetric_difference(const IntervalSet<T>& a, const T& b) { return IntervalSet<T>(a).set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_symmetric_difference(const T& a, const IntervalSet<T>& b) { return IntervalSet<T>(a).set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_symmetric_difference(const Interval<T>& a, const Interval<T>& b) { return IntervalSet<T>(a).set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_symmetric_difference(const Interval<T>& a, const T& b) { return IntervalSet<T>(a).set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_symmetric_difference(const T& a, const Interval<T>& b) { return IntervalSet<T>(a).set_symmetric_difference(b); }
+    template <IntervalCompatible T> auto set_symmetric_difference(const T& a, const T& b) { return IntervalSet<T>(a).set_symmetric_difference(b); }
 
 }
 

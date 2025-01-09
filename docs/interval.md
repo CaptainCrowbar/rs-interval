@@ -357,7 +357,7 @@ bool operator<=(const Interval& a, const Interval& b) noexcept;
 bool operator>=(const Interval& a, const Interval& b) noexcept;
 ```
 
-Lexicographical comparison operators. These call the `T` comparison operators.
+Lexicographical comparison operators. These call `T`'s comparison operators.
 An empty interval compares less than any non-empty interval.
 
 ### Iterator functions
@@ -368,23 +368,22 @@ Interval::iterator Interval::end() const;
 ```
 
 Iterators over the values in an interval. These are defined only for integral
-or stepwise underlying types. If either of the bounds does not exist
-(bound type `empty` or `unbound`), behaviour is undefined if the
-corresponding `begin()` or `end()` function is called.
+or stepwise underlying types. Behaviour is undefined if one of these is
+called when the corresponding bound is `unbound,` but if only one end of the
+interval is unbound it is safe to call the other function and iterate from
+there.
 
 ### Query functions
 
 ```c++
 bool Interval::contains(const T& t) const;
 Match Interval::match(const T& t) const;
-bool Interval::operator()(const T& t) const;
 ```
 
 These determine the relationship between a specific value and an interval. The
-`match()` function returns a value of the `Match` enumeration
-indicating the precise relationship, while `contains()` simply indicates
-whether the value is an element of the interval. The function call operator
-is equivalent to `contains()`.
+`match()` function returns a value of the `Match` enumeration indicating the
+precise relationship, while `contains()` simply indicates whether the value is
+an element of the interval.
 
 ```c++
 const T& Interval::min() const noexcept;
@@ -455,7 +454,6 @@ Hash function for an interval. Defined only if `std::hash<T>` is defined.
 
 ```c++
 IntervalSet<T> Interval::complement() const;
-IntervalSet<T> Interval::operator~() const;
 ```
 
 Return the complementary interval (the set of all values that are not in the
