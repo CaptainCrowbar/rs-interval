@@ -437,8 +437,8 @@ Returns the length of the interval. For integral types, the return type is
 
 For continuous types, the return type is `T`, and `size()` returns the
 difference between the upper and lower bounds, without regard to whether they
-are open or closed bounds. If one or both of the bounds is unbound, `size
-()` will return infinity if the type has a value for infinity; otherwise,
+are open or closed bounds. If one or both of the bounds is unbound, `size()`
+will return infinity if the type has a value for infinity; otherwise,
 behaviour is undefined.
 
 For ordered and stepwise types, the `size()` function is not defined.
